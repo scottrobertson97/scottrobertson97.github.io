@@ -37,6 +37,8 @@
 				"KEY_SHIFT": 16
 			});
 			
+			var projectiles = [];
+			
 			class Entity{
 				constructor(x, y, width, height, sprite){
 					this.position = {X:x, Y:y};
@@ -48,8 +50,8 @@
 				}
 				
 				update(){
-					this.velocity.X += this.acceleration.X * (1/60);
-					this.velocity.Y += this.acceleration.Y * (1/60);
+					this.velocity.X += this.acceleration.X;
+					this.velocity.Y += this.acceleration.Y;
 					
 					this.position.X += this.velocity.X * (1/60);
 					this.position.Y += this.velocity.Y * (1/60);
@@ -67,12 +69,114 @@
 					this.acceleration.Y += force.Y;
 				}
 				
+				isOutOfFrame(){
+					if(this.position.X < 0 + canvas.width &&
+					  this.position.X + this.width > 0 &&
+					  this.position.Y < 0 + canvas.height &&
+					  this.position.Y + this.height > 0){
+						return false;
+					}
+					else {
+						return true;
+					}
+				}
+				
+				isCollidingWith(other){
+					if(this.position.X < other.position.X + other.width &&
+					  this.position.X + this.width > other.position.X &&
+					  this.position.Y < other.position.Y + other.height &&
+					  this.position.Y + this.height > other.position.Y){
+						return true;
+					}
+					else {
+						return false;
+					}
+				}
+				
+				keepInFrame(){
+					if(this.position.X < 0){
+						this.position.X = 0;
+						this.velocity.X = 0;
+					}
+					else if(this.position.X + this.width > canvas.width){
+						this.position.X = canvas.width - this.width;
+						this.velocity.X = 0;
+					}
+					if(this.position.Y < 0){
+						this.position.Y = 0;
+						this.velocity.Y = 0;
+					}
+					else if(this.position.Y + this.height > canvas.height){
+						this.position.Y = canvas.height - this.height;
+						this.velocity.Y = 0;
+					}
+				}
+			}
+			
+			class Character extends Entity{
+				constructor(x, y, width, height, sprite, hp){
+					super(x, y, width, height, sprite);
+					this.hp = hp;
+				}
+			}
+			
+			class Player extends Character{
+				constructor(){
+					var x = canvas.width/2;
+					var y = canvas.height/2;
+					var width = 50;
+					var height = 50;
+					var sprite = 'ball';
+					var hp = 3;
+					super(x, y, width, height, sprite, hp);
+				}
+				
+				update(){
+					this.playerControls();
+					super.update();
+					super.keepInFrame();
+				}
+				
 				applyDrag(){
 					var force = {
-						X: -1.5 * this.velocity.X,
-						Y: -1.5 * this.velocity.Y
+						X: -0.1 * this.velocity.X,
+						Y: -0.1 * this.velocity.Y
 					};
-					this.applyForce(force);
+					super.applyForce(force);
+				}
+				
+				shoot(){
+					var projectile = new Entity(this.position.X, this.position.Y, 10, 50, 'ball');
+					projectile.applyForce({X:0, Y:-500});
+					projectiles.push(projectile);
+				}
+				
+				playerControls(){
+					var moving = false;
+					
+					if(keydown[KEYBOARD.KEY_RIGHT]){
+						super.applyForce({X:20,Y:0});
+						moving = true;
+					}
+					if(keydown[KEYBOARD.KEY_LEFT]){
+						super.applyForce({X:-20,Y:0});
+						moving = true;
+					}
+					if(keydown[KEYBOARD.KEY_UP]){
+						super.applyForce({X:0,Y:-20});
+						moving = true;
+					}
+					if(keydown[KEYBOARD.KEY_DOWN]){
+						super.applyForce({X:0,Y:20});
+						moving = true;
+					}
+					if(!moving){
+						this.applyDrag();
+					}
+					
+					if(keydown[KEYBOARD.KEY_SPACE] && !previousKeydown[KEYBOARD.KEY_SPACE]){
+						this.shoot();
+					}
 				}
 			}
 			
@@ -84,8 +188,7 @@
 				
 				eventHookUp();
 				
-				var img = document.getElementById('ball');
-				player = new Entity(50,50,50,50, "ball");
+				player = new Player();
 				
 				window.requestAnimationFrame(update);
 			}
@@ -95,8 +198,8 @@
 					case GAMESTATE.MENU:
 						break;
 					case GAMESTATE.PLAYING:
-						playerControls();
 						player.update();
+						updateProjectiles();						
 						break;
 					case GAMESTATE.PAUSED:
 						break;
@@ -112,37 +215,14 @@
 					case GAMESTATE.PLAYING:
 						ctx.fillRect(0,0,canvas.width, canvas.height);
 						player.draw();
+						drawProjectiles();
 						break;
 					case GAMESTATE.PAUSED:
 						break;
 				}
 				previousKeydown = keydown.slice();
 				window.requestAnimationFrame(update);
-			}
-			
-			function playerControls(){
-				var moving = false;
-				
-				if(keydown[KEYBOARD.KEY_RIGHT]){
-					player.applyForce({X:1000,Y:0});
-					moving = true;
-				}
-				if(keydown[KEYBOARD.KEY_LEFT]){
-					player.applyForce({X:-1000,Y:0});
-					moving = true;
-				}
-				if(keydown[KEYBOARD.KEY_UP]){
-					player.applyForce({X:0,Y:-1000});
-					moving = true;
-				}
-				if(keydown[KEYBOARD.KEY_DOWN]){
-					player.applyForce({X:0,Y:1000});
-					moving = true;
-				}
-				if(!moving){
-					player.applyDrag();
-				}
-			}
+			}				
 			
 			function eventHookUp(){	
 				window.addEventListener("keydown",function(e){
@@ -155,11 +235,26 @@
 				});
 			}
 			
+			function updateProjectiles(){
+				for(var i = projectiles.length -1; i >= 0; i--){
+					projectiles[i].update();
+					if(projectiles[i].isOutOfFrame()){
+						projectiles.splice(i,1);
+					}
+				}
+			}
+			
+			function drawProjectiles(){
+				for(var i = 0; i < projectiles.length; i++){
+					projectiles[i].draw();
+				}
+			}
+			
 		})();
 	</script>
 </head>
 <body>
-	<canvas id="canvas" height="500" width="500"></canvas>
+	<canvas id="canvas" height="600" width="800"></canvas>
 	<div style="display:none;">
 		<img id="ball" src="https://cdn.shopify.com/s/files/1/0257/6087/products/48-Soccer-Ball-Solo_Single_Front_ee0e6213-8997-45fc-bfc5-483ef2dc1391.png?v=1510679921"/>
 	</div>
