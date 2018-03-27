@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Game</title>
+	<style type="text/css">
+	
+	</style>
+	
+	<script>
+		"use strict";
+		
+		(function(){
+			window.onload = init;
+			
+			var canvas, ctx;
+			
+			var gamestate;
+			
+			var keydown = [];
+			var previousKeydown = [];
+			
+			var player;
+			
+			var GAMESTATE = Object.freeze({
+				MENU: "menu",
+				PLAYING: "playing",
+				PAUSED: "paused"
+			});
+			
+			var KEYBOARD = Object.freeze({
+				"KEY_LEFT": 37, 
+				"KEY_UP": 38, 
+				"KEY_RIGHT": 39, 
+				"KEY_DOWN": 40,
+				"KEY_SPACE": 32,
+				"KEY_SHIFT": 16
+			});
+			
+			class Entity{
+				constructor(x, y, width, height, sprite){
+					this.position = {X:x, Y:y};
+					this.velocity = {X:0,Y:0};
+					this.acceleration = {X:0, Y:0};
+					this.width = width;
+					this.height = height;
+					this.sprite = document.getElementById(sprite);
+				}
+				
+				update(){
+					this.velocity.X += this.acceleration.X * (1/60);
+					this.velocity.Y += this.acceleration.Y * (1/60);
+					
+					this.position.X += this.velocity.X * (1/60);
+					this.position.Y += this.velocity.Y * (1/60);
+					
+					this.acceleration.X = 0;
+					this.acceleration.Y = 0;
+				}
+				
+				draw(){
+					ctx.drawImage(this.sprite, this.position.X, this.position.Y, this.width, this.height);
+				}
+				
+				applyForce(force){
+					this.acceleration.X += force.X;
+					this.acceleration.Y += force.Y;
+				}
+				
+				applyDrag(){
+					var force = {
+						X: -1.5 * this.velocity.X,
+						Y: -1.5 * this.velocity.Y
+					};
+					this.applyForce(force);
+				}
+			}
+			
+			function init(){
+				canvas = document.getElementById('canvas');
+				ctx = canvas.getContext('2d');
+				
+				gamestate = GAMESTATE.PLAYING;
+				
+				eventHookUp();
+				
+				var img = document.getElementById('ball');
+				player = new Entity(50,50,50,50, "ball");
+				
+				window.requestAnimationFrame(update);
+			}
+			
+			function update(){
+				switch(gamestate){
+					case GAMESTATE.MENU:
+						break;
+					case GAMESTATE.PLAYING:
+						playerControls();
+						player.update();
+						break;
+					case GAMESTATE.PAUSED:
+						break;
+				}
+				previousKeydown = keydown.slice();
+				draw();
+			}
+			
+			function draw(){
+				switch(gamestate){
+					case GAMESTATE.MENU:
+						break;
+					case GAMESTATE.PLAYING:
+						ctx.fillRect(0,0,canvas.width, canvas.height);
+						player.draw();
+						break;
+					case GAMESTATE.PAUSED:
+						break;
+				}
+				previousKeydown = keydown.slice();
+				window.requestAnimationFrame(update);
+			}
+			
+			function playerControls(){
+				var moving = false;
+				
+				if(keydown[KEYBOARD.KEY_RIGHT]){
+					player.applyForce({X:1000,Y:0});
+					moving = true;
+				}
+				if(keydown[KEYBOARD.KEY_LEFT]){
+					player.applyForce({X:-1000,Y:0});
+					moving = true;
+				}
+				if(keydown[KEYBOARD.KEY_UP]){
+					player.applyForce({X:0,Y:-1000});
+					moving = true;
+				}
+				if(keydown[KEYBOARD.KEY_DOWN]){
+					player.applyForce({X:0,Y:1000});
+					moving = true;
+				}
+				if(!moving){
+					player.applyDrag();
+				}
+			}
+			
+			function eventHookUp(){	
+				window.addEventListener("keydown",function(e){
+					console.log("keydown=" + e.keyCode);
+					keydown[e.keyCode] = true;
+				});
+				window.addEventListener("keyup",function(e){
+					console.log("keyup=" + e.keyCode);
+					keydown[e.keyCode] = false;
+				});
+			}
+			
+		})();
+	</script>
+</head>
+<body>
+	<canvas id="canvas" height="500" width="500"></canvas>
+	<div style="display:none;">
+		<img id="ball" src="https://cdn.shopify.com/s/files/1/0257/6087/products/48-Soccer-Ball-Solo_Single_Front_ee0e6213-8997-45fc-bfc5-483ef2dc1391.png?v=1510679921"/>
+	</div>
+</body>
+</html>
