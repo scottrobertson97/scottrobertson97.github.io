@@ -15,7 +15,7 @@
 			
 			var canvas, ctx;
 			
-			var gameState;
+			var gamestate;
 			
 			var keydown = [];
 			var previousKeydown = [];
@@ -194,7 +194,7 @@
 			}
 			
 			function update(){
-				switch(gameState){
+				switch(gamestate){
 					case GAMESTATE.MENU:
 						break;
 					case GAMESTATE.PLAYING:
@@ -209,7 +209,7 @@
 			}
 			
 			function draw(){
-				switch(gameState){
+				switch(gamestate){
 					case GAMESTATE.MENU:
 						break;
 					case GAMESTATE.PLAYING:
@@ -220,6 +220,7 @@
 					case GAMESTATE.PAUSED:
 						break;
 				}
+				previousKeydown = keydown.slice();
 				window.requestAnimationFrame(update);
 			}				
 			
@@ -253,21 +254,10 @@
 	</script>
 </head>
 <body>
-	<canvas id="canvas"></canvas>
-	
+	<canvas id="canvas" height="600" width="800"></canvas>
 	<div style="display:none;">
-		<img id="ship" src="laserBlue01.png"/>
-		<img id="lazer" src="playerShip1_red.png"/>
+		<img id="lazer" src="laserBlue01.png"/>
+		<img id="ship" src="playerShip1_red.png"/>
 	</div>
-	
-	<section id="audioControls">
-		<audio id="bgAudio" src="media/background.mp3" controls loop></audio>
-	</section>
-	
-	<script src='js/utilities.js'></script>
-	<script src='js/loader.js'></script>
-	<script src='js/main.js'></script>
-	<script src='js/keys.js'></script>
-	<script src='js/sound.js'></script>
 </body>
 </html>

@@ -22,9 +22,9 @@ app.game = {
 	canvas: undefined,
 	ctx: undefined,
 	lastTime: 0, // used by calculateDeltaTime() 
-	animationID: 0,
-	sound: undefined,
-	myKeys: undefined,
+	//animationID: 0,
+	//sound: undefined,
+	//myKeys: undefined,
 	gameState: undefined,
 	GAME_STATE:	Object.freeze({
 		MENU: "menu",
@@ -44,10 +44,10 @@ app.game = {
 		this.ctx = this.canvas.getContext('2d');
 		
 		//hook up events
-		this.canvas.onmousedown = this.doMousedown.bind(this);
+		//this.canvas.onmousedown = this.doMousedown.bind(this);
 		
 		this.gameState = this.GAME_STATE.PLAYING;
-		
+		this.createPlayer();
 		
 		
 		//this.bgAudio = document.querySelector("#bgAudio");
@@ -61,6 +61,7 @@ app.game = {
 		// 1) LOOP
 		// schedule a call to update()
 		this.animationID = requestAnimationFrame(this.update.bind(this));
+		
 		switch(this.gameState){
 			case this.GAME_STATE.MENU:
 				break;
@@ -72,7 +73,7 @@ app.game = {
 			case this.GAME_STATE.PAUSED:
 				break;
 		}
-		this.myKeys.previousKeydown = this.myKeys.keydown.slice();
+		myKeys.previousKeydown = myKeys.keydown.slice();
 		this.draw();
 	},
 	
@@ -139,9 +140,10 @@ app.game = {
 		}
 	},*/
 	
-	stopBGAudio: function(){
-		this.sound.stopBGAudio();
-	},
+	//stopBGAudio: function(){
+	//	this.sound.stopBGAudio();
+	//},
+	
 	entityUpdate: function(entity){
 		entity.velocity.X += entity.acceleration.X;
 		entity.velocity.Y += entity.acceleration.Y;
@@ -193,13 +195,21 @@ app.game = {
 		}
 	},
 	
+	entityApplyDrag: function(entity){
+		var force = {
+			X: -0.1 * entity.velocity.X,
+			Y: -0.1 * entity.velocity.Y
+		};
+		this.entityApplyForce(entity, force);
+	},
+	
 	createPlayer: function(){
-		this.player.position = {X: this.canvas.width, Y:this.canvas.height};
+		this.player.position = {X: this.canvas.width/2, Y:this.canvas.height/2};
 		this.player.velocity = {X: 0, Y: 0};
 		this.player.acceleration = {X: 0, Y: 0};
 		this.player.width = 50;
-		this.player.head = 50;
-		this.player.sprite = document.getElementById('ball');
+		this.player.height = 50;
+		this.player.sprite = document.getElementById('ship');
 		this.player.hp = 3;
 	},
 	
@@ -211,27 +221,27 @@ app.game = {
 	playerControls: function(){
 		var moving = false;
 		
-		if(this.keydown[this.KEYBOARD.KEY_RIGHT]){
+		if(myKeys.keydown[myKeys.KEYBOARD.KEY_RIGHT]){
 			this.entityApplyForce(this.player, {X:20,Y:0});
 			moving = true;
 		}
-		if(this.keydown[this.KEYBOARD.KEY_LEFT]){
+		if(myKeys.keydown[myKeys.KEYBOARD.KEY_LEFT]){
 			this.entityApplyForce(this.player, {X:-20,Y:0});
 			moving = true;
 		}
-		if(this.keydown[this.KEYBOARD.KEY_UP]){
+		if(myKeys.keydown[myKeys.KEYBOARD.KEY_UP]){
 			this.entityApplyForce(this.player, {X:0,Y:-20});
 			moving = true;
 		}
-		if(this.keydown[this.KEYBOARD.KEY_DOWN]){
+		if(myKeys.keydown[myKeys.KEYBOARD.KEY_DOWN]){
 			this.entityApplyForce(this.player, {X:0,Y:20});
 			moving = true;
 		}
 		if(!moving){
-			//applydrag
+			this.entityApplyDrag(this.player);
 		}
 		
-		if(this.keydown[this.KEYBOARD.KEY_SPACE] && !this.previousKeydown[this.KEYBOARD.KEY_SPACE]){
+		if(myKeys.keydown[myKeys.KEYBOARD.KEY_SPACE] && !myKeys.previousKeydown[myKeys.KEYBOARD.KEY_SPACE]){
 			this.shoot();
 		}
 	},
@@ -242,9 +252,24 @@ app.game = {
 		projectile.velocity = {X: 0, Y: 0};
 		projectile.acceleration = {X: 0, Y: 0};
 		projectile.width = 10;
-		projectile.head = 50;
-		projectile.sprite = document.getElementById('ball');
+		projectile.height = 50;
+		projectile.sprite = document.getElementById('lazer');
 		this.entityApplyForce(projectile, {X:0, Y:-500} );
 		this.projectiles.push(projectile);
+	},
+	
+	updateProjectiles: function(){
+		for(var i = this.projectiles.length -1; i >= 0; i--){
+			this.entityUpdate(this.projectiles[i]);
+			if(this.entityIsOutOfFrame(this.projectiles[i])){
+				this.projectiles.splice(i,1);
+			}
+		}
+	},
+	
+	drawProjectiles: function(){
+		for(var i = 0; i < this.projectiles.length; i++){
+			this.entityDraw(this.projectiles[i]);
+		}
 	}
 }; // end app.main

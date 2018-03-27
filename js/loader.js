@@ -16,8 +16,8 @@ window.onload = function(){
 	
 	//app.sound.init();
 	//app.main.sound = app.sound;	
-	app.game.myKeys = app.myKeys;	
-	app.game.Emitter = app.Emitter;
+	//app.game.myKeys = app.myKeys;	
+	//app.game.Emitter = app.Emitter;
 	app.game.init();	
 };
 
