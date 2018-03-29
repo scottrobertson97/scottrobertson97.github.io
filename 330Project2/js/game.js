@@ -21,8 +21,9 @@ app.game = {
 	HEIGHT: 600,
 	canvas: undefined,
 	ctx: undefined,
-	lastTime: 0, // used by calculateDeltaTime() 
-	//animationID: 0,
+	lastTime: 0, // used by calculateDeltaTime()
+	dt: 0,
+	animationID: 0,
 	//sound: undefined,
 	//myKeys: undefined,
 	gameState: undefined,
@@ -33,6 +34,7 @@ app.game = {
 	}),
 	player: {},
 	projectiles: [],
+	timeUntilNextShot: 0, //used in player controls
 	
 	// methods
 	init: function() {
@@ -61,6 +63,7 @@ app.game = {
 		// 1) LOOP
 		// schedule a call to update()
 		this.animationID = requestAnimationFrame(this.update.bind(this));
+		this.dt = this.calculateDeltaTime();
 		
 		switch(this.gameState){
 			case this.GAME_STATE.MENU:
@@ -82,19 +85,15 @@ app.game = {
 			case this.GAME_STATE.MENU:
 				break;
 			case this.GAME_STATE.PLAYING:
-				this.ctx.fillRect(0,0,this.canvas.width, this.canvas.height);
+				this.ctx.fillRect(0,0,this.canvas.width, this.canvas.height);				
+				this.drawProjectiles();	
 				this.entityDraw(this.player);
-				this.drawProjectiles();						
 				break;
 			case this.GAME_STATE.PAUSED:
 				break;
 		}
 	},
 	
-	/*doMousedown:function(e){		
-		var mouse = getMouse(e);
-	},
-
 	calculateDeltaTime: function() {
 		var now, fps;
 		now = performance.now();
@@ -102,6 +101,10 @@ app.game = {
 		fps = clamp(fps, 12, 60);
 		this.lastTime = now;
 		return 1 / fps;
+	},
+	
+	/*doMousedown:function(e){		
+		var mouse = getMouse(e);
 	},
 	
 	drawPauseScreen: function(ctx){
@@ -144,12 +147,12 @@ app.game = {
 	//	this.sound.stopBGAudio();
 	//},
 	
-	entityUpdate: function(entity){
+	entityUpdate: function(entity, dt){
 		entity.velocity.X += entity.acceleration.X;
 		entity.velocity.Y += entity.acceleration.Y;
 		
-		entity.position.X += entity.velocity.X * (1/60);
-		entity.position.Y += entity.velocity.Y * (1/60);
+		entity.position.X += entity.velocity.X * dt;
+		entity.position.Y += entity.velocity.Y * dt;
 		
 		entity.acceleration.X = 0;
 		entity.acceleration.Y = 0;
@@ -176,7 +179,7 @@ app.game = {
 		}
 	},
 	
-	entityKeepInFrame: function(entity){
+	entityKeepInFrame: function(entity, dt){
 		if(entity.position.X < 0){
 			entity.position.X = 0;
 			entity.velocity.X = 0;
@@ -207,33 +210,38 @@ app.game = {
 		this.player.position = {X: this.canvas.width/2, Y:this.canvas.height/2};
 		this.player.velocity = {X: 0, Y: 0};
 		this.player.acceleration = {X: 0, Y: 0};
-		this.player.width = 50;
+		this.player.width = 65;
 		this.player.height = 50;
 		this.player.sprite = document.getElementById('ship');
 		this.player.hp = 3;
 	},
 	
 	updatePlayer: function(){
-		this.entityUpdate(this.player);
+		this.entityUpdate(this.player, this.dt);
 		this.entityKeepInFrame(this.player);
 	},
 	
 	playerControls: function(){
+		if(this.timeUntilNextShot > 0)
+			this.timeUntilNextShot -= this.dt;
+		if(this.timeUntilNextShot < 0)
+			this.timeUntilNextShot = 0;
+		
 		var moving = false;
 		
-		if(myKeys.keydown[myKeys.KEYBOARD.KEY_RIGHT]){
+		if(myKeys.keydown[myKeys.KEYBOARD.KEY_RIGHT] || myKeys.keydown[myKeys.KEYBOARD.KEY_D]){
 			this.entityApplyForce(this.player, {X:20,Y:0});
 			moving = true;
 		}
-		if(myKeys.keydown[myKeys.KEYBOARD.KEY_LEFT]){
+		if(myKeys.keydown[myKeys.KEYBOARD.KEY_LEFT] || myKeys.keydown[myKeys.KEYBOARD.KEY_A]){
 			this.entityApplyForce(this.player, {X:-20,Y:0});
 			moving = true;
 		}
-		if(myKeys.keydown[myKeys.KEYBOARD.KEY_UP]){
+		if(myKeys.keydown[myKeys.KEYBOARD.KEY_UP] || myKeys.keydown[myKeys.KEYBOARD.KEY_W]){
 			this.entityApplyForce(this.player, {X:0,Y:-20});
 			moving = true;
 		}
-		if(myKeys.keydown[myKeys.KEYBOARD.KEY_DOWN]){
+		if(myKeys.keydown[myKeys.KEYBOARD.KEY_DOWN] || myKeys.keydown[myKeys.KEYBOARD.KEY_S]){
 			this.entityApplyForce(this.player, {X:0,Y:20});
 			moving = true;
 		}
@@ -241,26 +249,33 @@ app.game = {
 			this.entityApplyDrag(this.player);
 		}
 		
-		if(myKeys.keydown[myKeys.KEYBOARD.KEY_SPACE] && !myKeys.previousKeydown[myKeys.KEYBOARD.KEY_SPACE]){
+		var auto = true;// can be implemented with power up
+		var timeBetweenShots = 0.2; //can change with powerups
+		if(myKeys.keydown[myKeys.KEYBOARD.KEY_SPACE] && (!myKeys.previousKeydown[myKeys.KEYBOARD.KEY_SPACE] || auto) && this.timeUntilNextShot == 0){
 			this.shoot();
+			this.timeUntilNextShot = timeBetweenShots; 
 		}
 	},
 	
 	shoot: function(){
 		var projectile = {};
-		projectile.position = {X: this.player.position.X, Y: this.player.position.Y};
-		projectile.velocity = {X: 0, Y: 0};
-		projectile.acceleration = {X: 0, Y: 0};
 		projectile.width = 10;
 		projectile.height = 50;
+		//the projectile on the x is center to the ship
+		projectile.position = {X: this.player.position.X + this.player.width/2 - projectile.width/2, Y: this.player.position.Y};
+		projectile.velocity = {X: 0, Y: 0};
+		projectile.acceleration = {X: 0, Y: 0};		
 		projectile.sprite = document.getElementById('lazer');
 		this.entityApplyForce(projectile, {X:0, Y:-500} );
 		this.projectiles.push(projectile);
 	},
 	
 	updateProjectiles: function(){
+		//loop through projectiles backwards
 		for(var i = this.projectiles.length -1; i >= 0; i--){
-			this.entityUpdate(this.projectiles[i]);
+			//update
+			this.entityUpdate(this.projectiles[i], this.dt);
+			//if it is out of the canvas, delete it
 			if(this.entityIsOutOfFrame(this.projectiles[i])){
 				this.projectiles.splice(i,1);
 			}
@@ -268,6 +283,7 @@ app.game = {
 	},
 	
 	drawProjectiles: function(){
+		//loop through projectiles and draw them
 		for(var i = 0; i < this.projectiles.length; i++){
 			this.entityDraw(this.projectiles[i]);
 		}

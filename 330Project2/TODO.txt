@@ -1,0 +1,25 @@
+Enemies
+	Create them
+	flying patterns
+	attack patterns	
+	
+Powerups
+	sheild
+	big lazer
+	auto gun
+	
+UI
+	Main menu
+	game over screen	
+
+Grapgics
+	ship propultion
+	particles flying by to imitate movement
+	
+Game
+	Levels
+	
+Audio
+	BG music
+	game effects
+	UI effect
