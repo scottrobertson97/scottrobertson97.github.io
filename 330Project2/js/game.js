@@ -28,13 +28,17 @@ app.game = {
 	//myKeys: undefined,
 	gameState: undefined,
 	GAME_STATE:	Object.freeze({
-		MENU: "menu",
-		PLAYING: "playing",
-		PAUSED: "paused"
+		MENU: 0,
+		PLAYING: 1,
+		PAUSED: 2
 	}),
 	player: {},
 	projectiles: [],
-	timeUntilNextShot: 0, //used in player controls
+	enemies: [],
+	PROJECTILE_TARGET: Object.freeze({
+		PLAYER: 0,
+		ENEMY: 1
+	}),
 	
 	// methods
 	init: function() {
@@ -50,7 +54,7 @@ app.game = {
 		
 		this.gameState = this.GAME_STATE.PLAYING;
 		this.createPlayer();
-		
+		this.createEnemies();
 		
 		//this.bgAudio = document.querySelector("#bgAudio");
 		//this.bgAudio.volume = 0.25;
@@ -71,6 +75,7 @@ app.game = {
 			case this.GAME_STATE.PLAYING:
 				this.playerControls();
 				this.updatePlayer();
+				this.updateEnemies();
 				this.updateProjectiles();						
 				break;
 			case this.GAME_STATE.PAUSED:
@@ -87,6 +92,7 @@ app.game = {
 			case this.GAME_STATE.PLAYING:
 				this.ctx.fillRect(0,0,this.canvas.width, this.canvas.height);				
 				this.drawProjectiles();	
+				this.drawEnemies();
 				this.entityDraw(this.player);
 				break;
 			case this.GAME_STATE.PAUSED:
@@ -147,12 +153,12 @@ app.game = {
 	//	this.sound.stopBGAudio();
 	//},
 	
-	entityUpdate: function(entity, dt){
+	entityUpdate: function(entity){
 		entity.velocity.X += entity.acceleration.X;
 		entity.velocity.Y += entity.acceleration.Y;
 		
-		entity.position.X += entity.velocity.X * dt;
-		entity.position.Y += entity.velocity.Y * dt;
+		entity.position.X += entity.velocity.X * this.dt;
+		entity.position.Y += entity.velocity.Y * this.dt;
 		
 		entity.acceleration.X = 0;
 		entity.acceleration.Y = 0;
@@ -179,7 +185,7 @@ app.game = {
 		}
 	},
 	
-	entityKeepInFrame: function(entity, dt){
+	entityKeepInFrame: function(entity){
 		if(entity.position.X < 0){
 			entity.position.X = 0;
 			entity.velocity.X = 0;
@@ -207,25 +213,21 @@ app.game = {
 	},
 	
 	createPlayer: function(){
-		this.player.position = {X: this.canvas.width/2, Y:this.canvas.height/2};
-		this.player.velocity = {X: 0, Y: 0};
-		this.player.acceleration = {X: 0, Y: 0};
-		this.player.width = 65;
-		this.player.height = 50;
-		this.player.sprite = document.getElementById('ship');
-		this.player.hp = 3;
+		this.player = this.createEntity(this.canvas.width/2, this.canvas.height/2, 65, 50, 'ship', 3);
+		this.player.timeBetweenShots = 0.2;
+		this.player.timeUntilNextShot = 0;
+		this.player.autoFire = true;
 	},
 	
 	updatePlayer: function(){
-		this.entityUpdate(this.player, this.dt);
+		this.entityUpdate(this.player);
 		this.entityKeepInFrame(this.player);
 	},
 	
 	playerControls: function(){
-		if(this.timeUntilNextShot > 0)
-			this.timeUntilNextShot -= this.dt;
-		if(this.timeUntilNextShot < 0)
-			this.timeUntilNextShot = 0;
+		this.player.timeUntilNextShot -= this.dt;
+		if(this.player.timeUntilNextShot <= 0)
+			this.player.timeUntilNextShot = 0;
 		
 		var moving = false;
 		
@@ -249,43 +251,150 @@ app.game = {
 			this.entityApplyDrag(this.player);
 		}
 		
-		var auto = true;// can be implemented with power up
-		var timeBetweenShots = 0.2; //can change with powerups
-		if(myKeys.keydown[myKeys.KEYBOARD.KEY_SPACE] && (!myKeys.previousKeydown[myKeys.KEYBOARD.KEY_SPACE] || auto) && this.timeUntilNextShot == 0){
-			this.shoot();
-			this.timeUntilNextShot = timeBetweenShots; 
+		//if space is pressed, and either it just wasn't(aka semi auto) or is full auto, and it is time
+		if(myKeys.keydown[myKeys.KEYBOARD.KEY_SPACE] && (!myKeys.previousKeydown[myKeys.KEYBOARD.KEY_SPACE] || this.player.autoFire) && this.player.timeUntilNextShot == 0){
+			this.playerShoot();
+			this.player.timeUntilNextShot = this.player.timeBetweenShots; 
 		}
 	},
 	
-	shoot: function(){
-		var projectile = {};
-		projectile.width = 10;
-		projectile.height = 50;
-		//the projectile on the x is center to the ship
-		projectile.position = {X: this.player.position.X + this.player.width/2 - projectile.width/2, Y: this.player.position.Y};
-		projectile.velocity = {X: 0, Y: 0};
-		projectile.acceleration = {X: 0, Y: 0};		
-		projectile.sprite = document.getElementById('lazer');
+	createEntity: function(x, y, width, height, sprite, hp = 0){
+		var entity = {};
+		entity.position = {X: x, Y: y};
+		entity.velocity = {X: 0, Y: 0};
+		entity.acceleration = {X: 0, Y: 0};
+		entity.width = width;
+		entity.height = height;
+		entity.sprite = document.getElementById(sprite);
+		entity.hp = hp;
+		return entity;
+	},
+	
+	//AABB collision of 2 entities
+	isColliding: function(entity1, entity2){
+		if(entity1.position.X < entity2.position.X + entity2.width &&
+		  entity1.position.X + entity1.width > entity2.position.X &&
+		  entity1.position.Y < entity2.position.Y + entity2.height &&
+		  entity1.position.Y + entity1.height > entity2.position.Y){
+			return true;
+		}
+		else {
+			return false;
+		}
+	},
+	
+	//creates projectile, and shoots it foward
+	playerShoot: function(){
+		var projectile = this.createEntity(this.player.position.X + this.player.width/2 - 5, this.player.position.Y, 10, 50, 'laser');
+		projectile.target = this.PROJECTILE_TARGET.ENEMY;
 		this.entityApplyForce(projectile, {X:0, Y:-500} );
 		this.projectiles.push(projectile);
 	},
 	
+	playerHit: function(){
+		this.player.hp--;
+		if(this.player.hp <= 0)
+			this.die();
+		
+		//TODO more
+		console.log("player hit");
+	},
+	
+	die: function(){
+		//TODO
+	},
+	
+	//do physics update for all projectiles
 	updateProjectiles: function(){
 		//loop through projectiles backwards
 		for(var i = this.projectiles.length -1; i >= 0; i--){
 			//update
 			this.entityUpdate(this.projectiles[i], this.dt);
+			
+			var hitSomething = false;
+			
+			//if the target is the player, and they collide, the player takes a hit
+			if(this.projectiles[i].target == this.PROJECTILE_TARGET.PLAYER && this.isColliding(this.projectiles[i], this.player)){
+				this.playerHit();
+				hitSomething = true;
+			}
+			
+			if(this.projectiles[i].target == this.PROJECTILE_TARGET.ENEMY && this.checkIfEnemyIsHit(this.projectiles[i])){
+					hitSomething = true;
+			}
+			
 			//if it is out of the canvas, delete it
-			if(this.entityIsOutOfFrame(this.projectiles[i])){
+			if(hitSomething || this.entityIsOutOfFrame(this.projectiles[i])){
 				this.projectiles.splice(i,1);
 			}
 		}
 	},
 	
+	checkIfEnemyIsHit: function(projectile){
+		for(var i = this.enemies.length - 1; i >= 0; i--){
+			if(this.isColliding(this.enemies[i], projectile)){
+				this.enemyHit(this.enemies[i]);
+				
+				if(this.enemies[i].hp <= 0)
+					this.enemies.splice(i,1);
+					
+				return true;
+			}
+		}
+		return false;
+	},
+	
+	//draw all projectiles
 	drawProjectiles: function(){
 		//loop through projectiles and draw them
 		for(var i = 0; i < this.projectiles.length; i++){
 			this.entityDraw(this.projectiles[i]);
 		}
+	},
+	
+	createEnemy: function(){
+		var enemy = this.createEntity(this.canvas.width/2, this.canvas.height/2 - 200, 65, 50, 'enemy', 1);
+		enemy.timeBetweenShots = 0.5;
+		enemy.timeUntilNextShot = 0;
+		return enemy;
+	},
+	
+	createEnemies: function(){
+		var e = this.createEnemy();
+		this.enemies.push(e);
+		//TODO
+	},
+	
+	updateEnemies:function(){
+		for(var i = 0; i < this.enemies.length; i++){
+			this.entityUpdate(this.enemies[i]);
+			
+			//update time counter
+			this.enemies[i].timeUntilNextShot -= this.dt;
+			//if it is time to shoot
+			if(this.enemies[i].timeUntilNextShot <= 0){
+				//reset counter
+				this.enemies[i].timeUntilNextShot = this.enemies[i].timeBetweenShots;
+				//shoot
+				this.enemyShoot(this.enemies[i]);
+			}
+		}
+	},
+	
+	drawEnemies:function(){
+		for(var i = 0; i < this.enemies.length; i++){
+			this.entityDraw(this.enemies[i]);
+		}
+	},
+	
+	enemyShoot: function(enemy){
+		var projectile = this.createEntity(enemy.position.X + enemy.width/2 - 5, enemy.position.Y, 10, 50, 'laserEnemy');
+		projectile.target = this.PROJECTILE_TARGET.PLAYER;
+		this.entityApplyForce(projectile, {X:0, Y:500} );
+		this.projectiles.push(projectile);
+	},
+		
+	enemyHit: function(enemy){
+		enemy.hp--;		
 	}
 }; // end app.main

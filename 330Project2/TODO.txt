@@ -18,6 +18,8 @@ Grapgics
 	
 Game
 	Levels
+	die()
+	checkIfEnemyIsHit()
 	
 Audio
 	BG music
