@@ -35,6 +35,7 @@ app.game = {
 	player: {},
 	projectiles: [],
 	enemies: [],
+	stars: [],
 	PROJECTILE_TARGET: Object.freeze({
 		PLAYER: 0,
 		ENEMY: 1
@@ -56,6 +57,7 @@ app.game = {
 		this.gameState = this.GAME_STATE.PLAYING;
 		this.createPlayer();
 		this.createEnemies();
+		this.createStars();
 		
 		//this.bgAudio = document.querySelector("#bgAudio");
 		//this.bgAudio.volume = 0.25;
@@ -79,7 +81,7 @@ app.game = {
 					this.enemyspawn = 3;
 					this.createEnemy();
 				}
-				
+				this.updateStars();
 				this.playerControls();
 				this.updatePlayer();
 				this.updateEnemies();
@@ -97,7 +99,8 @@ app.game = {
 			case this.GAME_STATE.MENU:
 				break;
 			case this.GAME_STATE.PLAYING:
-				this.ctx.fillRect(0,0,this.canvas.width, this.canvas.height);				
+				this.ctx.fillRect(0,0,this.canvas.width, this.canvas.height);		
+				this.drawStars();
 				this.drawProjectiles();	
 				this.drawEnemies();
 				this.drawPlayer();
@@ -413,5 +416,39 @@ app.game = {
 		
 	enemyHit: function(enemy){
 		enemy.hp--;		
+	},
+	
+	createStars: function(){
+		for(var i = 0; i < 50; i++){
+			var type = Math.floor(Math.random() * 3) + 1;
+			var size = type;
+			var speed = type * 1.5;
+			var x = Math.random() * this.canvas.width;
+			var y = Math.random() * this.canvas.height;
+			
+			this.stars.push({
+				X: x,
+				Y: y,
+				size: size,
+				speed: speed
+			});
+		}
+	},
+	
+	updateStars: function(){
+		for(var i = 0; i < this.stars.length; i++){
+			this.stars[i].Y+=this.stars[i].speed;			
+			if(this.stars[i].Y > this.canvas.height)
+				this.stars[i].Y = 0 - this.stars[i].size;
+		}
+	},
+	
+	drawStars: function(){
+		this.ctx.save();
+		this.ctx.fillStyle = 'white';
+		for(var i = 0; i < this.stars.length; i++){
+			this.ctx.fillRect(this.stars[i].X, this.stars[i].Y, this.stars[i].size, this.stars[i].size);
+		}
+		this.ctx.restore();
 	}
 }; // end app.main
