@@ -20,6 +20,7 @@ Game
 	Levels
 	die()
 	checkIfEnemyIsHit()
+	createEnemies()
 	
 Audio
 	BG music

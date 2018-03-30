@@ -39,6 +39,7 @@ app.game = {
 		PLAYER: 0,
 		ENEMY: 1
 	}),
+	enemyspawn:0,
 	
 	// methods
 	init: function() {
@@ -73,6 +74,12 @@ app.game = {
 			case this.GAME_STATE.MENU:
 				break;
 			case this.GAME_STATE.PLAYING:
+				this.enemyspawn -= this.dt;
+				if(this.enemyspawn <=0){
+					this.enemyspawn = 3;
+					this.createEnemy();
+				}
+				
 				this.playerControls();
 				this.updatePlayer();
 				this.updateEnemies();
@@ -93,7 +100,7 @@ app.game = {
 				this.ctx.fillRect(0,0,this.canvas.width, this.canvas.height);				
 				this.drawProjectiles();	
 				this.drawEnemies();
-				this.entityDraw(this.player);
+				this.drawPlayer();
 				break;
 			case this.GAME_STATE.PAUSED:
 				break;
@@ -217,11 +224,18 @@ app.game = {
 		this.player.timeBetweenShots = 0.2;
 		this.player.timeUntilNextShot = 0;
 		this.player.autoFire = true;
+		this.player.dmgSprites = [document.getElementById("dmg3"), document.getElementById("dmg2"), document.getElementById("dmg1")];
 	},
 	
 	updatePlayer: function(){
 		this.entityUpdate(this.player);
 		this.entityKeepInFrame(this.player);
+	},
+	
+	drawPlayer: function(){
+		this.entityDraw(this.player);
+		if(this.player.hp < 3)
+			this.ctx.drawImage(this.player.dmgSprites[this.player.hp], this.player.position.X, this.player.position.Y, this.player.width, this.player.height);
 	},
 	
 	playerControls: function(){
@@ -258,7 +272,7 @@ app.game = {
 		}
 	},
 	
-	createEntity: function(x, y, width, height, sprite, hp = 0){
+	createEntity: function(x, y, width, height, sprite, hp=0){
 		var entity = {};
 		entity.position = {X: x, Y: y};
 		entity.velocity = {X: 0, Y: 0};
@@ -293,7 +307,7 @@ app.game = {
 	
 	playerHit: function(){
 		this.player.hp--;
-		if(this.player.hp <= 0)
+		if(this.player.hp < 0)
 			this.die();
 		
 		//TODO more
@@ -301,7 +315,8 @@ app.game = {
 	},
 	
 	die: function(){
-		//TODO
+		this.player.hp = 3;
+		//TODO		
 	},
 	
 	//do physics update for all projectiles
@@ -353,21 +368,23 @@ app.game = {
 	},
 	
 	createEnemy: function(){
-		var enemy = this.createEntity(this.canvas.width/2, this.canvas.height/2 - 200, 65, 50, 'enemy', 1);
-		enemy.timeBetweenShots = 0.5;
+		var enemy = this.createEntity(Math.random()*this.canvas.width, 0-50, 65, 50, 'enemy', 1);
+		enemy.timeBetweenShots = 0.75;
 		enemy.timeUntilNextShot = 0;
+		this.entityApplyForce(enemy, {X:0, Y:100} );
+		this.enemies.push(enemy);
 		return enemy;
 	},
 	
 	createEnemies: function(){
-		var e = this.createEnemy();
-		this.enemies.push(e);
 		//TODO
 	},
 	
 	updateEnemies:function(){
-		for(var i = 0; i < this.enemies.length; i++){
+		for(var i = this.enemies.length-1; i >= 0; i--){
 			this.entityUpdate(this.enemies[i]);
+			if(this.enemies[i].position.Y > this.canvas.height)
+				this.enemies.splice(i,1);
 			
 			//update time counter
 			this.enemies[i].timeUntilNextShot -= this.dt;
