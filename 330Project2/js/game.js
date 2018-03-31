@@ -40,7 +40,19 @@ app.game = {
 		PLAYER: 0,
 		ENEMY: 1
 	}),
-	enemyspawn:0,
+	enemyspawn: 0,
+	WAVE_TYPE: Object.freeze({
+		LINE: 0,
+		WEDGE: 1
+	}),
+	ENEMY_TYPE: Object.freeze({
+		BASIC: 0,
+		HEAVY: 1
+	}),
+	ENEMY_BEHAVIOR: Object.freeze({
+		LINE: 0,
+		ZIGZAG: 1
+	}),
 	
 	// methods
 	init: function() {
@@ -56,7 +68,6 @@ app.game = {
 		
 		this.gameState = this.GAME_STATE.PLAYING;
 		this.createPlayer();
-		this.createEnemies();
 		this.createStars();
 		
 		//this.bgAudio = document.querySelector("#bgAudio");
@@ -78,8 +89,11 @@ app.game = {
 			case this.GAME_STATE.PLAYING:
 				this.enemyspawn -= this.dt;
 				if(this.enemyspawn <=0){
-					this.enemyspawn = 3;
-					this.createEnemy();
+					this.enemyspawn = 5;
+					if(Math.random() < 0.5)
+						this.spawnWave(this.WAVE_TYPE.LINE);
+					else
+						this.spawnWave(this.WAVE_TYPE.WEDGE);
 				}
 				this.updateStars();
 				this.playerControls();
@@ -370,22 +384,84 @@ app.game = {
 		}
 	},
 	
-	createEnemy: function(){
-		var enemy = this.createEntity(Math.random()*this.canvas.width, 0-50, 65, 50, 'enemy', 1);
-		enemy.timeBetweenShots = 0.75;
-		enemy.timeUntilNextShot = 0;
-		this.entityApplyForce(enemy, {X:0, Y:100} );
+	createEnemy: function(x, y, type, behavior){
+		var enemy;
+		switch(type){
+			case this.ENEMY_TYPE.BASIC:
+				enemy= this.createEntity(x, y, 65, 50, 'enemy', 1);
+				enemy.timeBetweenShots = 0.75;
+				enemy.timeUntilNextShot = 0;
+				break;
+			case this.ENEMY_TYPE.HEAVY:
+				enemy= this.createEntity(x, y, 65, 50, 'ship', 2);
+				enemy.timeBetweenShots = 1.0;
+				enemy.timeUntilNextShot = 0;				
+				break;
+		}
+		switch(behavior){
+			case this.ENEMY_BEHAVIOR.LINE:
+				this.entityApplyForce(enemy, {X:0, Y:100} );
+				break;
+			case this.ENEMY_BEHAVIOR.ZIGZAG:
+				this.entityApplyForce(enemy, {X:-100, Y:100} );
+				enemy.behaviorTimeInterval = 1;
+				enemy.goingLeft = true;
+				break;
+		}
+		enemy.type = type;
+		enemy.behavior = behavior;
 		this.enemies.push(enemy);
 		return enemy;
 	},
 	
-	createEnemies: function(){
-		//TODO
+	spawnWave: function(type){
+		switch(type){
+			case this.WAVE_TYPE.LINE:
+				var xPos = Math.random() * (this.canvas.width - 65 * 3); //fit 3 enemies
+				console.log("spawn wave");
+				this.createEnemy(xPos + 65 * 0, 0 - 50, this.ENEMY_TYPE.BASIC, this.ENEMY_BEHAVIOR.ZIGZAG); //create first
+				this.createEnemy(xPos + 65 * 1, 0 - 50, this.ENEMY_TYPE.BASIC, this.ENEMY_BEHAVIOR.ZIGZAG);
+				this.createEnemy(xPos + 65 * 2, 0 - 50, this.ENEMY_TYPE.BASIC, this.ENEMY_BEHAVIOR.ZIGZAG);
+				break;
+			case this.WAVE_TYPE.WEDGE:
+				var xPos = Math.random() * (this.canvas.width - 65 * 3); //fit 3 enemies
+				console.log("spawn wave");
+				this.createEnemy(xPos + 65 * 0, 0 - 100, this.ENEMY_TYPE.BASIC, this.ENEMY_BEHAVIOR.LINE); //create first
+				this.createEnemy(xPos + 65 * 1, 0 - 50, this.ENEMY_TYPE.HEAVY, this.ENEMY_BEHAVIOR.LINE);
+				this.createEnemy(xPos + 65 * 2, 0 - 100, this.ENEMY_TYPE.BASIC, this.ENEMY_BEHAVIOR.LINE);
+				break;
+		}
 	},
 	
 	updateEnemies:function(){
 		for(var i = this.enemies.length-1; i >= 0; i--){
+			//behave
+			switch(this.enemies[i].behavior){
+				case this.ENEMY_BEHAVIOR.LINE:
+					break;
+				case this.ENEMY_BEHAVIOR.ZIGZAG:
+					//decrement time
+					this.enemies[i].behaviorTimeInterval -= this.dt;
+					//if it is tine
+					if(this.enemies[i].behaviorTimeInterval <= 0){
+						this.enemies[i].behaviorTimeInterval = 1;
+						//go left or right
+						if(this.enemies[i].goingLeft){
+							this.entityApplyForce(this.enemies[i], {X:200, Y:0} );
+							this.enemies[i].goingLeft = false;
+						}
+						else{
+							this.entityApplyForce(this.enemies[i], {X:-200, Y:0} );
+							this.enemies[i].goingLeft = true;
+						}
+					}
+					break;
+			}
+			
+			//physic update
 			this.entityUpdate(this.enemies[i]);
+			
+			//if they move off screen
 			if(this.enemies[i].position.Y > this.canvas.height)
 				this.enemies.splice(i,1);
 			
