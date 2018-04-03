@@ -2,9 +2,6 @@ Powerups
 	sheild
 	big lazer
 	auto gun
-	
-UI
-	Main menu
 
 Grapgics
 	ship propultion
@@ -12,8 +9,8 @@ Grapgics
 	
 Game
 	Levels
+	clean up pausing
 	
 Audio
-	BG music
-	game effects
+	Clean Up
 	UI effect

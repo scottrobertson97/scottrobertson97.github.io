@@ -14,9 +14,8 @@ var app = app || {};
 window.onload = function(){
 	console.log("window.onload called");
 	
-	//app.sound.init();
-	//app.main.sound = app.sound;	
-	//app.game.myKeys = app.myKeys;	
+	app.sound.init();
+	app.game.sound = app.sound;	
 	//app.game.Emitter = app.Emitter;
 	app.game.init();	
 };

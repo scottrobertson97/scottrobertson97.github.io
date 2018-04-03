@@ -10,7 +10,7 @@ app.sound = (function(){
 	var bgAudio = undefined;
 	var currentEffect = 0;
 	var currentDirection = 1;
-	var effectSounds = ["1.mp3","2.mp3","3.mp3","4.mp3","5.mp3","6.mp3","7.mp3","8.mp3"];
+	var effectSounds = ["laser1.ogg", "laser2.ogg", "laser3.ogg", "laser4.ogg", "laser5.ogg", "laser6.ogg", "laser7.ogg", "laser8.ogg", "laser9.ogg"];
 
 	function init(){
 		bgAudio = document.querySelector("#bgAudio");
@@ -24,7 +24,7 @@ app.sound = (function(){
 	
 	function playEffect(){
     var effectSound = document.createElement('audio');
-    effectSound.volume = 0.3;
+    effectSound.volume = 0.1;
 		effectSound.src = "media/" + effectSounds[currentEffect];
 		effectSound.play();
 		currentEffect += currentDirection;

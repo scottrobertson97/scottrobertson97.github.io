@@ -24,8 +24,7 @@ app.game = {
 	lastTime: 0, // used by calculateDeltaTime()
 	dt: 0,
 	animationID: 0,
-	//sound: undefined,
-	//myKeys: undefined,
+	sound: undefined,
 	gameState: undefined,
 	GAME_STATE:	Object.freeze({
 		MENU: 0,
@@ -94,6 +93,7 @@ app.game = {
 				if(myKeys.keydown[myKeys.KEYBOARD.KEY_SPACE]){
 					this.gameState = this.GAME_STATE.PLAYING;
 					this.reset();
+					this.sound.playBGAudio();
 				}
 				break;
 			case this.GAME_STATE.PLAYING:
@@ -394,6 +394,8 @@ app.game = {
 		projectile.target = this.PROJECTILE_TARGET.ENEMY;
 		this.entityApplyForce(projectile, {X:0, Y:-500} );
 		this.projectiles.push(projectile);
+		
+		this.sound.playEffect();
 	},
 	
 	playerHit: function(){
@@ -564,6 +566,8 @@ app.game = {
 		projectile.target = this.PROJECTILE_TARGET.PLAYER;
 		this.entityApplyForce(projectile, {X:0, Y:500} );
 		this.projectiles.push(projectile);
+		
+		this.sound.playEffect();
 	},
 		
 	enemyHit: function(enemy){
