@@ -117,11 +117,11 @@ app.game = {
 	},
 	
 	draw:function(){
+		this.ctx.fillRect(0,0,this.canvas.width, this.canvas.height);	
 		switch(this.gameState){
 			case this.GAME_STATE.MENU:
 				break;
 			case this.GAME_STATE.PLAYING:
-				this.ctx.fillRect(0,0,this.canvas.width, this.canvas.height);		
 				this.drawStars();
 				this.drawProjectiles();	
 				this.drawEnemies();
@@ -130,7 +130,12 @@ app.game = {
 				break;
 			case this.GAME_STATE.PAUSED:
 				break;
-			case this.GAME_STATE.GAME_OVER:
+			case this.GAME_STATE.GAME_OVER:				
+				this.drawGameOver();
+				if(myKeys.keydown[myKeys.KEYBOARD.KEY_SPACE]){
+					this.gameState = this.GAME_STATE.PLAYING;
+					this.reset();
+				}
 				break;
 		}
 	},
@@ -154,6 +159,18 @@ app.game = {
 		this.ctx.restore();
 	},
 	
+	drawGameOver: function(){
+		this.ctx.save();
+		this.ctx.textAlign = "center";
+		this.ctx.textBaseline = "middle";
+		this.ctx.fillStyle = 'white';
+		this.ctx.font = '16pt Arial';
+		this.ctx.fillText("Game Over", this.canvas.width / 2, this.canvas.height / 2 - 40);
+		this.ctx.fillText("You scored " + this.points + " points", this.canvas.width / 2, this.canvas.height / 2);
+		this.ctx.fillText("Click to SPACE to play again.", this.canvas.width / 2, this.canvas.height / 2 + 35);
+		this.ctx.restore();
+	},
+	
 	calculateDeltaTime: function() {
 		var now, fps;
 		now = performance.now();
@@ -161,6 +178,16 @@ app.game = {
 		fps = clamp(fps, 12, 60);
 		this.lastTime = now;
 		return 1 / fps;
+	},
+	
+	reset: function(){
+		this.player.position = {X: this.canvas.width/2, Y:this.canvas.height/2};
+		this.player.hp = 3;
+		this.lives = 3;
+		this.projectiles = [];
+		this.enemies = [];
+		this.points = 0;
+		this.enemyspawn = 0;
 	},
 	
 	/*doMousedown:function(e){		
@@ -364,7 +391,8 @@ app.game = {
 	die: function(){
 		this.player.hp = 3;
 		this.lives --;
-		//TODO		
+		if(this.lives < 0)
+			this.gameState = this.GAME_STATE.GAME_OVER;
 	},
 	
 	//do physics update for all projectiles
@@ -527,6 +555,7 @@ app.game = {
 	},
 	
 	createStars: function(){
+		this.stars = [];
 		for(var i = 0; i < 50; i++){
 			var type = Math.floor(Math.random() * 3) + 1;
 			var size = type;
