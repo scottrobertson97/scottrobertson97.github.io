@@ -546,8 +546,10 @@ app.game = {
 	updateStars: function(){
 		for(var i = 0; i < this.stars.length; i++){
 			this.stars[i].Y+=this.stars[i].speed;			
-			if(this.stars[i].Y > this.canvas.height)
+			if(this.stars[i].Y > this.canvas.height){
 				this.stars[i].Y = 0 - this.stars[i].size;
+				this.stars[i].X = Math.random() * this.canvas.width;
+			}
 		}
 	},
 	
