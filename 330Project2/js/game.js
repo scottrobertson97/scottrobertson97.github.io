@@ -72,7 +72,7 @@ app.game = {
 		
 		this.playerLifeImage = document.getElementById('playerLife');
 		
-		this.gameState = this.GAME_STATE.PLAYING;
+		this.gameState = this.GAME_STATE.MENU;
 		this.createPlayer();
 		this.createStars();
 		
@@ -90,7 +90,11 @@ app.game = {
 		this.dt = this.calculateDeltaTime();
 		
 		switch(this.gameState){
-			case this.GAME_STATE.MENU:
+			case this.GAME_STATE.MENU:				
+				if(myKeys.keydown[myKeys.KEYBOARD.KEY_SPACE]){
+					this.gameState = this.GAME_STATE.PLAYING;
+					this.reset();
+				}
 				break;
 			case this.GAME_STATE.PLAYING:
 				this.enemyspawn -= this.dt;
@@ -109,7 +113,11 @@ app.game = {
 				break;
 			case this.GAME_STATE.PAUSED:
 				break;
-			case this.GAME_STATE.GAME_OVER:
+			case this.GAME_STATE.GAME_OVER:				
+				if(myKeys.keydown[myKeys.KEYBOARD.KEY_SPACE]){
+					this.gameState = this.GAME_STATE.PLAYING;
+					this.reset();
+				}
 				break;
 		}
 		myKeys.previousKeydown = myKeys.keydown.slice();
@@ -120,6 +128,7 @@ app.game = {
 		this.ctx.fillRect(0,0,this.canvas.width, this.canvas.height);	
 		switch(this.gameState){
 			case this.GAME_STATE.MENU:
+				this.drawMenu();
 				break;
 			case this.GAME_STATE.PLAYING:
 				this.drawStars();
@@ -132,10 +141,6 @@ app.game = {
 				break;
 			case this.GAME_STATE.GAME_OVER:				
 				this.drawGameOver();
-				if(myKeys.keydown[myKeys.KEYBOARD.KEY_SPACE]){
-					this.gameState = this.GAME_STATE.PLAYING;
-					this.reset();
-				}
 				break;
 		}
 	},
@@ -167,7 +172,19 @@ app.game = {
 		this.ctx.font = '16pt Arial';
 		this.ctx.fillText("Game Over", this.canvas.width / 2, this.canvas.height / 2 - 40);
 		this.ctx.fillText("You scored " + this.points + " points", this.canvas.width / 2, this.canvas.height / 2);
-		this.ctx.fillText("Click to SPACE to play again.", this.canvas.width / 2, this.canvas.height / 2 + 35);
+		this.ctx.fillText("Click to SPACE to play again.", this.canvas.width / 2, this.canvas.height / 2 + 40);
+		this.ctx.restore();
+	},
+	
+	drawMenu: function(){
+		this.ctx.save();
+		this.ctx.textAlign = "center";
+		this.ctx.textBaseline = "middle";
+		this.ctx.fillStyle = 'white';
+		this.ctx.font = '16pt Arial';
+		this.ctx.fillText("Welcome to SpaceBlaster!", this.canvas.width / 2, this.canvas.height / 2 - 40);
+		this.ctx.fillText("WASD or Arrow Keys to move, SPACE to shoot", this.canvas.width / 2, this.canvas.height / 2);
+		this.ctx.fillText("Press SPACE to start", this.canvas.width / 2, this.canvas.height / 2 + 40);
 		this.ctx.restore();
 	},
 	
