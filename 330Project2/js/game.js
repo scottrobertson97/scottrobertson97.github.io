@@ -30,12 +30,16 @@ app.game = {
 	GAME_STATE:	Object.freeze({
 		MENU: 0,
 		PLAYING: 1,
-		PAUSED: 2
+		PAUSED: 2,
+		GAME_OVER: 3
 	}),
 	player: {},
 	projectiles: [],
 	enemies: [],
 	stars: [],
+	points: 0,
+	lives: 3,
+	playerLifeImage: undefined,
 	PROJECTILE_TARGET: Object.freeze({
 		PLAYER: 0,
 		ENEMY: 1
@@ -58,13 +62,15 @@ app.game = {
 	init: function() {
 		console.log("app.main.init() called");
 		// initialize properties
-		this.canvas = document.querySelector('canvas');
+		this.canvas = document.getElementById('canvas');
 		this.canvas.width = this.WIDTH;
 		this.canvas.height = this.HEIGHT;
 		this.ctx = this.canvas.getContext('2d');
 		
 		//hook up events
 		//this.canvas.onmousedown = this.doMousedown.bind(this);
+		
+		this.playerLifeImage = document.getElementById('playerLife');
 		
 		this.gameState = this.GAME_STATE.PLAYING;
 		this.createPlayer();
@@ -103,6 +109,8 @@ app.game = {
 				break;
 			case this.GAME_STATE.PAUSED:
 				break;
+			case this.GAME_STATE.GAME_OVER:
+				break;
 		}
 		myKeys.previousKeydown = myKeys.keydown.slice();
 		this.draw();
@@ -118,10 +126,32 @@ app.game = {
 				this.drawProjectiles();	
 				this.drawEnemies();
 				this.drawPlayer();
+				this.drawHUD();
 				break;
 			case this.GAME_STATE.PAUSED:
 				break;
+			case this.GAME_STATE.GAME_OVER:
+				break;
 		}
+	},
+	
+	drawHUD: function(){
+		//player life image is 33x26
+		switch(this.lives){
+			case 3:
+				this.ctx.drawImage(this.playerLifeImage, this.canvas.width - 33 * 3, 0, 33, 26);
+			case 2:
+				this.ctx.drawImage(this.playerLifeImage, this.canvas.width - 33 * 2, 0, 33, 26);
+			case 1:
+				this.ctx.drawImage(this.playerLifeImage, this.canvas.width - 33 * 1, 0, 33, 26);
+				break;
+		}
+		
+		this.ctx.save();
+		this.ctx.font = '16pt Arial';
+		this.ctx.fillStyle = 'white';
+		this.ctx.fillText('Score: '+this.points,10,20);
+		this.ctx.restore();
 	},
 	
 	calculateDeltaTime: function() {
@@ -333,6 +363,7 @@ app.game = {
 	
 	die: function(){
 		this.player.hp = 3;
+		this.lives --;
 		//TODO		
 	},
 	
@@ -393,7 +424,7 @@ app.game = {
 				enemy.timeUntilNextShot = 0;
 				break;
 			case this.ENEMY_TYPE.HEAVY:
-				enemy= this.createEntity(x, y, 65, 50, 'ship', 2);
+				enemy= this.createEntity(x, y, 65, 50, 'enemyBlack4', 2);
 				enemy.timeBetweenShots = 1.0;
 				enemy.timeUntilNextShot = 0;				
 				break;
@@ -491,7 +522,8 @@ app.game = {
 	},
 		
 	enemyHit: function(enemy){
-		enemy.hp--;		
+		enemy.hp--;
+		this.points += 10;
 	},
 	
 	createStars: function(){
