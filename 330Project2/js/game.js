@@ -221,8 +221,8 @@ app.game = {
 		this.ctx.fillStyle = 'white';
 		this.ctx.font = '16pt Audiowide';
 		this.ctx.fillText("Controls:", this.canvas.width / 2, this.canvas.height / 2 - 40);
-		this.ctx.fillText("WASD or Arrow Keys to move, SPACE to shoot", this.canvas.width / 2, this.canvas.height / 2);
-		this.ctx.fillText("Press SPACE to start", this.canvas.width / 2, this.canvas.height / 2 + 40);
+		this.ctx.fillText("WASD or Arrow Keys to move", this.canvas.width / 2, this.canvas.height / 2);
+		this.ctx.fillText("SPACE to shoot", this.canvas.width / 2, this.canvas.height / 2 + 40);
 		this.ctx.restore();
 	},
 	
