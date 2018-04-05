@@ -12,7 +12,7 @@ var app = app || {};
 
 
 window.onload = function(){
-	console.log("window.onload called");
+	console.log("window.onloa d called");
 	
 	app.sound.init();
 	app.game.sound = app.sound;	
@@ -22,10 +22,10 @@ window.onload = function(){
 
 window.onblur = function(){
 	console.log("blur at "+Date());
-	//app.main.pauseGame();
+	app.game.pauseGame();
 };
 
 window.onfocus = function(){
 	console.log("focus at "+Date());
-	//app.main.resumeGame();
+	app.game.resumeGame();
 };

@@ -6,23 +6,33 @@
 	<link href="https://fonts.googleapis.com/css?family=Audiowide" rel="stylesheet">
 	<style>
 		canvas{
-			//padding-left: 0;
-    		//padding-right: 0;
-    		//margin-left: auto;
-    		//margin-right: auto;
-    		//display: block;
+			padding:0;
+    		margin:0;
+		}
+		#screen{
+			width: 800px;
+			height: 600px;
+			padding: 0;
+    		margin-left: auto;
+    		margin-right: auto;
+    		display: block;
+		}
+		button{
+			font-family: "Audiowide", cursive;
+			font-size: 20pt;
 		}
 	</style>
 </head>
 <body>
-	<h3>Controls</h3>
-	<ul>
-		<li>WASD or ARROW keys to move</li>
-		<li>SPACE to shoot</li>
-	</ul>
-	<canvas id="canvas"></canvas>
+	<div id="screen">
+		<canvas id="canvas"></canvas>
 	
-	<section id="audioControls">
+		<button id="enterbutton" style="position: relative; top:-200px; left:350px;">Enter</button>
+		<button id="playbutton" style="position: relative; top:-200px; left:350px; display: none;">Start</button>
+		<button id="replaybutton" style="position: relative; top:-200px; left:300px; display: none;">Play Again</button>
+	</div>
+	
+	<section id="audioControls" style="display: none;">
 		<audio id="bgAudio" src="media/GlintingGold.mp3" controls loop></audio>
 	</section>
 	

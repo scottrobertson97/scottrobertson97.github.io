@@ -26,11 +26,13 @@ app.game = {
 	animationID: 0,
 	sound: undefined,
 	gameState: undefined,
+	lastState: undefined,
 	GAME_STATE:	Object.freeze({
 		MENU: 0,
 		PLAYING: 1,
 		PAUSED: 2,
-		GAME_OVER: 3
+		GAME_OVER: 3,
+		TITLE: 4
 	}),
 	player: {},
 	projectiles: [],
@@ -68,10 +70,28 @@ app.game = {
 		
 		//hook up events
 		//this.canvas.onmousedown = this.doMousedown.bind(this);
+		document.getElementById('enterbutton').onclick = (function(){
+			this.gameState = this.GAME_STATE.MENU;
+			document.getElementById('enterbutton').style.display = 'none';
+			document.getElementById('playbutton').style.display = 'block';
+		}).bind(this);
+		
+		document.getElementById('playbutton').onclick = (function(){
+			this.gameState = this.GAME_STATE.PLAYING;
+			this.reset();
+			this.sound.playBGAudio();
+			document.getElementById('playbutton').style.display = 'none';
+		}).bind(this);
+		
+		document.getElementById('replaybutton').onclick = (function(){
+			this.gameState = this.GAME_STATE.PLAYING;
+			this.reset();
+			document.getElementById('replaybutton').style.display = 'none';
+		}).bind(this);
 		
 		this.playerLifeImage = document.getElementById('playerLife');
 		
-		this.gameState = this.GAME_STATE.MENU;
+		this.gameState = this.GAME_STATE.TITLE;
 		this.createPlayer();
 		this.createStars();
 		
@@ -86,15 +106,11 @@ app.game = {
 		// 1) LOOP
 		// schedule a call to update()
 		this.animationID = requestAnimationFrame(this.update.bind(this));
+		
 		this.dt = this.calculateDeltaTime();
 		
 		switch(this.gameState){
-			case this.GAME_STATE.MENU:				
-				if(myKeys.keydown[myKeys.KEYBOARD.KEY_SPACE]){
-					this.gameState = this.GAME_STATE.PLAYING;
-					this.reset();
-					this.sound.playBGAudio();
-				}
+			case this.GAME_STATE.MENU:
 				break;
 			case this.GAME_STATE.PLAYING:
 				this.enemyspawn -= this.dt;
@@ -111,17 +127,16 @@ app.game = {
 				this.updateEnemies();
 				this.updateProjectiles();						
 				break;
-			case this.GAME_STATE.PAUSED:
+			case this.GAME_STATE.GAME_OVER:
 				break;
-			case this.GAME_STATE.GAME_OVER:				
-				if(myKeys.keydown[myKeys.KEYBOARD.KEY_SPACE]){
-					this.gameState = this.GAME_STATE.PLAYING;
-					this.reset();
-				}
+			case this.GAME_STATE.PAUSED:
+				cancelAnimationFrame(this.animationID);
 				break;
 		}
 		myKeys.previousKeydown = myKeys.keydown.slice();
 		this.draw();
+		
+		
 	},
 	
 	draw:function(){
@@ -137,10 +152,14 @@ app.game = {
 				this.drawPlayer();
 				this.drawHUD();
 				break;
-			case this.GAME_STATE.PAUSED:
-				break;
 			case this.GAME_STATE.GAME_OVER:				
 				this.drawGameOver();
+				break;
+			case this.GAME_STATE.PAUSED:
+				this.drawPauseScreen();
+				break;
+			case this.GAME_STATE.TITLE:
+				this.drawTitle();
 				break;
 		}
 	},
@@ -158,7 +177,7 @@ app.game = {
 		}
 		
 		this.ctx.save();
-		this.ctx.font = '16pt Arial';
+		this.ctx.font = '16pt Audiowide';
 		this.ctx.fillStyle = 'white';
 		this.ctx.fillText('Score: '+this.points,10,20);
 		this.ctx.restore();
@@ -169,10 +188,19 @@ app.game = {
 		this.ctx.textAlign = "center";
 		this.ctx.textBaseline = "middle";
 		this.ctx.fillStyle = 'white';
-		this.ctx.font = '16pt Arial';
-		this.ctx.fillText("Game Over", this.canvas.width / 2, this.canvas.height / 2 - 40);
-		this.ctx.fillText("You scored " + this.points + " points", this.canvas.width / 2, this.canvas.height / 2);
-		this.ctx.fillText("Click to SPACE to play again.", this.canvas.width / 2, this.canvas.height / 2 + 40);
+		this.ctx.font = '16pt Audiowide';
+		this.ctx.fillText("Game Over", this.canvas.width / 2, this.canvas.height / 2 - 20);
+		this.ctx.fillText("You scored " + this.points + " points", this.canvas.width / 2, this.canvas.height / 2 + 20);
+		this.ctx.restore();
+	},
+	
+	drawTitle: function(){
+		this.ctx.save();
+		this.ctx.textAlign = "center";
+		this.ctx.textBaseline = "middle";
+		this.ctx.fillStyle = 'white';
+		this.ctx.font = '30pt Audiowide';
+		this.ctx.fillText("Welcome to Space Blaster!", this.canvas.width / 2, this.canvas.height / 2);
 		this.ctx.restore();
 	},
 	
@@ -182,10 +210,38 @@ app.game = {
 		this.ctx.textBaseline = "middle";
 		this.ctx.fillStyle = 'white';
 		this.ctx.font = '16pt Audiowide';
-		this.ctx.fillText("Welcome to SpaceBlaster!", this.canvas.width / 2, this.canvas.height / 2 - 40);
+		this.ctx.fillText("Controls:", this.canvas.width / 2, this.canvas.height / 2 - 40);
 		this.ctx.fillText("WASD or Arrow Keys to move, SPACE to shoot", this.canvas.width / 2, this.canvas.height / 2);
 		this.ctx.fillText("Press SPACE to start", this.canvas.width / 2, this.canvas.height / 2 + 40);
 		this.ctx.restore();
+	},
+	
+	drawPauseScreen: function(){
+		this.ctx.save();
+		this.ctx.textAlign = "center";
+		this.ctx.textBaseline = "middle";
+		this.ctx.font = '40pt Audiowide';
+		this.ctx.fillStyle = 'white';
+		this.ctx.fillText("... PAUSED ...", this.WIDTH/2, this.HEIGHT/2);
+		this.ctx.restore();
+	},
+	
+	pauseGame: function(){
+		cancelAnimationFrame(this.animationID);
+		this.sound.stopBGAudio();
+		
+		this.lastState = this.gameState;
+		this.gameState = this.GAME_STATE.PAUSED;
+		
+		this.update();
+	},
+	
+	resumeGame: function(){
+		cancelAnimationFrame(this.animationID);
+		if(this.lastState == this.GAME_STATE.PLAYING)
+			this.sound.playBGAudio();
+		this.gameState = this.lastState;
+		this.update();
 	},
 	
 	calculateDeltaTime: function() {
@@ -209,30 +265,6 @@ app.game = {
 	
 	/*doMousedown:function(e){		
 		var mouse = getMouse(e);
-	},
-	
-	drawPauseScreen: function(ctx){
-		ctx.save();
-		ctx.fillStyle = "black";
-		ctx.fillRect(0,0,this.WIDTH,this.HEIGHT);
-		ctx.textAlign = "center";
-		ctx.textBaseline = "middle";
-		this.fillText("... PAUSED ...", this.WIDTH/2, this.HEIGHT/2, "40pt courier", "white");
-		ctx.restore();
-	},
-	
-	pauseGame: function(){
-		this.paused = true;
-		cancelAnimationFrame(this.animationID);
-		this.stopBGAudio();
-		this.update();
-	},
-	
-	resumeGame: function(){
-		cancelAnimationFrame(this.animationID);
-		this.paused = false;
-		this.sound.playBGAudio();
-		this.update();
 	},
 	
 	playEffect: function(){
@@ -410,8 +442,11 @@ app.game = {
 	die: function(){
 		this.player.hp = 3;
 		this.lives --;
-		if(this.lives < 0)
+		if(this.lives < 0){
 			this.gameState = this.GAME_STATE.GAME_OVER;
+			document.getElementById('replaybutton').style.display = 'block';
+			this.sound.stopBGAudio();
+		}
 	},
 	
 	//do physics update for all projectiles
