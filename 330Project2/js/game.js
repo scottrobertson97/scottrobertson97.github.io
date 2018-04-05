@@ -45,7 +45,8 @@ app.game = {
 		PLAYER: 0,
 		ENEMY: 1
 	}),
-	enemyspawn: 0,
+	enemySpawnTime: 0,
+	TIME_BETWEEN_ENEMY_SPAWNS: 10,
 	WAVE_TYPE: Object.freeze({
 		LINE: 0,
 		WEDGE: 1
@@ -113,9 +114,18 @@ app.game = {
 			case this.GAME_STATE.MENU:
 				break;
 			case this.GAME_STATE.PLAYING:
-				this.enemyspawn -= this.dt;
-				if(this.enemyspawn <=0){
-					this.enemyspawn = 5;
+				//count down to spawn wave
+				this.enemySpawnTime -= this.dt;
+				//it is time to spawn a wave
+				if(this.enemySpawnTime <=0){
+					//reset the time
+					this.enemySpawnTime = this.TIME_BETWEEN_ENEMY_SPAWNS;
+					//make it so the time between is less
+					this.TIME_BETWEEN_ENEMY_SPAWNS *= 0.9;
+					//cap it at 1 second
+					if(this.TIME_BETWEEN_ENEMY_SPAWNS < 2.0)
+						this.TIME_BETWEEN_ENEMY_SPAWNS = 2.0;
+					//spawn a wave with a rendom type
 					if(Math.random() < 0.5)
 						this.spawnWave(this.WAVE_TYPE.LINE);
 					else
@@ -502,12 +512,12 @@ app.game = {
 		switch(type){
 			case this.ENEMY_TYPE.BASIC:
 				enemy= this.createEntity(x, y, 65, 50, 'enemy', 1);
-				enemy.timeBetweenShots = 0.75;
+				enemy.timeBetweenShots = 1.5;
 				enemy.timeUntilNextShot = 0;
 				break;
 			case this.ENEMY_TYPE.HEAVY:
 				enemy= this.createEntity(x, y, 65, 50, 'enemyBlack4', 2);
-				enemy.timeBetweenShots = 1.0;
+				enemy.timeBetweenShots = 3.0;
 				enemy.timeUntilNextShot = 0;				
 				break;
 		}
