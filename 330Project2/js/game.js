@@ -181,7 +181,7 @@ app.game = {
 		this.ctx.textAlign = "center";
 		this.ctx.textBaseline = "middle";
 		this.ctx.fillStyle = 'white';
-		this.ctx.font = '16pt Arial';
+		this.ctx.font = '16pt Audiowide';
 		this.ctx.fillText("Welcome to SpaceBlaster!", this.canvas.width / 2, this.canvas.height / 2 - 40);
 		this.ctx.fillText("WASD or Arrow Keys to move, SPACE to shoot", this.canvas.width / 2, this.canvas.height / 2);
 		this.ctx.fillText("Press SPACE to start", this.canvas.width / 2, this.canvas.height / 2 + 40);
@@ -395,7 +395,7 @@ app.game = {
 		this.entityApplyForce(projectile, {X:0, Y:-500} );
 		this.projectiles.push(projectile);
 		
-		this.sound.playEffect();
+		this.sound.playEffect(3);
 	},
 	
 	playerHit: function(){
@@ -539,10 +539,6 @@ app.game = {
 			//physic update
 			this.entityUpdate(this.enemies[i]);
 			
-			//if they move off screen
-			if(this.enemies[i].position.Y > this.canvas.height)
-				this.enemies.splice(i,1);
-			
 			//update time counter
 			this.enemies[i].timeUntilNextShot -= this.dt;
 			//if it is time to shoot
@@ -552,6 +548,10 @@ app.game = {
 				//shoot
 				this.enemyShoot(this.enemies[i]);
 			}
+			
+			//if they move off screen
+			if(this.enemies[i].position.Y > this.canvas.height)
+				this.enemies.splice(i,1);
 		}
 	},
 	
@@ -567,7 +567,10 @@ app.game = {
 		this.entityApplyForce(projectile, {X:0, Y:500} );
 		this.projectiles.push(projectile);
 		
-		this.sound.playEffect();
+		if(enemy.type == this.ENEMY_TYPE.BASIC)
+			this.sound.playEffect(0);
+		else if(enemy.type == this.ENEMY_TYPE.HEAVY)
+			this.sound.playEffect(3);
 	},
 		
 	enemyHit: function(enemy){

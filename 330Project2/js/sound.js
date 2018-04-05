@@ -22,16 +22,21 @@ app.sound = (function(){
 		bgAudio.currentTime = 0;
 	}
 	
-	function playEffect(){
-    var effectSound = document.createElement('audio');
-    effectSound.volume = 0.1;
-		effectSound.src = "media/" + effectSounds[currentEffect];
-		effectSound.play();
-		currentEffect += currentDirection;
-		if (currentEffect == effectSounds.length || currentEffect == -1){
-			currentDirection *= -1;
+	function playEffect(index = -1){
+    	var effectSound = document.createElement('audio');
+    	effectSound.volume = 0.1;
+		
+		if(index < 0 || index >= effectSound.length){
+			index = currentEffect;
 			currentEffect += currentDirection;
+			if (currentEffect == effectSounds.length || currentEffect == -1){
+				currentDirection *= -1;
+				currentEffect += currentDirection;
+			}
 		}
+		
+		effectSound.src = "media/" + effectSounds[index];
+		effectSound.play();	
 	}
 	
 	function playBGAudio(){
