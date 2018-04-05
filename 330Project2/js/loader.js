@@ -12,20 +12,19 @@ var app = app || {};
 
 
 window.onload = function(){
-	console.log("window.onloa d called");
+	//console.log("window.onloa d called");
 	
 	app.sound.init();
 	app.game.sound = app.sound;	
-	//app.game.Emitter = app.Emitter;
 	app.game.init();	
 };
 
 window.onblur = function(){
-	console.log("blur at "+Date());
+	//console.log("blur at "+Date());
 	app.game.pauseGame();
 };
 
 window.onfocus = function(){
-	console.log("focus at "+Date());
+	//console.log("focus at "+Date());
 	app.game.resumeGame();
 };

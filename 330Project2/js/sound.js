@@ -6,7 +6,7 @@ var app = app || {};
 
 // define the .sound module and immediately invoke it in an IIFE
 app.sound = (function(){
-	console.log("sound.js module loaded");
+	//console.log("sound.js module loaded");
 	var bgAudio = undefined;
 	var currentEffect = 0;
 	var currentDirection = 1;

@@ -22,7 +22,7 @@ app.game = {
 	canvas: undefined,
 	ctx: undefined,
 	lastTime: 0, // used by calculateDeltaTime()
-	dt: 0,
+	dt: 0,	//delta time
 	animationID: 0,
 	sound: undefined,
 	gameState: undefined,
@@ -45,8 +45,8 @@ app.game = {
 		PLAYER: 0,
 		ENEMY: 1
 	}),
-	enemySpawnTime: 0,
-	TIME_BETWEEN_ENEMY_SPAWNS: 10,
+	enemySpawnTime: 0,	//timer until a new wave spawns
+	TIME_BETWEEN_ENEMY_SPAWNS: 10,	//time between waves
 	WAVE_TYPE: Object.freeze({
 		LINE: 0,
 		WEDGE: 1
@@ -62,7 +62,7 @@ app.game = {
 	
 	// methods
 	init: function() {
-		console.log("app.main.init() called");
+		//console.log("app.main.init() called");
 		// initialize properties
 		this.canvas = document.getElementById('canvas');
 		this.canvas.width = this.WIDTH;
@@ -70,34 +70,43 @@ app.game = {
 		this.ctx = this.canvas.getContext('2d');
 		
 		//hook up events
-		//this.canvas.onmousedown = this.doMousedown.bind(this);
+		//the button on the title screen
 		document.getElementById('enterbutton').onclick = (function(){
+			//go to the menu
 			this.gameState = this.GAME_STATE.MENU;
+			//hide this button, diplay the button for the next screen
 			document.getElementById('enterbutton').style.display = 'none';
 			document.getElementById('playbutton').style.display = 'block';
 		}).bind(this);
-		
+		//button on the menu/iintructions screen
 		document.getElementById('playbutton').onclick = (function(){
+			//start playing the game
 			this.gameState = this.GAME_STATE.PLAYING;
+			//reset the game
 			this.reset();
+			//start the sound
 			this.sound.playBGAudio();
+			//turn thisbutton off
 			document.getElementById('playbutton').style.display = 'none';
 		}).bind(this);
-		
+		//game over screen button
 		document.getElementById('replaybutton').onclick = (function(){
+			//set to playing, and restart
 			this.gameState = this.GAME_STATE.PLAYING;
 			this.reset();
+			//turn this button off
 			document.getElementById('replaybutton').style.display = 'none';
 		}).bind(this);
 		
+		//get the image for the player lives in top right corner
 		this.playerLifeImage = document.getElementById('playerLife');
 		
+		//set gamestate to title screen
 		this.gameState = this.GAME_STATE.TITLE;
+		//create player object
 		this.createPlayer();
+		//create star particles
 		this.createStars();
-		
-		//this.bgAudio = document.querySelector("#bgAudio");
-		//this.bgAudio.volume = 0.25;
 		
 		// start the game loop
 		this.update();
@@ -108,8 +117,10 @@ app.game = {
 		// schedule a call to update()
 		this.animationID = requestAnimationFrame(this.update.bind(this));
 		
+		//get dt
 		this.dt = this.calculateDeltaTime();
 		
+		//game state switch
 		switch(this.gameState){
 			case this.GAME_STATE.MENU:
 				break;
@@ -131,6 +142,7 @@ app.game = {
 					else
 						this.spawnWave(this.WAVE_TYPE.WEDGE);
 				}
+				//update everything
 				this.updateStars();
 				this.playerControls();
 				this.updatePlayer();
@@ -143,23 +155,25 @@ app.game = {
 				cancelAnimationFrame(this.animationID);
 				break;
 		}
+		//get the previous keys
 		myKeys.previousKeydown = myKeys.keydown.slice();
 		this.draw();
-		
-		
 	},
 	
 	draw:function(){
+		//draw black screen
 		this.ctx.fillRect(0,0,this.canvas.width, this.canvas.height);	
 		switch(this.gameState){
 			case this.GAME_STATE.MENU:
 				this.drawMenu();
 				break;
 			case this.GAME_STATE.PLAYING:
+				//draw the things
 				this.drawStars();
 				this.drawProjectiles();	
 				this.drawEnemies();
 				this.drawPlayer();
+				//draw HUD on top
 				this.drawHUD();
 				break;
 			case this.GAME_STATE.GAME_OVER:				
@@ -176,6 +190,7 @@ app.game = {
 	
 	drawHUD: function(){
 		//player life image is 33x26
+		//display the amount of images, for the amount of lives the player has
 		switch(this.lives){
 			case 3:
 				this.ctx.drawImage(this.playerLifeImage, this.canvas.width - 33 * 3, 0, 33, 26);
@@ -239,18 +254,23 @@ app.game = {
 	pauseGame: function(){
 		cancelAnimationFrame(this.animationID);
 		this.sound.stopBGAudio();
-		
+		//get the state it just was
 		this.lastState = this.gameState;
+		//set the state to paused
 		this.gameState = this.GAME_STATE.PAUSED;
-		
+		//go back to the loop
 		this.update();
 	},
 	
 	resumeGame: function(){
+		//cancel the animation frame
 		cancelAnimationFrame(this.animationID);
+		//if it just was playing, play the bg audio
 		if(this.lastState == this.GAME_STATE.PLAYING)
 			this.sound.playBGAudio();
+		//go back to the last gamestate before the pause
 		this.gameState = this.lastState;
+		//go back to the loop
 		this.update();
 	},
 	
@@ -264,6 +284,7 @@ app.game = {
 	},
 	
 	reset: function(){
+		//reset the things
 		this.player.position = {X: this.canvas.width/2, Y:this.canvas.height/2};
 		this.player.hp = 3;
 		this.lives = 3;
@@ -273,27 +294,8 @@ app.game = {
 		this.enemyspawn = 0;
 	},
 	
-	/*doMousedown:function(e){		
-		var mouse = getMouse(e);
-	},
-	
-	playEffect: function(){
-		var effectSound = document.createElement("audio");
-		effectSound.volume = 0.3;
-		effectSound.src = "media/" + this.effectSounds[this.currentEffect];
-		effectSound.play();
-		this.currentEffect += this.currentDirection;
-		if(this.currentEffect == this.effectSounds.length || this.currentEffect == -1){
-			this.currentDirection *= -1;
-			this.currentEffect += this.currentDirection;
-		}
-	},*/
-	
-	//stopBGAudio: function(){
-	//	this.sound.stopBGAudio();
-	//},
-	
 	entityUpdate: function(entity){
+		//update physics
 		entity.velocity.X += entity.acceleration.X;
 		entity.velocity.Y += entity.acceleration.Y;
 		
@@ -326,6 +328,7 @@ app.game = {
 	},
 	
 	entityKeepInFrame: function(entity){
+		//if the entity is out of frame, move it back in
 		if(entity.position.X < 0){
 			entity.position.X = 0;
 			entity.velocity.X = 0;
@@ -345,6 +348,7 @@ app.game = {
 	},
 	
 	entityApplyDrag: function(entity){
+		//basic drag force
 		var force = {
 			X: -0.1 * entity.velocity.X,
 			Y: -0.1 * entity.velocity.Y
@@ -367,17 +371,16 @@ app.game = {
 	
 	drawPlayer: function(){
 		this.entityDraw(this.player);
+		//if the player is damaged, draw the damge sprites on top
 		if(this.player.hp < 3)
 			this.ctx.drawImage(this.player.dmgSprites[this.player.hp], this.player.position.X, this.player.position.Y, this.player.width, this.player.height);
 	},
 	
 	playerControls: function(){
-		this.player.timeUntilNextShot -= this.dt;
-		if(this.player.timeUntilNextShot <= 0)
-			this.player.timeUntilNextShot = 0;
 		
 		var moving = false;
 		
+		//push the ship in the direction of the key presesd
 		if(myKeys.keydown[myKeys.KEYBOARD.KEY_RIGHT] || myKeys.keydown[myKeys.KEYBOARD.KEY_D]){
 			this.entityApplyForce(this.player, {X:20,Y:0});
 			moving = true;
@@ -398,8 +401,12 @@ app.game = {
 			this.entityApplyDrag(this.player);
 		}
 		
+		
+		//decrement the timer
+		this.player.timeUntilNextShot -= this.dt;
+		
 		//if space is pressed, and either it just wasn't(aka semi auto) or is full auto, and it is time
-		if(myKeys.keydown[myKeys.KEYBOARD.KEY_SPACE] && (!myKeys.previousKeydown[myKeys.KEYBOARD.KEY_SPACE] || this.player.autoFire) && this.player.timeUntilNextShot == 0){
+		if(myKeys.keydown[myKeys.KEYBOARD.KEY_SPACE] && (!myKeys.previousKeydown[myKeys.KEYBOARD.KEY_SPACE] || this.player.autoFire) && this.player.timeUntilNextShot <= 0){
 			this.playerShoot();
 			this.player.timeUntilNextShot = this.player.timeBetweenShots; 
 		}
@@ -432,29 +439,40 @@ app.game = {
 	
 	//creates projectile, and shoots it foward
 	playerShoot: function(){
+		//create a projectile at where the player is
 		var projectile = this.createEntity(this.player.position.X + this.player.width/2 - 5, this.player.position.Y, 10, 50, 'laser');
 		projectile.target = this.PROJECTILE_TARGET.ENEMY;
+		//push it forword
 		this.entityApplyForce(projectile, {X:0, Y:-500} );
+		//add it to the list
 		this.projectiles.push(projectile);
-		
+		//play the sound effect
 		this.sound.playEffect(3);
 	},
 	
 	playerHit: function(){
+		//lose health
 		this.player.hp--;
+		//if helath is 0, die
 		if(this.player.hp < 0)
 			this.die();
 		
 		//TODO more
-		console.log("player hit");
+		//console.log("player hit");
 	},
 	
 	die: function(){
+		//reset health
 		this.player.hp = 3;
+		//decrement lives
 		this.lives --;
+		//if the player has no live, then it is game over
 		if(this.lives < 0){
+			//set to game over
 			this.gameState = this.GAME_STATE.GAME_OVER;
+			//make the button visable
 			document.getElementById('replaybutton').style.display = 'block';
+			//stop the bg sound
 			this.sound.stopBGAudio();
 		}
 	},
@@ -474,11 +492,12 @@ app.game = {
 				hitSomething = true;
 			}
 			
+			//if the target is an enemy and it hit the enemy
 			if(this.projectiles[i].target == this.PROJECTILE_TARGET.ENEMY && this.checkIfEnemyIsHit(this.projectiles[i])){
-					hitSomething = true;
+				hitSomething = true;
 			}
 			
-			//if it is out of the canvas, delete it
+			//if it hit something or is out of the canvas, delete it
 			if(hitSomething || this.entityIsOutOfFrame(this.projectiles[i])){
 				this.projectiles.splice(i,1);
 			}
@@ -486,13 +505,16 @@ app.game = {
 	},
 	
 	checkIfEnemyIsHit: function(projectile){
+		//loop through enemies backwards
 		for(var i = this.enemies.length - 1; i >= 0; i--){
+			//if they are colliding
 			if(this.isColliding(this.enemies[i], projectile)){
+				//the enemy is hit
 				this.enemyHit(this.enemies[i]);
-				
+				//if it has no hp left, remove it from the list
 				if(this.enemies[i].hp <= 0)
 					this.enemies.splice(i,1);
-					
+				
 				return true;
 			}
 		}
@@ -509,6 +531,7 @@ app.game = {
 	
 	createEnemy: function(x, y, type, behavior){
 		var enemy;
+		//set the information based on type
 		switch(type){
 			case this.ENEMY_TYPE.BASIC:
 				enemy= this.createEntity(x, y, 65, 50, 'enemy', 1);
@@ -521,34 +544,41 @@ app.game = {
 				enemy.timeUntilNextShot = 0;				
 				break;
 		}
+		//set the information based on behavior
 		switch(behavior){
 			case this.ENEMY_BEHAVIOR.LINE:
 				this.entityApplyForce(enemy, {X:0, Y:100} );
 				break;
 			case this.ENEMY_BEHAVIOR.ZIGZAG:
+				//push it down and to the side
 				this.entityApplyForce(enemy, {X:-100, Y:100} );
+				//set the intervl that it will go back and forth
 				enemy.behaviorTimeInterval = 1;
+				//it is going left
 				enemy.goingLeft = true;
 				break;
 		}
 		enemy.type = type;
 		enemy.behavior = behavior;
+		//add to the list
 		this.enemies.push(enemy);
 		return enemy;
 	},
 	
 	spawnWave: function(type){
 		switch(type){
+			//3 baasic enemies in a line that zigzag
 			case this.WAVE_TYPE.LINE:
 				var xPos = Math.random() * (this.canvas.width - 65 * 3); //fit 3 enemies
-				console.log("spawn wave");
+				//console.log("spawn wave");
 				this.createEnemy(xPos + 65 * 0, 0 - 50, this.ENEMY_TYPE.BASIC, this.ENEMY_BEHAVIOR.ZIGZAG); //create first
 				this.createEnemy(xPos + 65 * 1, 0 - 50, this.ENEMY_TYPE.BASIC, this.ENEMY_BEHAVIOR.ZIGZAG);
 				this.createEnemy(xPos + 65 * 2, 0 - 50, this.ENEMY_TYPE.BASIC, this.ENEMY_BEHAVIOR.ZIGZAG);
 				break;
+			//3 enemies in a V formation, the one that is the head is a heavy, the others are basic
 			case this.WAVE_TYPE.WEDGE:
 				var xPos = Math.random() * (this.canvas.width - 65 * 3); //fit 3 enemies
-				console.log("spawn wave");
+				//console.log("spawn wave");
 				this.createEnemy(xPos + 65 * 0, 0 - 100, this.ENEMY_TYPE.BASIC, this.ENEMY_BEHAVIOR.LINE); //create first
 				this.createEnemy(xPos + 65 * 1, 0 - 50, this.ENEMY_TYPE.HEAVY, this.ENEMY_BEHAVIOR.LINE);
 				this.createEnemy(xPos + 65 * 2, 0 - 100, this.ENEMY_TYPE.BASIC, this.ENEMY_BEHAVIOR.LINE);
@@ -607,11 +637,16 @@ app.game = {
 	},
 	
 	enemyShoot: function(enemy){
+		//create a projectie where the enemy is
 		var projectile = this.createEntity(enemy.position.X + enemy.width/2 - 5, enemy.position.Y, 10, 50, 'laserEnemy');
+		//set the target
 		projectile.target = this.PROJECTILE_TARGET.PLAYER;
+		//push forwords
 		this.entityApplyForce(projectile, {X:0, Y:500} );
+		//add to the list
 		this.projectiles.push(projectile);
 		
+		//play the correct sound effect
 		if(enemy.type == this.ENEMY_TYPE.BASIC)
 			this.sound.playEffect(0);
 		else if(enemy.type == this.ENEMY_TYPE.HEAVY)
@@ -625,13 +660,18 @@ app.game = {
 	
 	createStars: function(){
 		this.stars = [];
+		//make 50 stars
 		for(var i = 0; i < 50; i++){
+			//type is 1, 2, or 3
 			var type = Math.floor(Math.random() * 3) + 1;
 			var size = type;
+			//big ones move faster, this creates a paralax effect
 			var speed = type * 1.5;
+			//place randomly on the canvas
 			var x = Math.random() * this.canvas.width;
 			var y = Math.random() * this.canvas.height;
 			
+			//make the object literal, and push in onto the list
 			this.stars.push({
 				X: x,
 				Y: y,
@@ -643,7 +683,9 @@ app.game = {
 	
 	updateStars: function(){
 		for(var i = 0; i < this.stars.length; i++){
-			this.stars[i].Y+=this.stars[i].speed;			
+			//move them
+			this.stars[i].Y+=this.stars[i].speed;	
+			//if they go off screen put the on top, and give them a random x position
 			if(this.stars[i].Y > this.canvas.height){
 				this.stars[i].Y = 0 - this.stars[i].size;
 				this.stars[i].X = Math.random() * this.canvas.width;

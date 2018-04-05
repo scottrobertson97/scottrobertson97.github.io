@@ -84,7 +84,7 @@ function loadImagesWithCallback(sources, callback) {
 	  imageObjects[i] = new Image();
 	  imageObjects[i].onload = function() {
 	  	numLoadedImages++;
-	  	console.log("loaded image at '" + this.src + "'")
+	  	//console.log("loaded image at '" + this.src + "'")
 		if(numLoadedImages >= numImages) {
 		  callback(imageObjects); // send the images back
 		}
