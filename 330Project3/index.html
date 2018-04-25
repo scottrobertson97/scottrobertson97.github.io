@@ -5,12 +5,13 @@
 	<title>SomethingToDoRightNow</title>
 	<meta name="viewport" content="initial-scale=1.0">
 	<meta charset="utf-8">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
 	<style>
 		/* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
 
 		#map {
-			height: 75%;
+			height: 500px;
 		}
 
 		/* Optional: Makes the sample page fill the window. */
@@ -36,14 +37,26 @@
 </head>
 
 <body>
-	<h1>SomethingToDoRightNow</h1>
-	<button type="button" id="search">Get Event!</button> Enter Your Zip Code -&gt; <input id="searchterm" type="text" size="20" maxlength="20" autofocus value="14623" />
-	<h2>Results</h2>
-	<div id="content">
-		<p>No data yet!</p>
+	<div class="container">
+		<header class="row">
+			<div class="col">
+				<h1>SomethingToDoRightNow</h1>
+			</div>
+		</header>
+		<nav class="row">
+			<div class="col">
+				Enter Your Zip Code -&gt;
+				<input id="searchterm" type="text" size="20" maxlength="20" autofocus value="14623" />
+				<button type="button" id="search">Get Things To Do!</button>
+			</div>
+		</nav>
+		<main class="row">
+			<div class="col" id="content">
+				<p>No data yet!</p>
+			</div>
+		</main>
+		<div id="map"></div>
 	</div>
-	<div id="map"></div>
-
 
 	<script>
 		var map;
@@ -55,6 +68,39 @@
 		var WEATHER_URL = "http://api.openweathermap.org/data/2.5/weather?";
 		var value;
 		var geocoder;
+		//the big list
+		var THINGS_TO_DO = [
+			"amusement_park",
+			"aquarium",
+			"art_gallery",
+			"bowling_alley",
+			"campground",
+			"movie_rental",
+			"movie_theater",
+			"museum",
+			"park",
+			"shopping_mall",
+			"spa",
+			"stadium",
+			"zoo"
+		];
+		var INSIDE_THINGS = [
+			"aquarium",
+			"art_gallery",
+			"bowling_alley",
+			"movie_rental",
+			"movie_theater",
+			"museum",
+			"shopping_mall",
+			"spa",
+		];
+		var OUTSIDE_THINGS = [
+			"amusement_park",
+			"campground",
+			"park",
+			"stadium",
+			"zoo"
+		];
 
 		function initMap() {
 
@@ -65,7 +111,7 @@
 				//	lat: 43.083848,
 				//	lng: -77.6799
 				//},
-				zoom: 12,
+				zoom: 14,
 				mapTypeId: google.maps.MapTypeId.ROADMAP
 			};
 
@@ -73,7 +119,7 @@
 
 			map.mapTypeId = 'satellite';
 			map.setTilt(45);
-			
+
 			geocoder = new google.maps.Geocoder();
 		}
 
@@ -87,7 +133,7 @@
 					addMarker(place);
 				}
 			}
-		}		
+		}
 
 		function addMarker(place) {
 			//var position = {
@@ -144,7 +190,7 @@
 			//
 			geocodeAddress(geocoder, map, value, getData);
 		}
-		
+
 		/*
 		function from https://developers.google.com/maps/documentation/javascript/examples/geocoding-simple?csw=1
 		*/
@@ -163,6 +209,7 @@
 						map: resultsMap,
 						position: results[0].geometry.location
 					});
+					markers.push(marker);
 				} else {
 					alert('Geocode was not successful for the following reason: ' + status);
 				}
@@ -180,22 +227,23 @@
 			URL += "&units=imperial";
 			URL += "&appid=";
 			URL += WEATHER_API_KEY;
-			
+
 			//make weather ajax call
 			//if it is successful then, update the weather info,
 			//and search for places
 			$.ajax({
 				dataType: "jsonp",
 				url: URL,
-				success: function(obj){
-					updateWeatherInfo(obj);					
+				success: function(obj) {
+					updateWeatherInfo(obj);
 					requestPlaces(obj, location);
 				}
 			});
 		}
-		
-		function updateWeatherInfo(obj){
-			
+
+		function updateWeatherInfo(obj) {
+			document.querySelector("#content").innerHTML = "";
+
 			console.dir(obj);
 			var weatherSection = document.createElement('section');
 
@@ -206,41 +254,41 @@
 			var weatherType = document.createElement('p');
 			weatherType.textContent = "The weather is " + obj.weather[0].main + "";
 			weatherSection.appendChild(weatherType);
-			
+
 			var img = document.createElement('img');
-			img.src = "http://openweathermap.org/img/w/"+obj.weather[0].icon+".png";
+			img.src = "http://openweathermap.org/img/w/" + obj.weather[0].icon + ".png";
 			weatherSection.appendChild(img);
-			
+
 			var weatherTemp = document.createElement('p');
 			weatherTemp.textContent = "It is " + obj.main.temp + "°";
 			weatherSection.appendChild(weatherTemp);
 
-			document.querySelector("#content").appendChild(weatherSection);	
+			document.querySelector("#content").appendChild(weatherSection);
 		}
 
 		function requestPlaces(obj, location) {
 			//
 			//get what places based on the weather obj
 			//
-			
+
 			//
 			//clear previous
 			//
-			clearMarkers();			
+			clearMarkers();
 			console.dir(location);
-			
+
 			//
 			//do multiple requests based on the weather
 			//
 			var request = {
 				location: location,
-				radius: '10000',
+				radius: '5000',
 				type: ['restaurant']
 			};
-			
+
 			service = new google.maps.places.PlacesService(map);
 			service.nearbySearch(request, searchPlaces);
-			
+
 		}
 
 		function makeInfoWindow(position, msg) {
