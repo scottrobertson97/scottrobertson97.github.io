@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>SomethingToDoRightNow</title>
+	<meta name="viewport" content="initial-scale=1.0">
+	<meta charset="utf-8">
+	<style>
+		/* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+
+		#map {
+			height: 75%;
+		}
+
+		/* Optional: Makes the sample page fill the window. */
+
+		html,
+		body {
+			height: 100%;
+			margin: 0;
+			padding: 0;
+		}
+
+		button {
+			//font-size: 11px;
+			//position: absolute;
+			//color: red;
+			//font-weight: bold;
+			//height: 30px;
+			//width: 130px;
+			//z-index: 100;
+		}
+
+	</style>
+</head>
+
+<body>
+	<h1>SomethingToDoRightNow</h1>
+	<button type="button" id="search">Get Event!</button> Enter Your Zip Code -&gt; <input id="searchterm" type="text" size="20" maxlength="20" autofocus value="14623" />
+	<h2>Results</h2>
+	<div id="content">
+		<p>No data yet!</p>
+	</div>
+	<div id="map"></div>
+
+
+	<script>
+		var map;
+		var service;
+		var infowindow;
+		var markers = [];
+		var places = [];
+		var WEATHER_API_KEY = "6e8807ddf43cb3a5bbd4cb3a3633ef0f";
+		var WEATHER_URL = "http://api.openweathermap.org/data/2.5/weather?";
+		var value;
+		var geocoder;
+
+		function initMap() {
+
+			document.querySelector("#search").onclick = search;
+
+			var mapOptions = {
+				//center: {
+				//	lat: 43.083848,
+				//	lng: -77.6799
+				//},
+				zoom: 12,
+				mapTypeId: google.maps.MapTypeId.ROADMAP
+			};
+
+			map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+			map.mapTypeId = 'satellite';
+			map.setTilt(45);
+			
+			geocoder = new google.maps.Geocoder();
+		}
+
+		function searchPlaces(results, status) {
+			if (status == google.maps.places.PlacesServiceStatus.OK) {
+				for (var i = 0; i < results.length; i++) {
+					var place = results[i];
+					console.dir(place);
+					//createMarker(results[i]);
+					places.push(place);
+					addMarker(place);
+				}
+			}
+		}		
+
+		function addMarker(place) {
+			//var position = {
+			//	lat: latitude,
+			//	lng: longitude
+			//};
+			//var marker = new google.maps.Marker({
+			//	position: position,
+			//	map: map
+			//});
+			//marker.setTitle(title);
+
+			var marker = new google.maps.Marker({
+				map: map,
+				position: place.geometry.location,
+				title: place.name
+			});
+
+			markers.push(marker);
+
+			google.maps.event.addListener(marker, 'click', function(e) {
+				makeInfoWindow(this.position, this.title);
+			});
+		}
+
+		function clearMarkers() {
+			markers.forEach(function(marker) {
+				marker.setMap(null);
+			});
+
+			markers = [];
+		}
+
+		//seach function
+		function search() {
+			//
+			//Getting the zip code
+			//
+
+			// get value of form field
+			value = document.querySelector("#searchterm").value;
+
+			// get rid of any leading and trailing spaces
+			value = value.trim();
+
+			// if there's no city to search then bail out of the function
+			if (value.length < 1) return;
+
+			document.querySelector("#content").innerHTML = "<b>Searching for " + value + "</b>";
+
+			//
+			//Centering the map on the zip code
+			//if the location is valid it also calls getData
+			//
+			geocodeAddress(geocoder, map, value, getData);
+		}
+		
+		/*
+		function from https://developers.google.com/maps/documentation/javascript/examples/geocoding-simple?csw=1
+		*/
+		function geocodeAddress(geocoder, resultsMap, address, callback) {
+			//var address = document.getElementById('address').value;
+			geocoder.geocode({
+				'address': address
+			}, function(results, status) {
+				if (status === 'OK') {
+
+					//location is valid, so get the data
+					callback(results[0].geometry.location);
+
+					resultsMap.setCenter(results[0].geometry.location);
+					var marker = new google.maps.Marker({
+						map: resultsMap,
+						position: results[0].geometry.location
+					});
+				} else {
+					alert('Geocode was not successful for the following reason: ' + status);
+				}
+			});
+		}
+
+		function getData(location) {
+			//
+			//get the weather
+			//
+
+			var URL = WEATHER_URL;
+			URL += "zip=";
+			URL += value;
+			URL += "&units=imperial";
+			URL += "&appid=";
+			URL += WEATHER_API_KEY;
+			
+			//make weather ajax call
+			//if it is successful then, update the weather info,
+			//and search for places
+			$.ajax({
+				dataType: "jsonp",
+				url: URL,
+				success: function(obj){
+					updateWeatherInfo(obj);					
+					requestPlaces(obj, location);
+				}
+			});
+		}
+		
+		function updateWeatherInfo(obj){
+			
+			console.dir(obj);
+			var weatherSection = document.createElement('section');
+
+			var weatherLocation = document.createElement('h3');
+			weatherLocation.textContent = "The current weather in " + obj.name;
+			weatherSection.appendChild(weatherLocation);
+
+			var weatherType = document.createElement('p');
+			weatherType.textContent = "The weather is " + obj.weather[0].main + "";
+			weatherSection.appendChild(weatherType);
+			
+			var img = document.createElement('img');
+			img.src = "http://openweathermap.org/img/w/"+obj.weather[0].icon+".png";
+			weatherSection.appendChild(img);
+			
+			var weatherTemp = document.createElement('p');
+			weatherTemp.textContent = "It is " + obj.main.temp + "°";
+			weatherSection.appendChild(weatherTemp);
+
+			document.querySelector("#content").appendChild(weatherSection);	
+		}
+
+		function requestPlaces(obj, location) {
+			//
+			//get what places based on the weather obj
+			//
+			
+			//
+			//clear previous
+			//
+			clearMarkers();			
+			console.dir(location);
+			
+			//
+			//do multiple requests based on the weather
+			//
+			var request = {
+				location: location,
+				radius: '10000',
+				type: ['restaurant']
+			};
+			
+			service = new google.maps.places.PlacesService(map);
+			service.nearbySearch(request, searchPlaces);
+			
+		}
+
+		function makeInfoWindow(position, msg) {
+			if (infowindow)
+				infowindow.close();
+			infowindow = new google.maps.InfoWindow({
+				map: map,
+				position: position,
+				content: "<b>" + msg + "</b>"
+			});
+		}
+
+	</script>
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0ROpt9TBnKosfKJOEun6G6_DM1VCCOx0&callback=initMap&libraries=places" async defer></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+</body>
+
+</html>
