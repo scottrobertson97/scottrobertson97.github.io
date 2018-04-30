@@ -33,6 +33,10 @@
 			//z-index: 100;
 		}
 
+		img {
+			display: inline-block;
+		}
+
 	</style>
 </head>
 
@@ -123,12 +127,17 @@
 			geocoder = new google.maps.Geocoder();
 		}
 
+		//process the search request
 		function searchPlaces(results, status) {
 			if (status == google.maps.places.PlacesServiceStatus.OK) {
 				for (var i = 0; i < results.length; i++) {
 					var place = results[i];
 					console.dir(place);
 					//createMarker(results[i]);
+					//if (place.opening_hours.open_now == true) {
+					//	places.push(place);
+					//	addMarker(place);
+					//}
 					places.push(place);
 					addMarker(place);
 				}
@@ -136,15 +145,6 @@
 		}
 
 		function addMarker(place) {
-			//var position = {
-			//	lat: latitude,
-			//	lng: longitude
-			//};
-			//var marker = new google.maps.Marker({
-			//	position: position,
-			//	map: map
-			//});
-			//marker.setTitle(title);
 
 			var marker = new google.maps.Marker({
 				map: map,
@@ -165,6 +165,10 @@
 			});
 
 			markers = [];
+		}
+
+		function clearPlaces() {
+			places = [];
 		}
 
 		//seach function
@@ -205,11 +209,11 @@
 					callback(results[0].geometry.location);
 
 					resultsMap.setCenter(results[0].geometry.location);
-					var marker = new google.maps.Marker({
-						map: resultsMap,
-						position: results[0].geometry.location
-					});
-					markers.push(marker);
+					//var marker = new google.maps.Marker({
+					//	map: resultsMap,
+					//	position: results[0].geometry.location
+					//});
+					//markers.push(marker);
 				} else {
 					alert('Geocode was not successful for the following reason: ' + status);
 				}
@@ -251,18 +255,27 @@
 			weatherLocation.textContent = "The current weather in " + obj.name;
 			weatherSection.appendChild(weatherLocation);
 
-			var weatherType = document.createElement('p');
-			weatherType.textContent = "The weather is " + obj.weather[0].main + "";
-			weatherSection.appendChild(weatherType);
+			var weatherText = document.createElement('p');
 
+			//add text to show main weather type
+			var weatherType = document.createElement('span');
+			weatherType.textContent = "The weather is " + obj.weather[0].main + "";
+			weatherText.appendChild(weatherType);
+
+			//add image
 			var img = document.createElement('img');
 			img.src = "https://openweathermap.org/img/w/" + obj.weather[0].icon + ".png";
-			weatherSection.appendChild(img);
+			weatherText.appendChild(img);
 
-			var weatherTemp = document.createElement('p');
+			//add weather temp text
+			var weatherTemp = document.createElement('span');
 			weatherTemp.textContent = "It is " + obj.main.temp + "°";
-			weatherSection.appendChild(weatherTemp);
+			weatherText.appendChild(weatherTemp);
 
+			//append
+			weatherSection.appendChild(weatherText);
+
+			//append
 			document.querySelector("#content").appendChild(weatherSection);
 		}
 
@@ -270,25 +283,39 @@
 			//
 			//get what places based on the weather obj
 			//
+			var thingsToDo;
+			if (obj.weather[0].id >= 800) {
+				thingsToDo = OUTSIDE_THINGS;
+			} else {
+				thingsToDo = INSIDE_THINGS;
+			}
 
 			//
 			//clear previous
 			//
 			clearMarkers();
+			clearPlaces();
 			console.dir(location);
 
 			//
 			//do multiple requests based on the weather
 			//
-			var request = {
-				location: location,
-				radius: '5000',
-				type: ['restaurant']
+			var search = function(type){
+				console.log(type);
+					var index = i;
+					var request = {
+						location: location,
+						radius: '5000',
+						type: [type]
+					};
+
+					service = new google.maps.places.PlacesService(map);
+					service.nearbySearch(request, searchPlaces);
 			};
-
-			service = new google.maps.places.PlacesService(map);
-			service.nearbySearch(request, searchPlaces);
-
+			
+			for (var i = 0; i < thingsToDo.length; i++) {
+				setTimeout(search(thingsToDo[i]), 500 * i);
+			}
 		}
 
 		function makeInfoWindow(position, msg) {
