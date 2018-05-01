@@ -121,9 +121,6 @@
 
 			map = new google.maps.Map(document.getElementById('map'), mapOptions);
 
-			map.mapTypeId = 'satellite';
-			map.setTilt(45);
-
 			geocoder = new google.maps.Geocoder();
 		}
 
@@ -133,29 +130,45 @@
 				for (var i = 0; i < results.length; i++) {
 					var place = results[i];
 					console.dir(place);
-					//createMarker(results[i]);
-					//if (place.opening_hours.open_now == true) {
-					//	places.push(place);
-					//	addMarker(place);
-					//}
-					places.push(place);
-					addMarker(place);
+					var open = place.opening_hours || {open_now: true};
+					if (open.open_now) {
+						addPlace(place);
+						addMarker(place);
+					}
 				}
 			}
+		}
+		
+		function addPlace(place){
+			places.push(place);
 		}
 
 		function addMarker(place) {
 
+			var rating = place.rating || "?";
+			
+			//image var from
+			// https://developers.google.com/maps/documentation/javascript/places
+			var image = {
+      	url: place.icon,
+      	size: new google.maps.Size(71, 71),
+      	origin: new google.maps.Point(0, 0),
+      	anchor: new google.maps.Point(17, 34),
+      	scaledSize: new google.maps.Size(25, 25)
+    	};
+			
 			var marker = new google.maps.Marker({
 				map: map,
 				position: place.geometry.location,
-				title: place.name
+				title: place.name,
+				rating: rating,
+				icon: image
 			});
 
 			markers.push(marker);
 
 			google.maps.event.addListener(marker, 'click', function(e) {
-				makeInfoWindow(this.position, this.title);
+				makeInfoWindow(this.position, this.title + " ("+this.rating+"/5)");
 			});
 		}
 
@@ -300,7 +313,7 @@
 			//
 			//do multiple requests based on the weather
 			//
-			var search = function(type){
+			var searchForTypes = function(type){
 				console.log(type);
 					var index = i;
 					var request = {
@@ -314,7 +327,7 @@
 			};
 			
 			for (var i = 0; i < thingsToDo.length; i++) {
-				setTimeout(search(thingsToDo[i]), 500 * i);
+				setTimeout(searchForTypes(thingsToDo[i]), 50 * i);
 			}
 		}
 
@@ -329,7 +342,7 @@
 		}
 
 	</script>
-	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0ROpt9TBnKosfKJOEun6G6_DM1VCCOx0&callback=initMap&libraries=places" async defer></script>
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDiQLn6GpobKsgbRXRF7KeLslKPFWnyRdI&callback=initMap&libraries=places" async defer></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 </body>
 
