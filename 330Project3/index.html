@@ -56,7 +56,7 @@
 		</nav>
 		<main class="row">
 			<div class="col" id="content">
-				<p>No data yet!</p>
+				<p>You have not searched yet...</p>
 			</div>
 		</main>
 		<div id="map"></div>
@@ -72,7 +72,7 @@
 		var WEATHER_URL = "https://api.openweathermap.org/data/2.5/weather?";
 		var value;
 		var geocoder;
-		//the big list
+		//the big list of all things, for reference 
 		var THINGS_TO_DO = [
 			"amusement_park",
 			"aquarium",
@@ -88,6 +88,7 @@
 			"stadium",
 			"zoo"
 		];
+		//list of indorr activities
 		var INSIDE_THINGS = [
 			"aquarium",
 			"art_gallery",
@@ -98,6 +99,7 @@
 			"shopping_mall",
 			"spa",
 		];
+		//list of outdoo activities
 		var OUTSIDE_THINGS = [
 			"amusement_park",
 			"campground",
@@ -127,10 +129,13 @@
 		//process the search request
 		function searchPlaces(results, status) {
 			if (status == google.maps.places.PlacesServiceStatus.OK) {
+				//loop through request
 				for (var i = 0; i < results.length; i++) {
 					var place = results[i];
-					console.dir(place);
+					//console.dir(place);
+					//get the opening hours, if it doesnt exist, just make one and say it is open
 					var open = place.opening_hours || {open_now: true};
+					//if it is open, add it
 					if (open.open_now) {
 						addPlace(place);
 						addMarker(place);
@@ -157,18 +162,28 @@
       	scaledSize: new google.maps.Size(25, 25)
     	};
 			
+			//make marker
 			var marker = new google.maps.Marker({
 				map: map,
 				position: place.geometry.location,
 				title: place.name,
-				rating: rating,
 				icon: image
 			});
-
+			
+			//push to list
 			markers.push(marker);
-
+			
+			var content = 
+					'<div>'+
+						'<p><em>'+place.types[0]+'</em></p>'+
+						'<h5>'+place.name+'</h5>'+
+						'<p>('+rating+' / 5)</p>'+
+						'<p>'+place.vicinity+'</p>'+
+					'</div>';
+			
+			//add click event
 			google.maps.event.addListener(marker, 'click', function(e) {
-				makeInfoWindow(this.position, this.title + " ("+this.rating+"/5)");
+				makeInfoWindow(this.position, content);
 			});
 		}
 
@@ -261,7 +276,7 @@
 		function updateWeatherInfo(obj) {
 			document.querySelector("#content").innerHTML = "";
 
-			console.dir(obj);
+			//console.dir(obj);
 			var weatherSection = document.createElement('section');
 
 			var weatherLocation = document.createElement('h3');
@@ -308,13 +323,13 @@
 			//
 			clearMarkers();
 			clearPlaces();
-			console.dir(location);
+			//console.dir(location);
 
 			//
 			//do multiple requests based on the weather
 			//
 			var searchForTypes = function(type){
-				console.log(type);
+				//console.log(type);
 					var index = i;
 					var request = {
 						location: location,
@@ -331,13 +346,13 @@
 			}
 		}
 
-		function makeInfoWindow(position, msg) {
+		function makeInfoWindow(position, content) {
 			if (infowindow)
 				infowindow.close();
 			infowindow = new google.maps.InfoWindow({
 				map: map,
 				position: position,
-				content: "<b>" + msg + "</b>"
+				content: content
 			});
 		}
 
