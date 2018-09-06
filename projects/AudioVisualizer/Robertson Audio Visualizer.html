@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8" />
+	<title>Web Audio Visualizer</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<link href="https://fonts.googleapis.com/css?family=Bungee" rel="stylesheet">
+	<style>
+		body {
+			background: #eeeeee;
+			font-family: tahoma, verdana, sans serif;
+		}
+
+		canvas {
+			padding-left: 0;
+			padding-right: 0;
+			margin-left: auto;
+			margin-right: auto;
+			display: block; //box-shadow: 4px 4px 8px rgba(0,0,0,0.5);
+			background: black;
+		}
+
+		#controls {
+			margin-top: 10px;
+			text-align: center;
+		}
+		.row{
+		}
+		.col{
+			border: 1px solid black;
+			margin: 5px;
+			padding: 5px;
+		}
+		h1{
+			font-family: 'Bungee', cursive;
+			text-align: center;
+			padding: 5pt;
+		}
+
+	</style>
+	
+	<script>
+		// An IIFE ("Iffy") - see the notes in mycourses
+		(function() {
+			"use strict";
+			var NUM_SAMPLES = 256;
+			//sound files
+			var SOUND_1 = 'media/GlintingGold.mp3';
+			var SOUND_2 = 'media/waveDash.mp3';
+			//audio vars
+			var audioElement, analyserNode, delayNode, bassFilterNode;
+			//delay
+			var delayAmount = 0.0;
+			//canvas
+			var canvas, ctx;
+			//image manipulation
+			var invert = false;
+			var tintRed = false;
+			var lines = false;
+			var noise = false;
+			//freq or waves
+			var waves = false;
+			//raius that the bars sit upon
+			var maxRadius = 100;
+			//radius of the orbit of the ship
+			var orbitRadius = 150;
+			//data for the orbit height
+			var orbitDataPrevious = 0;
+			var orbitYVel = 0;
+			var orbitYPos = 0;
+			//diplay style - bars/circles/curves
+			var display = "bars";
+			//stars
+			var stars = new Array(64);
+			//color
+			var radialGradient;
+			//rocket vars
+			var rocketSpeed = 50;
+			var rocketPos = 0;
+			
+			//couln't get this to work
+			var bassBoost = 1;
+
+			function init() {
+				// set up canvas stuff
+				canvas = document.querySelector('canvas');
+				ctx = canvas.getContext("2d");
+
+				// get reference to <audio> element on page
+				audioElement = document.querySelector('audio');
+
+				// call our helper function and get an analyser node
+				analyserNode = createWebAudioContextWithAnalyserNode(audioElement);
+
+				// get sound track <select> and Full Screen button working
+				setupUI();
+
+				// load and play default sound into audio element
+				playStream(audioElement, SOUND_1);
+				
+				//make the star particles
+				createStars();
+				
+				//create radial gradient
+				radialGradient = ctx.createRadialGradient(canvas.width/2, canvas.height/2, maxRadius, canvas.width/2, canvas.height/2, orbitRadius);
+				radialGradient.addColorStop(0  ,"rgba(0  ,255,  0,1.0)");				
+				radialGradient.addColorStop(0.45,"rgba(0  ,  0,255,1.0)");
+				radialGradient.addColorStop(1.0,"rgba(255,  0,  0,1.0)");
+				
+
+				// start animation loop
+				update();
+			}
+
+			function createWebAudioContextWithAnalyserNode(audioElement) {
+				var audioCtx, analyserNode, sourceNode;
+				// create new AudioContext
+				// The || is because WebAudio has not been standardized across browsers yet
+				// http://webaudio.github.io/web-audio-api/#the-audiocontext-interface
+				audioCtx = new(window.AudioContext || window.webkitAudioContext);
+
+				// create an analyser node
+				analyserNode = audioCtx.createAnalyser();
+				analyserNode.fftSize = NUM_SAMPLES;
+
+				//create delay node
+				delayNode = audioCtx.createDelay();
+				delayNode.delayTime.value = delayAmount;
+
+				//create bass boost node
+				//couldn't get this to work
+				bassFilterNode = audioCtx.createBiquadFilter();
+				bassFilterNode.type = "lowshelf";
+				bassFilterNode.frequency.value = 600;
+				bassFilterNode.gain.value = bassBoost;
+
+				// this is where we hook up the <audio> element to the analyserNode
+				sourceNode = audioCtx.createMediaElementSource(audioElement);
+				sourceNode.connect(bassFilterNode);
+				bassFilterNode.connect(delayNode);
+				delayNode.connect(analyserNode);
+
+				// here we connect to the destination i.e. speakers
+				analyserNode.connect(audioCtx.destination);
+				sourceNode.connect(audioCtx.destination);
+				return analyserNode;
+			}
+
+			function setupUI() {
+				document.querySelector('#slider').onchange = function(e) {
+					//maxRadius = e.target.value;
+					rocketSpeed = e.target.value;
+				}
+
+				document.querySelector('#delaySlider').onchange = function(e) {
+					delayAmount = e.target.value;
+				}
+
+				document.querySelector('#bassSlider').onchange = function(e) {
+					bassBoost = e.target.value;
+				}
+
+				document.querySelector("#trackSelect").onchange = function(e) {
+					playStream(audioElement, e.target.value);
+				};
+
+				document.querySelector("#frequency-waveform").onchange = function(e) {
+					waves = e.target.value == "waveform";
+				};
+
+				document.querySelector("#display").onchange = function(e) {
+					display = e.target.value;
+				};
+
+				document.querySelector("#fsButton").onclick = function() {
+					requestFullscreen(canvas);
+				};
+			}
+
+			function playStream(audioElement, path) {
+				audioElement.src = path;
+				audioElement.play();
+				audioElement.volume = 0.2;
+				document.querySelector('#status').innerHTML = "Now playing: " + path;
+			}
+
+			function update() {
+				// this schedules a call to the update() method in 1/60 seconds
+				requestAnimationFrame(update);
+
+				/*
+					Nyquist Theorem
+					http://whatis.techtarget.com/definition/Nyquist-Theorem
+					The array of data we get back is 1/2 the size of the sample rate 
+				*/
+
+				// create a new array of 8-bit integers (0-255)
+				var data = new Uint8Array(NUM_SAMPLES / 2);
+
+				// populate the array with the frequency data
+				// notice these arrays can be passed "by reference" 
+				delayNode.delayTime.value = delayAmount;
+				//set bass amount
+				bassFilterNode.gain.value = bassBoost;
+				
+				//wave data or frequency data
+				if (!waves) {
+					analyserNode.getByteFrequencyData(data);
+				} else {
+					analyserNode.getByteTimeDomainData(data); // waveform data
+				}
+
+				// DRAW!
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				
+				//cutt of the end of the data b/c its all 0's
+				var cutoffLength = Math.floor(data.length - (data.length * 0.5));
+				
+				//do the stars
+				updateStars();
+				drawStars(data);
+				
+				//display either bars/circles or curvles
+				if (display == "bars" || display == "circles") {
+					// loop through the data and draw!
+					for (var i = 0; i < cutoffLength; i++) {
+						drawRectsOrCircles(i, data[i], cutoffLength);
+						//drawCircle(data[i], cutoffLength);
+					}
+				} else if (display == "curves") {
+					drawCurves(data, cutoffLength);
+				}
+				
+				//rocket orbit
+				drawOrbit(data, cutoffLength);
+				//asteroid bounce
+				drawAsteroid(data, cutoffLength);
+
+				manipulatePixels();
+			}
+
+			function createStars() {
+				for (var i = 0; i < stars.length; i++) {
+					var s = {};
+					//random pos
+					s.x = Math.random() * canvas.width;
+					s.y = Math.random() * canvas.height;
+					//size either 1 or 2
+					s.size = Math.ceil(Math.random() * 2);
+					stars[i] = s;
+				}
+			}
+
+			function updateStars() {
+				//move them towards x+ and y+
+				for (var i = 0; i < stars.length; i++) {
+					stars[i].x++;
+					stars[i].y++;
+					if (stars[i].x > canvas.width) stars[i].x = 0;
+					if (stars[i].y > canvas.height) stars[i].y = 0;
+				}
+			}
+
+			function manipulatePixels() {
+				tintRed = document.querySelector('#tintred').checked;
+				invert = document.querySelector('#invert').checked;
+				noise = document.querySelector('#noise').checked;
+				lines = document.querySelector('#lines').checked;
+
+				var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+				var data = imageData.data;
+				var length = data.length;
+				var width = imageData.width;
+
+				for (var i = 0; i < length; i += 4) {
+					if (tintRed) {
+						//add to the red value
+						data[i] = data[i] + 100;
+					}
+					if (invert) {
+						var red = data[i];
+						var green = data[i + 1];
+						var blue = data[i + 2];
+						data[i] = 255 - red;
+						data[i + 1] = 255 - green;
+						data[i + 2] = 255 - blue;
+					}
+					if (noise && Math.random() < 0.1) {
+						data[i] = data[i + 1] = data[i + 2] = 128;
+					}
+				}
+				ctx.putImageData(imageData, 0, 0);
+
+				if (lines) {
+					ctx.save();
+					ctx.strokeStyle = "white";
+					ctx.lineWidth = 1;
+					//make the lines radial to match the bars
+					for (var r = maxRadius; r <= orbitRadius; r += 10) {
+						ctx.beginPath();
+						ctx.arc(canvas.width / 2, canvas.height / 2, r, 0, Math.PI * 2, false);
+						ctx.stroke();
+						ctx.closePath();
+					}
+					ctx.restore();
+				}
+			}
+
+			function drawStars(data, dataLength){
+				/*each star is tied to a data point
+				the brightness is based upon the data's intencity*/
+				for (var i = 0; i < stars.length; i++) {
+					var alpha = data[i]/256;
+					ctx.fillStyle = "rgba(255,255,255,"+alpha+")";
+					//draw a rect at the star position					
+					ctx.fillRect(stars[i].x, stars[i].y, stars[i].size, stars[i].size);
+				}
+			}
+
+			function drawRectsOrCircles(index, datum, dataLength) {
+				//get how around the circle this bar is
+				var radians = Math.PI * 2 * (index / dataLength);
+				//radius of the circle the bars sit upon
+				var radius = 100;
+				//this is 50, the distance between the radius and the orbit of the spaceship
+				var maxHeight = orbitRadius - radius;
+				var barWidth = 5;
+				//persentage this is out of the max value
+				var barHeight = (datum / 256) * maxHeight;
+
+				ctx.save();
+				ctx.fillStyle = radialGradient;
+				ctx.save();
+				//move to the center
+				ctx.translate(canvas.width / 2, canvas.height / 2);
+				//rotate
+				ctx.rotate(radians);
+				
+				ctx.beginPath();
+				//draw the bar
+				if (display == "bars") {
+					//move to where the top left of the bar should be
+					ctx.translate(barWidth / -2, -1 * (radius + barHeight));
+					ctx.rect(0, 0, barWidth, barHeight);
+				} else if (display == "circles") {
+					ctx.translate(0, -1 * (radius + barHeight));					
+					ctx.arc(0, 0, barWidth / 2, 0, Math.PI * 2, false);					
+				}
+				ctx.closePath();
+				ctx.restore();
+				ctx.fill();
+				ctx.restore();
+			}
+
+			function drawCurves(data, dataLength) {
+				//list of points around the circle
+				var points = new Array(dataLength + 1);
+				for (var i = 0; i <= dataLength; i++) {
+					//min radius
+					var radius = 100;
+					//max radius
+					var maxHeight = orbitRadius - radius;
+					//how high is this point
+					var height = (data[i] / 256) * maxHeight + radius;
+					//how around are we in the circle
+					var radians = Math.PI * 2 * (i / dataLength);
+					//position in a unit circle rotated counter clockwise 90 degrees
+					var xPos = Math.cos(radians - Math.PI / 2);
+					var yPos = Math.sin(radians - Math.PI / 2);
+					//get the height
+					xPos *= height;
+					yPos *= height;
+					//move to be around the center instead of (0,0)
+					xPos += canvas.width / 2;
+					yPos += canvas.height / 2;
+					//add the point to the array
+					points[i] = {
+						x: xPos,
+						y: yPos
+					};
+				}
+
+				/*
+				drawing curve code from https://stackoverflow.com/a/7058606
+				copied lines are denotes by //!
+				*/
+				// move to the first point
+				ctx.save();
+				ctx.strokeStyle = radialGradient;
+				ctx.lineWidth = 3;
+				ctx.save();
+				ctx.beginPath();
+				ctx.moveTo(points[0].x, points[0].y); //!				
+				var i = 1;
+				for (; i < points.length - 2; i++) { //!
+					var xc = (points[i].x + points[i + 1].x) / 2; //!
+					var yc = (points[i].y + points[i + 1].y) / 2; //!
+					ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc); //!
+				} //!
+				// curve through the last two points //!
+				ctx.quadraticCurveTo(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y); //!
+				ctx.closePath();
+				ctx.restore();
+				ctx.stroke();
+				
+
+				ctx.restore();
+			}
+
+			function drawCircle(datum, dataLength) {
+				var percent = datum / 255;
+				var circleRadius = percent * maxRadius;
+				ctx.beginPath();
+				ctx.fillStyle = makeColor(255, 111, 111, 0.34 - percent / 3.0);
+				ctx.arc(canvas.width / 2, canvas.height / 2, circleRadius, 0, Math.PI * 2, false);
+				ctx.fill();
+				ctx.closePath();
+
+				ctx.beginPath();
+				ctx.fillStyle = makeColor(0, 0, 255, 0.10 - percent / 10.0);
+				ctx.arc(canvas.width / 2, canvas.height / 2, circleRadius * 1.5, 0, Math.PI * 2, false);
+				ctx.fill();
+				ctx.closePath();
+
+				//ctx.save();
+				ctx.beginPath();
+				ctx.fillStyle = makeColor(200, 200, 0, 0.5 - percent / 5.0);
+				ctx.arc(canvas.width / 2, canvas.height / 2, circleRadius * 0.5, 0, Math.PI * 2, false);
+				ctx.fill();
+				ctx.closePath();
+				//ctx.restore();
+			}
+
+			function drawOrbit(data, dataLength) {
+				//convert speed from degrees to radians and muliply by delta Time
+				rocketPos += (rocketSpeed * (Math.PI / 180) * (1/60));
+				//if the rocket goes around the circle set its posiion to 0degrees instead of 2*PI
+				if(rocketPos > Math.PI * 2) rocketPos = 0;
+				
+				//get where around in the circle the rocket is
+				var percentAround = rocketPos / (Math.PI * 2);
+				var index = Math.floor(dataLength * percentAround);
+				var datum = data[index];	
+				
+				//velcocity up and down changes to the data
+				orbitYVel = ((datum - orbitDataPrevious) / 256) * 15;
+				orbitYPos += orbitYVel;
+				
+				orbitDataPrevious = datum;
+
+				var rocket = document.getElementById('rocket');
+				var fire = document.getElementById('fire');
+
+				ctx.save();
+				ctx.fillStyle = 'rgba(0,255,0,0.6)';
+				ctx.translate(canvas.width / 2, canvas.height / 2);
+				ctx.rotate(rocketPos);
+				ctx.translate(0, -1 * (orbitRadius + orbitYPos));
+				ctx.drawImage(rocket, -20, -10, 40, 20);
+				ctx.drawImage(fire, -40, -5, 20, 10);
+				ctx.restore();
+			}
+
+			function drawAsteroid(data, dataLength) {
+				//find the average intensity of the bottom 25% of frequencies
+				var count = Math.floor(dataLength * 0.25);
+				var total = 0;
+				for (var i = dataLength - 1; i >= dataLength - count; i--) {
+					total += data[i];
+				}
+				var average = total / count;
+				
+				var asteroid = document.getElementById('asteroid');
+
+				var width = 100;
+				var height = 100;
+				//if the average intencity is enough make the asteroid bounce
+				if (average > 30 && !waves) {
+					//expand the asteroid by an amount
+					var percent = (average - 30) / 50; //range 30-80
+					width += width * percent;
+					height += height * percent;
+				}
+				ctx.save();
+				ctx.translate(canvas.width / 2, canvas.height / 2);
+				ctx.drawImage(asteroid, width / -2, height / -2, width, height);
+				ctx.restore();
+			}
+
+			// HELPER
+			function makeColor(red, green, blue, alpha) {
+				var color = 'rgba(' + red + ',' + green + ',' + blue + ', ' + alpha + ')';
+				return color;
+			}
+
+			// FULL SCREEN MODE
+			function requestFullscreen(element) {
+				if (element.requestFullscreen) {
+					element.requestFullscreen();
+				} else if (element.mozRequestFullscreen) {
+					element.mozRequestFullscreen();
+				} else if (element.mozRequestFullScreen) { // camel-cased 'S' was changed to 's' in spec
+					element.mozRequestFullScreen();
+				} else if (element.webkitRequestFullscreen) {
+					element.webkitRequestFullscreen();
+				}
+				// .. and do nothing if the method is not supported
+			};
+
+			window.addEventListener("load", init);
+		}());
+
+	</script>
+</head>
+
+<body>
+	<div class="row">
+			<div class="col">
+				<h1>
+					Scott Robertson Space Audio Visualizer
+				</h1>
+			</div>
+		</div>
+	<canvas id="canvas" width="640" height="400"></canvas>
+	<div id="controls" class="container">
+		
+		<div class="row">
+			<div class="col"><audio controls loop></audio></div>
+			<label class="col">Track: 
+				<select id="trackSelect" >
+					<option value="media/GlintingGold.mp3" selected="selected">Glinting Gold</option>
+					<option value="media/waveDash.mp3">waveDash</option>
+				</select>
+			</label>
+			<button id="fsButton" class="col">Go Full Screen</button><br>
+		</div>
+		<div class="row">
+			<div class="col">
+				<label for="tintred">Tint Red</label>
+				<input id="tintred" type="checkbox">
+			</div>
+			<div class="col">
+				<label for="invert">Invert</label>
+				<input id="invert" type="checkbox">
+			</div>
+			<div class="col">
+				<label for="noise">Noise</label>
+				<input id="noise" type="checkbox">
+			</div>
+			<div class="col">
+				<label for="lines">Lines</label>
+				<input id="lines" type="checkbox">
+			</div>
+		</div>
+		<div class="row">
+			<div class="col">
+				<label for="slider">Rocket Speed Slider</label>
+				<input id="slider" type="range" min="1" max="100" value="50" step="1">
+			</div>
+			<div class="col">
+				<label for="delaySlider">Reverb Slider</label>
+				<input id="delaySlider" type="range" min="0.00" max="0.2" value="0" step="0.01">
+			</div>
+			<div class="col" style="display: none;">
+				<label for="bassSlider">Bass Boost</label>
+				<input id="bassSlider" type="range" min="1.0" max="5.0" value="1.0" step="0.1">
+			</div>
+		</div>
+		<div class="row">
+			<label class="col">Frequency/Waveform: 
+			<select id="frequency-waveform" >
+				<option value="frequency" selected="selected">Frequency</option>
+				<option value="waveform">Waveform</option>
+			</select>
+			</label>
+
+			<label class="col">Display Style: 
+			<select id="display" >
+				<option value="bars" selected="selected">Bars</option>
+				<option value="circles">Circles</option>
+				<option value="curves">Curves</option>
+			</select>
+		</label>
+		</div>		
+		<div class="row">
+			<p id="status" class="col">???</p>
+		</div>		
+
+		<div style="display:none;">
+			<img id="rocket" src="images/spaceRockets_002.png">
+			<img id="fire" src="images/spaceEffects_004.png">
+			<img id="asteroid" src="images/spaceMeteors_002.png">
+		</div>
+
+	</div>
+</body>
+
+</html>
