@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Town Select Demo</title>
+	<style>
+		#map {
+			height: 100%;
+		}
+		html, body {
+				height: 100%;
+				margin: 0;
+				padding: 0;
+			}
+		#controls {
+		position: absolute;
+			top: 20px;
+			left: 20px;
+			z-index: 1;
+			width: auto;
+			background-color: white;
+			text-align: center;
+			padding: 10px;
+			border-color: block;
+			border-style: solid;
+			border-width: 5px;
+		}
+		#controls button{
+			padding: 10px;
+		}
+		.countyPopup_content {
+			height: 200px;
+		}
+		.countyPopup_content input{
+			position: relative;
+			margin-right: 5px; 
+			transform: scale(1.2);
+		}
+		.countyPopup_content p{
+			margin: 5px;
+			padding: 5px;
+		}
+		.countyPopup_content h3{
+			margin-top: 5px;
+			margin-bottom: 5px;
+		}
+	</style>
+	</head>
+<body>
+	<div id="controls">
+		<h3>Controls</h3>
+		<button onclick="viewAllStates()">View All States</button>
+	</div>
+	<div id="map"></div>
+	<script>
+		var _0x458f=["\x2A","\x6F\x6E\x6C\x6F\x61\x64","\x6D\x61\x70","\x67\x65\x74\x45\x6C\x65\x6D\x65\x6E\x74\x42\x79\x49\x64","\x72\x6F\x61\x64\x6D\x61\x70","\x6D\x61\x70\x73","\x67\x65\x74\x42\x6F\x75\x6E\x64\x69\x6E\x67\x42\x6F\x78","\x70\x72\x6F\x74\x6F\x74\x79\x70\x65","\x50\x6F\x6C\x79\x67\x6F\x6E","\x65\x78\x74\x65\x6E\x64","\x66\x6F\x72\x45\x61\x63\x68","\x67\x65\x74\x50\x61\x74\x68","\x6F\x6E\x72\x65\x61\x64\x79\x73\x74\x61\x74\x65\x63\x68\x61\x6E\x67\x65","\x72\x65\x61\x64\x79\x53\x74\x61\x74\x65","\x73\x74\x61\x74\x75\x73","\x72\x65\x73\x70\x6F\x6E\x73\x65\x54\x65\x78\x74","\x70\x61\x72\x73\x65","\x66\x65\x61\x74\x75\x72\x65\x73","\x73\x74\x61\x74\x65\x73","\x47\x45\x54","\x68\x74\x74\x70\x73\x3A\x2F\x2F\x72\x61\x77\x2E\x67\x69\x74\x68\x75\x62\x75\x73\x65\x72\x63\x6F\x6E\x74\x65\x6E\x74\x2E\x63\x6F\x6D\x2F\x75\x73\x63\x65\x6E\x73\x75\x73\x62\x75\x72\x65\x61\x75\x2F\x63\x69\x74\x79\x73\x64\x6B\x2F\x6D\x61\x73\x74\x65\x72\x2F\x76\x32\x2F\x47\x65\x6F\x4A\x53\x4F\x4E\x2F\x32\x30\x6D\x2F\x32\x30\x31\x37\x2F\x73\x74\x61\x74\x65\x2E\x6A\x73\x6F\x6E","\x6F\x70\x65\x6E","\x73\x65\x6E\x64","\x63\x6F\x75\x6E\x74\x69\x65\x73","\x68\x74\x74\x70\x73\x3A\x2F\x2F\x72\x61\x77\x2E\x67\x69\x74\x68\x75\x62\x75\x73\x65\x72\x63\x6F\x6E\x74\x65\x6E\x74\x2E\x63\x6F\x6D\x2F\x75\x73\x63\x65\x6E\x73\x75\x73\x62\x75\x72\x65\x61\x75\x2F\x63\x69\x74\x79\x73\x64\x6B\x2F\x6D\x61\x73\x74\x65\x72\x2F\x76\x32\x2F\x47\x65\x6F\x4A\x53\x4F\x4E\x2F\x32\x30\x6D\x2F\x32\x30\x31\x37\x2F\x63\x6F\x75\x6E\x74\x79\x2E\x6A\x73\x6F\x6E","\x63\x6F\x6F\x72\x64\x69\x6E\x61\x74\x65\x73","\x67\x65\x6F\x6D\x65\x74\x72\x79","\x6C\x65\x6E\x67\x74\x68","\x70\x75\x73\x68","\x23\x46\x46\x30\x30\x30\x30","\x67\x65\x74\x43\x65\x6E\x74\x65\x72","\x63\x6C\x69\x63\x6B","\x63\x6C\x6F\x73\x65","\x63\x6F\x6E\x74\x65\x6E\x74","","\x70\x72\x6F\x70\x65\x72\x74\x69\x65\x73","\x61\x64\x64\x4C\x69\x73\x74\x65\x6E\x65\x72","\x74\x6F\x77\x6E\x73","\x43\x4F\x55\x4E\x54\x59\x46\x50","\x3C\x69\x6D\x67\x20\x73\x72\x63\x3D\x22\x6C\x6F\x61\x64\x69\x6E\x67\x2D\x69\x63\x6F\x6E\x2E\x67\x69\x66\x22\x20\x68\x65\x69\x67\x68\x74\x3D\x22\x35\x30\x22\x20\x77\x69\x64\x74\x68\x3D\x22\x35\x30\x22\x3E","\x73\x65\x74\x43\x6F\x6E\x74\x65\x6E\x74","\x73\x70\x6C\x69\x63\x65","\x64\x69\x76","\x63\x72\x65\x61\x74\x65\x45\x6C\x65\x6D\x65\x6E\x74","\x63\x6C\x61\x73\x73\x4E\x61\x6D\x65","\x63\x6F\x75\x6E\x74\x79\x50\x6F\x70\x75\x70\x5F\x63\x6F\x6E\x74\x65\x6E\x74","\x68\x33","\x69\x6E\x6E\x65\x72\x48\x54\x4D\x4C","\x20\x43\x6F\x75\x6E\x74\x79","\x61\x70\x70\x65\x6E\x64\x43\x68\x69\x6C\x64","\x2C","\x73\x70\x6C\x69\x74","\x20","\x73\x75\x62\x73\x74\x72\x69\x6E\x67","\x70","\x69\x6E\x70\x75\x74","\x74\x79\x70\x65","\x63\x68\x65\x63\x6B\x62\x6F\x78","\x6F\x6E\x63\x6C\x69\x63\x6B","\x73\x70\x61\x6E","\x68\x74\x74\x70\x73\x3A\x2F\x2F\x61\x70\x69\x2E\x63\x65\x6E\x73\x75\x73\x2E\x67\x6F\x76\x2F\x64\x61\x74\x61\x2F\x32\x30\x31\x37\x2F\x61\x63\x73\x2F\x61\x63\x73\x35\x3F\x67\x65\x74\x3D\x4E\x41\x4D\x45\x26\x66\x6F\x72\x3D\x63\x6F\x75\x6E\x74\x79\x25\x32\x30\x73\x75\x62\x64\x69\x76\x69\x73\x69\x6F\x6E\x3A\x2A\x26\x69\x6E\x3D\x73\x74\x61\x74\x65\x3A","\x26\x69\x6E\x3D\x63\x6F\x75\x6E\x74\x79\x3A","\x63\x68\x65\x63\x6B\x65\x64","\x73\x65\x74\x4D\x61\x70"];var states;var statesPolygons=[];var counties;var countiesPolygons=[];var currentState=_0x458f[0];var currentCounty;var townsOfCurrentState=[];var townsOfCurrentStatePolygons=[];var openInfowindow;var selectedTowns=[];window[_0x458f[1]]= ()=>{loadStatesAndCounties()};var map;function initMap(){map=  new google[_0x458f[5]].Map(document[_0x458f[3]](_0x458f[2]),{center:{lat:37,lng:-97},zoom:5,mapTypeId:_0x458f[4],disableDefaultUI:true,zoomControl:true});google[_0x458f[5]][_0x458f[8]][_0x458f[7]][_0x458f[6]]= function(){var _0xf695xd= new google[_0x458f[5]].LatLngBounds();this[_0x458f[11]]()[_0x458f[10]](function(_0xf695xe,_0xf695xf){_0xf695xd[_0x458f[9]](_0xf695xe)});return (_0xf695xd)}}function loadStatesAndCounties(){let _0xf695x11= new XMLHttpRequest();_0xf695x11[_0x458f[12]]= function(){if(this[_0x458f[13]]== 4&& this[_0x458f[14]]== 200){states= JSON[_0x458f[16]](this[_0x458f[15]]);states= states[_0x458f[17]];loadShapes(_0x458f[18],states);attachClickEventsForStates();drawShapes(_0x458f[0],statesPolygons)}};_0xf695x11[_0x458f[21]](_0x458f[19],_0x458f[20],true);_0xf695x11[_0x458f[22]]();let _0xf695x12= new XMLHttpRequest();_0xf695x12[_0x458f[12]]= function(){if(this[_0x458f[13]]== 4&& this[_0x458f[14]]== 200){counties= JSON[_0x458f[16]](this[_0x458f[15]]);counties= counties[_0x458f[17]];loadShapes(_0x458f[23],counties)}};_0xf695x12[_0x458f[21]](_0x458f[19],_0x458f[24],true);_0xf695x12[_0x458f[22]]()}function loadShapes(_0xf695x14,_0xf695x15){_0xf695x15[_0x458f[10]]((_0xf695x16)=>{let _0xf695x17=_0xf695x16[_0x458f[26]][_0x458f[25]];let _0xf695x18=[];_0xf695x17[_0x458f[10]]((_0xf695x19)=>{let _0xf695x1a=_0xf695x19;if(_0xf695x19[_0x458f[27]]== 1){_0xf695x1a= _0xf695x19[0]};let _0xf695x1b=[];for(let _0xf695x1c=0;_0xf695x1c< _0xf695x1a[_0x458f[27]];_0xf695x1c++){let _0xf695x1d={lat:_0xf695x1a[_0xf695x1c][1],lng:_0xf695x1a[_0xf695x1c][0]};_0xf695x1b[_0x458f[28]](_0xf695x1d)};let _0xf695x1e= new google[_0x458f[5]].Polygon({path:_0xf695x1b,strokeColor:_0x458f[29],strokeOpacity:0.8,strokeWeight:2,fillColor:_0x458f[29],fillOpacity:0.35});if(_0xf695x14== _0x458f[23]){let _0xf695x1f= new google[_0x458f[5]].InfoWindow({position:_0xf695x1e[_0x458f[6]]()[_0x458f[30]]()});_0xf695x1e[_0x458f[36]](_0x458f[31],()=>{if(openInfowindow!= null){openInfowindow[_0x458f[32]]()};if(_0xf695x1f[_0x458f[33]]== null|| _0xf695x1f[_0x458f[33]]== _0x458f[34]){getTowns(_0xf695x16[_0x458f[35]].STATEFP,_0xf695x16[_0x458f[35]].COUNTYFP,_0xf695x16[_0x458f[35]].NAME,_0xf695x1f)};_0xf695x1f[_0x458f[21]](map);openInfowindow= _0xf695x1f})};_0xf695x18[_0x458f[28]](_0xf695x1e)});if(_0xf695x14== _0x458f[18]){if(statesPolygons[Number(_0xf695x16[_0x458f[35]].STATEFP)]== null){statesPolygons[Number(_0xf695x16[_0x458f[35]].STATEFP)]= []};statesPolygons[Number(_0xf695x16[_0x458f[35]].STATEFP)][_0x458f[28]](_0xf695x18)};if(_0xf695x14== _0x458f[23]){if(countiesPolygons[Number(_0xf695x16[_0x458f[35]].STATEFP)]== null){countiesPolygons[Number(_0xf695x16[_0x458f[35]].STATEFP)]= []};countiesPolygons[Number(_0xf695x16[_0x458f[35]].STATEFP)][_0x458f[28]](_0xf695x18)};if(_0xf695x14== _0x458f[37]){if(townsOfCurrentStatePolygons[_0xf695x16[_0x458f[35]][_0x458f[38]]]== null){townsOfCurrentStatePolygons[_0xf695x16[_0x458f[35]][_0x458f[38]]]= []};townsOfCurrentStatePolygons[_0xf695x16[_0x458f[35]][_0x458f[38]]][_0x458f[28]](_0xf695x18)}})}function getTowns(_0xf695x21,_0xf695x22,_0xf695x23,_0xf695x1f){_0xf695x1f[_0x458f[40]](_0x458f[39]);let _0xf695x11= new XMLHttpRequest();_0xf695x11[_0x458f[12]]= function(){if(this[_0x458f[13]]== 4&& this[_0x458f[14]]== 200){towns= JSON[_0x458f[16]](this[_0x458f[15]]);towns[_0x458f[41]](0,1);let _0xf695x24=document[_0x458f[43]](_0x458f[42]);_0xf695x24[_0x458f[44]]= _0x458f[45];let _0xf695x25=document[_0x458f[43]](_0x458f[46]);_0xf695x25[_0x458f[47]]= _0xf695x23+ _0x458f[48];_0xf695x24[_0x458f[49]](_0xf695x25);towns[_0x458f[10]]((_0xf695x26)=>{let _0xf695x27=_0xf695x26[0][_0x458f[51]](_0x458f[50])[0];let _0xf695x28=_0xf695x27[_0x458f[51]](_0x458f[52]);let _0xf695x29=_0xf695x28[_0xf695x28[_0x458f[27]]- 1];_0xf695x27= _0xf695x27[_0x458f[53]](0,_0xf695x27[_0x458f[27]]- _0xf695x29[_0x458f[27]]- 1);let _0xf695x2a=document[_0x458f[43]](_0x458f[54]);let _0xf695x2b=document[_0x458f[43]](_0x458f[55]);_0xf695x2b[_0x458f[56]]= _0x458f[57];_0xf695x2b[_0x458f[58]]= ()=>{checkTown(_0xf695x26[3],_0xf695x27,_0xf695x2b)};_0xf695x2a[_0x458f[49]](_0xf695x2b);let _0xf695x2c=document[_0x458f[43]](_0x458f[59]);_0xf695x2c[_0x458f[47]]= _0xf695x27;_0xf695x2a[_0x458f[49]](_0xf695x2c);_0xf695x24[_0x458f[49]](_0xf695x2a)});_0xf695x1f[_0x458f[40]](_0xf695x24)}};_0xf695x11[_0x458f[21]](_0x458f[19],(_0x458f[60]+ _0xf695x21+ _0x458f[61]+ _0xf695x22+ _0x458f[34]),true);_0xf695x11[_0x458f[22]]()}function checkTown(_0xf695x2e,_0xf695x2f,_0xf695x2b){if(_0xf695x2b[_0x458f[62]]){selectedTowns[Number(_0xf695x2e)]= _0xf695x2f}else {delete (selectedTowns[Number(_0xf695x2e)])}}function drawShapes(_0xf695x2e,_0xf695x15){if(_0xf695x2e!= _0x458f[0]){_0xf695x15= [_0xf695x15[_0xf695x2e]]};_0xf695x15[_0x458f[10]]((_0xf695x2e)=>{_0xf695x2e[_0x458f[10]]((_0xf695x16)=>{_0xf695x16[_0x458f[10]]((_0xf695x1a)=>{_0xf695x1a[_0x458f[63]](map)})})})}function attachClickEventsForStates(){states[_0x458f[10]]((_0xf695x32)=>{statesPolygons[Number(_0xf695x32[_0x458f[35]].STATEFP)][0][_0x458f[10]]((_0xf695x1a)=>{_0xf695x1a[_0x458f[36]](_0x458f[31],()=>{zoomOnState(Number(_0xf695x32[_0x458f[35]].STATEFP))})})})}function zoomOnState(_0xf695x2e){currentState= _0xf695x2e;statesPolygons[_0x458f[10]]((_0xf695x32)=>{_0xf695x32[0][_0x458f[10]]((_0xf695x1a)=>{_0xf695x1a[_0x458f[63]](null)})});drawShapes(_0xf695x2e,countiesPolygons)}function viewAllStates(){if(openInfowindow!= null){openInfowindow[_0x458f[32]]()};if(currentState!= _0x458f[0]){countiesPolygons[currentState][_0x458f[10]]((_0xf695x35)=>{_0xf695x35[_0x458f[10]]((_0xf695x1a)=>{_0xf695x1a[_0x458f[63]](null)})});currentState= _0x458f[0];drawShapes(_0x458f[0],statesPolygons)}}
+	</script>
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0ROpt9TBnKosfKJOEun6G6_DM1VCCOx0&callback=initMap" async defer></script>
+</body>
+</html>
