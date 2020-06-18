@@ -4,6 +4,7 @@ window.onload = init;
 
 const c = document.getElementById("myCanvas");
 const ctx = c.getContext("2d");
+ctx.imageSmoothingEnabled = false;
 
 const TAU = Math.PI * 2;
 const P2 = Math.PI / 2;
@@ -19,6 +20,7 @@ function updateHorRes(num){
 	horRes = num;
 	halfHorRes = horRes/2;
 }
+let drawRays = true;
 
 const walls = [];
 walls.size = 8;
@@ -34,11 +36,13 @@ img.onload = () => {
 	img_ctx.drawImage(img, 0, 0);
 	img.style.display = 'none';
 	walls[2] = img_ctx.getImageData(0,0,16,16);
+	walls[2].img = img;
+	imagesLoaded = true;
 };
 
-
+let imagesLoaded = false;
 const map = {
-	x: 8, y: 8, s:64,
+	x: 8, y: 8, s:64, img: null,
 	grid:[
 		1,1,1,1,1,1,1,1,
 		1,0,1,0,0,2,1,1,
@@ -50,19 +54,33 @@ const map = {
 		1,1,1,1,1,1,1,1	
 	] ,
 	draw: () => {
-		let color = 'white';
-		for(let y = 0; y < map.y; y++){
-			for(let x = 0; x < map.x; x++){
-				if(map.grid[y*map.y+x]==1)
-					color = 'white';
-				else
-					color = 'black';
-				let xo = x*map.s;
-				let yo = y*map.s;
+		if(map.img == null){
+			let color = 'white';
+			for(let y = 0; y < map.y; y++){
+				for(let x = 0; x < map.x; x++){
+					let xo = x*map.s;
+					let yo = y*map.s;
+					let i = map.grid[y*map.y+x];
 
-				ctx.fillStyle = color;
-				ctx.fillRect(xo+1, yo+1, map.s-1, map.s-1);
+					if(i==1) {
+						ctx.fillStyle = 'white';
+						ctx.fillRect(xo+1, yo+1, map.s-1, map.s-1);
+					}
+					else if(i > 0) {
+						ctx.drawImage(walls[i].img, xo, yo, 64, 64);
+					}
+					else{
+						ctx.fillStyle = 'black';
+						ctx.fillRect(xo+1, yo+1, map.s-1, map.s-1);
+					}					
+
+					
+				}
 			}
+			//img = ctx.createImageData(512,512);
+			map.img = ctx.getImageData(0,0,512,512);
+		} else {
+			ctx.putImageData(map.img, 0, 0);
 		}
 	}
 };
@@ -131,12 +149,14 @@ function update() {
 }
 
 function draw() {
-	ctx.fillStyle = 'gray';
-	ctx.fillRect(0, 0, 1024, 512);
-	map.draw();
-	
-	drawRays2D();
-	player.draw();
+	if(imagesLoaded){
+		ctx.fillStyle = 'gray';
+		ctx.fillRect(0, 0, 1024, 512);
+		map.draw();
+		
+		drawRays2D();
+		player.draw();
+	}
 }
 
 function playerControls() {
@@ -167,9 +187,9 @@ function dist( ax, ay, bx, by, ang){
 }
 
 function drawRays2D() {
-	ctx.fillStyle = 'gray';
-	ctx.fillRect(512,0,512,256);
 	ctx.fillStyle = '#333';
+	ctx.fillRect(512,0,512,256);
+	ctx.fillStyle = 'gray';
 	ctx.fillRect(512,256,512,256);
 
 	let colorMod = 1;
@@ -184,7 +204,7 @@ function drawRays2D() {
 	if(ray.a > TAU)
 		ray.a -= TAU;
 
-	let lastImg, lastPixelX, imgData, imgWidth, imgHeight, imgSize, pixelIndex, heightFraction;
+	let lastImg, imgData, imgWidth, imgHeight, imgSize, pixelIndex, heightFraction;
 	
 	for(let r = 0; r < view.width/horRes; r++) {
 		//#region other
@@ -299,12 +319,14 @@ function drawRays2D() {
 		//#endregion
 
 		//#region draw 2d
-		ctx.beginPath();
-		ctx.moveTo(player.x, player.y);
-		ctx.lineTo(ray.x, ray.y);
-		ctx.strokeStyle = 'red';
-		ctx.lineWidth = 1;
-		ctx.stroke();
+		if(drawRays){
+			ctx.beginPath();
+			ctx.moveTo(player.x, player.y);
+			ctx.lineTo(ray.x, ray.y);
+			ctx.strokeStyle = 'red';
+			ctx.lineWidth = 1;
+			ctx.stroke();
+		}
 		//#endregion
 
 		//#region Draw 3D Walls
@@ -352,7 +374,7 @@ function drawRays2D() {
 			}
 
 			let pixelX = Math.trunc(imgWidth * percentage);			
-			let darken = (lineH/view.height) * colorMod;
+			let darken = (1.5*lineH/view.height) * colorMod;
 
 			//var grad= ctx.createLinearGradient(50, 50, 150, 150);
 			//grad.addColorStop(0, "red");
@@ -364,8 +386,7 @@ function drawRays2D() {
 			let grad= ctx.createLinearGradient(r*horRes + (view.height + halfHorRes), lineO, r*horRes + (view.height + halfHorRes), lineH + lineO);
 			
 			for(let i = 0; i < imgHeight; i++){
-				pixelIndex = i * (imgWidth*4)  + (pixelX*4);
-				lastPixelX = pixelX;						
+				pixelIndex = i * (imgWidth*4)  + (pixelX*4);					
 				//ctx.strokeStyle = `rgb(${imgData[pixelIndex]*darken}, ${imgData[pixelIndex+1]*darken}, ${imgData[pixelIndex+2]*darken})`;
 				let color = `rgb(${imgData[pixelIndex]*darken}, ${imgData[pixelIndex+1]*darken}, ${imgData[pixelIndex+2]*darken})`;
 				

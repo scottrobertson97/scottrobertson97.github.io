@@ -1,0 +1,5 @@
+window size, target 800x600,. but with hud 800x400
+2d in its own canvas, can be toggled
+image loader
+world size
+collisions with wall, bounding box
