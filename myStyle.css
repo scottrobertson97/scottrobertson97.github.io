@@ -1,0 +1,92 @@
+:root {
+	--black : rgba(35, 31, 32, 1);
+	--red : rgba(187, 68, 48, 1);
+	--blue : rgba(126, 189, 194, 1);
+	--yellow : rgba(243, 223, 162, 1);
+	--white : rgba(239, 230, 221, 1);
+}
+body {
+  	background-color: var(--white);
+	margin:0;
+}
+header {
+	background-color: var(--black);
+	color: var(--white);
+	fill: var(--white);
+}
+	header nav {
+		width: 60%;
+		margin: auto;		
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+	header ul {
+		list-style-type: none;
+		padding: 0;
+	}
+	header li{
+		float: left;
+		margin: 0 10px;
+	}
+	header li:hover{
+		color: var(--red);
+		fill: var(--red);
+	}
+a {
+ 	color: inherit;
+ 	text-decoration: inherit;
+ 	fill: inherit;
+}
+main{
+	width: 60%;
+	margin: auto;
+}
+#aboutme {	
+	background-color: var(--black);
+	color: var(--blue);
+	padding: 20px;
+	border-radius: 10px;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	margin-left: 10px;
+	margin-right: 10px;
+}
+	#aboutme h1{
+	}
+	#aboutme p{
+		font-size: 20px;
+	}
+.project {
+	width: 29%;	
+	padding: 10px;
+}
+.project-inner {
+	overflow: hidden;
+	border-radius: 20px;
+}
+.project-img {
+	height: 200px;
+	background-color: white;
+}
+.project-body {
+	background-color: var(--black);
+	color: var(--white);
+	padding: 10px;
+}
+.project-link {
+	width: 100%;
+	display: flex;
+	justify-content: flex-end;
+}
+.project-link a {
+	background-color: var(--white);
+	color: var(--black);
+	border-radius: 20px;
+	padding: 5px 10px;
+}
+.project-link a:hover {
+	background-color: var(--blue);
+	color: var(--black);
+	cursor: pointer;
+}
