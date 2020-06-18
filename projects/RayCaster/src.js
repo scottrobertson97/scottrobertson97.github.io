@@ -14,21 +14,28 @@ const viewW = 512; //view width
 const view = {width: 512, height: 512};
 const fov = 60;
 let horRes = 8; //horizontal resolution, higher number = less resolution
+let halfHorRes = horRes/2;
+function updateHorRes(num){
+	horRes = num;
+	halfHorRes = horRes/2;
+}
 
 const walls = [];
 walls.size = 8;
 walls[0] = [];
 walls[1] = ['#FF0000', '#FF0000', '#FF0000', '#FF0000',];
-walls[2] = [
-	'#00FFFF', '#00FF00', '#00FFFF', '#00FF00', '#00FFFF', '#00FF00', '#00FFFF', '#00FF00',
-	'#00FF00', '#00FFFF', '#00FF00', '#00FFFF', '#00FF00', '#00FFFF', '#00FF00', '#00FFFF',
-	'#00FFFF', '#00FF00', '#00FFFF', '#00FF00', '#00FFFF', '#00FF00', '#00FFFF', '#00FF00',
-	'#00FF00', '#00FFFF', '#00FF00', '#00FFFF', '#00FF00', '#00FFFF', '#00FF00', '#00FFFF',
-	'#00FFFF', '#00FF00', '#00FFFF', '#00FF00', '#00FFFF', '#00FF00', '#00FFFF', '#00FF00',
-	'#00FF00', '#00FFFF', '#00FF00', '#00FFFF', '#00FF00', '#00FFFF', '#00FF00', '#00FFFF',
-	'#00FFFF', '#00FF00', '#00FFFF', '#00FF00', '#00FFFF', '#00FF00', '#00FFFF', '#00FF00',
-	'#00FF00', '#00FFFF', '#00FF00', '#00FFFF', '#00FF00', '#00FFFF', '#00FF00', '#00FFFF'
-];
+
+let img = new Image();
+img.src = 'https://i.imgur.com/W8PJYFY.png';
+img.setAttribute('crossOrigin', '');
+const img_ctx = document.getElementById('imageCanvas').getContext('2d');
+walls[2] = img_ctx.createImageData(16, 16);
+img.onload = () => {
+	img_ctx.drawImage(img, 0, 0);
+	img.style.display = 'none';
+	walls[2] = img_ctx.getImageData(0,0,16,16);
+};
+
 
 const map = {
 	x: 8, y: 8, s:64,
@@ -134,13 +141,13 @@ function draw() {
 
 function playerControls() {
 	if(myKeys.keydown[myKeys.KEYBOARD.KEY_RIGHT] || myKeys.keydown[myKeys.KEYBOARD.KEY_D]){
-		player.a += 0.1;
+		player.a += 0.05;
 		if(player.a > TAU ) player.a = 0;
 		player.dx = Math.cos(player.a) * player.speed;
 		player.dy = Math.sin(player.a) * player.speed;
 	}
 	if(myKeys.keydown[myKeys.KEYBOARD.KEY_LEFT] || myKeys.keydown[myKeys.KEYBOARD.KEY_A]){
-		player.a -= 0.1;
+		player.a -= 0.05;
 		if(player.a < 0 ) player.a = TAU;
 		player.dx = Math.cos(player.a) * player.speed;
 		player.dy = Math.sin(player.a) * player.speed;
@@ -177,6 +184,8 @@ function drawRays2D() {
 	if(ray.a > TAU)
 		ray.a -= TAU;
 
+	let lastImg, lastPixelX, imgData, imgWidth, imgHeight, imgSize, pixelIndex, heightFraction;
+	
 	for(let r = 0; r < view.width/horRes; r++) {
 		//#region other
 		let isVertical, isLeft, isUp, mpv, mph;
@@ -316,12 +325,12 @@ function drawRays2D() {
 
 		if(map.grid[mp] == 1) {
 			ctx.beginPath();
-			ctx.moveTo(r*horRes + (view.height + horRes/2) , lineO);
-			ctx.lineTo(r*horRes + (view.height + horRes/2), lineH + lineO);
+			ctx.moveTo(r*horRes + (view.height + halfHorRes) , lineO);
+			ctx.lineTo(r*horRes + (view.height + halfHorRes), lineH + lineO);
 			ctx.strokeStyle = `rgb(${(lineH/view.height) * 256 * colorMod},0,0)`;
 			ctx.lineWidth = horRes;
 			ctx.stroke();
-		} else if(map.grid[mp] > 0) {
+		} else if(map.grid[mp] > 0 && walls[map.grid[mp]] != null) {
 			let percentage;
 			if(!isVertical && isUp){ //bottom face
 				percentage = (ray.x%map.s) / map.s;
@@ -333,16 +342,49 @@ function drawRays2D() {
 				percentage = 1 - (ray.y%map.s) / map.s;
 			} 
 
-			let pixelX = Math.trunc(walls.size * percentage);
-			
-			for(let i = 0; i < walls.size; i++){
-				ctx.beginPath();
-				ctx.moveTo(r*horRes + (view.height + horRes/2) , lineH *(i/walls.size) +lineO);
-				ctx.lineTo(r*horRes + (view.height + horRes/2), lineH *((i+1)/walls.size) + lineO);
-				ctx.strokeStyle = walls[map.grid[mp]][i * walls.size + pixelX];
-				ctx.lineWidth = horRes;
-				ctx.stroke();
+			if(map.grid[mp] != lastImg){
+				imgData = walls[map.grid[mp]].data;
+				imgWidth = walls[map.grid[mp]].width;
+				imgHeight = walls[map.grid[mp]].height;
+				imgSize = imgWidth * imgHeight;
+				heightFraction = 1/imgHeight;
+				lastImg = map.grid[mp];
 			}
+
+			let pixelX = Math.trunc(imgWidth * percentage);			
+			let darken = (lineH/view.height) * colorMod;
+
+			//var grad= ctx.createLinearGradient(50, 50, 150, 150);
+			//grad.addColorStop(0, "red");
+			//grad.addColorStop(0.5, "red");
+			//grad.addColorStop(0.5, "green");
+			//grad.addColorStop(1, "green");
+			//ctx.strokeStyle = grad;
+
+			let grad= ctx.createLinearGradient(r*horRes + (view.height + halfHorRes), lineO, r*horRes + (view.height + halfHorRes), lineH + lineO);
+			
+			for(let i = 0; i < imgHeight; i++){
+				pixelIndex = i * (imgWidth*4)  + (pixelX*4);
+				lastPixelX = pixelX;						
+				//ctx.strokeStyle = `rgb(${imgData[pixelIndex]*darken}, ${imgData[pixelIndex+1]*darken}, ${imgData[pixelIndex+2]*darken})`;
+				let color = `rgb(${imgData[pixelIndex]*darken}, ${imgData[pixelIndex+1]*darken}, ${imgData[pixelIndex+2]*darken})`;
+				
+				grad.addColorStop(i*heightFraction, color);
+				grad.addColorStop((i+1)*heightFraction, color);
+				
+				//ctx.lineWidth = horRes;
+				//ctx.beginPath();
+				//ctx.moveTo(r*horRes + (view.height + halfHorRes) , lineH *(i*heightFraction) +lineO);
+				//ctx.lineTo(r*horRes + (view.height + halfHorRes), lineH *((i+1)*heightFraction) + lineO);							
+				//ctx.closePath(); 
+				//ctx.stroke();
+			}
+			ctx.beginPath();
+			ctx.moveTo(r*horRes + (view.height + halfHorRes) , lineO);
+			ctx.lineTo(r*horRes + (view.height + halfHorRes), lineH + lineO);
+			ctx.strokeStyle = grad;
+			ctx.lineWidth = horRes;
+			ctx.stroke();
 		}
 		//#endregion
 
