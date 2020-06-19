@@ -3,3 +3,5 @@ window size, target 800x600,. but with hud 800x400
 image loader
 world size
 collisions with wall, bounding box
+load map from file
+map class

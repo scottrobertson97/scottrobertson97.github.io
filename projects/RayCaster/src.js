@@ -2,31 +2,36 @@
 
 window.onload = init;
 
+//canvas stuff
 const c = document.getElementById("myCanvas");
 const ctx = c.getContext("2d");
 ctx.imageSmoothingEnabled = false;
 
+//cosntants
 const TAU = Math.PI * 2;
 const P2 = Math.PI / 2;
 const P3 = 3 * Math.PI / 2;
 const DR = Math.PI / 180; // one degree in radians
+const DOF = 8;
 
-const viewW = 512; //view width
+//view stuff
 const view = {width: 512, height: 512};
 const fov = 60;
 let horRes = 8; //horizontal resolution, higher number = less resolution
 let halfHorRes = horRes/2;
+let drawRays = true;
 function updateHorRes(num){
 	horRes = num;
 	halfHorRes = horRes/2;
 }
-let drawRays = true;
 
+//#region wall texture stuff
 const walls = [];
-walls.size = 8;
 walls[0] = [];
 walls[1] = ['#FF0000', '#FF0000', '#FF0000', '#FF0000',];
+//#endregion
 
+//#region texture loading
 let img = new Image();
 img.src = 'https://i.imgur.com/W8PJYFY.png';
 img.setAttribute('crossOrigin', '');
@@ -39,12 +44,14 @@ img.onload = () => {
 	walls[2].img = img;
 	imagesLoaded = true;
 };
+let imagesLoaded = true;
+//#endregion
 
-let imagesLoaded = false;
+//#region map
 let map = [
-	[1,1,1,1,1,1,1,1],
-	[1,0,1,0,0,2,1,1],
-	[1,0,1,0,0,0,1,1],
+	[1,2,2,2,2,1,1,1],
+	[1,0,2,0,0,2,1,1],
+	[1,0,2,0,0,0,1,1],
 	[1,0,0,0,0,0,0,1],
 	[1,0,0,0,0,0,0,1],
 	[1,0,0,0,0,2,0,1],
@@ -71,23 +78,11 @@ Object.defineProperty(map, 'size', {
 	get: function() { return 64; }
 });
 map.img = null;
-/*map.grid = [
-	1,1,1,1,1,1,1,1,
-	1,0,1,0,0,2,1,1,
-	1,0,1,0,0,0,1,1,
-	1,0,0,0,0,0,0,1,
-	1,0,0,0,0,0,0,1,
-	1,0,0,0,0,2,0,1,
-	1,0,0,0,0,0,0,1,
-	1,1,1,1,1,1,1,1	];*/
 map.draw = () => {
 	if(map.img == null){
 		let color = 'white';
-		for(let y = 0; y < /*map.y*/map.height; y++){
-			for(let x = 0; x < /*map.x*/map.width; x++){
-				//let xo = x*map.s;
-				//let yo = y*map.s;
-				//let i = map.grid[y*map.y+x];
+		for(let y = 0; y < map.height; y++){
+			for(let x = 0; x < map.width; x++){
 
 				let xo = x*map.size;
 				let yo = y*map.size;
@@ -108,71 +103,16 @@ map.draw = () => {
 				
 			}
 		}
-		//img = ctx.createImageData(512,512);
 		map.img = ctx.getImageData(0,0,512,512);
 	} else {
 		ctx.putImageData(map.img, 0, 0);
 	}
 };
-map.setTile = (x, y, i) => {		
-	//map.grid[y*map.x + x] = i;
+map.setTile = (x, y, i) => {	
 	map[y][x]=i;
 	map.img = null;
 };
-/*
-map = {
-	x: 8, y: 8, s:64, img: null,
-	grid:[
-		1,1,1,1,1,1,1,1,
-		1,0,1,0,0,2,1,1,
-		1,0,1,0,0,0,1,1,
-		1,0,0,0,0,0,0,1,
-		1,0,0,0,0,0,0,1,
-		1,0,0,0,0,2,0,1,
-		1,0,0,0,0,0,0,1,
-		1,1,1,1,1,1,1,1	
-	],
-	draw: () => {
-		if(map.img == null){
-			let color = 'white';
-			for(let y = 0; y < map.y; y++){
-				for(let x = 0; x < map.x; x++){
-					//let xo = x*map.s;
-					//let yo = y*map.s;
-					//let i = map.grid[y*map.y+x];
-
-					let xo = x*map.s;
-					let yo = y*map.s;
-					let i = map[y][x];
-
-					if(i==1) {
-						ctx.fillStyle = 'white';
-						ctx.fillRect(xo+1, yo+1, map.s-1, map.s-1);
-					}
-					else if(i > 0) {
-						ctx.drawImage(walls[i].img, xo, yo, 64, 64);
-					}
-					else{
-						ctx.fillStyle = 'black';
-						ctx.fillRect(xo+1, yo+1, map.s-1, map.s-1);
-					}					
-
-					
-				}
-			}
-			//img = ctx.createImageData(512,512);
-			map.img = ctx.getImageData(0,0,512,512);
-		} else {
-			ctx.putImageData(map.img, 0, 0);
-		}
-	},
-	setTile: (x, y, i) => {		
-		//map.grid[y*map.x + x] = i;
-		map[y][x]=i;
-		map.img = null;
-	}
-};
-*/
+//#endregion
 
 //#region keyboard
 var myKeys = {};
@@ -217,9 +157,6 @@ const player =  {
 		ctx.strokeStyle = 'yellow';
 		ctx.lineWidth = 1;
 		ctx.stroke();
-		//ctx.beginPath();
-		//ctx.arc(player.x, player.y, 5, 0, TAU);
-		//ctx.fill();
 	}
 }
 
@@ -297,7 +234,9 @@ function drawRays2D() {
 	
 	for(let r = 0; r < view.width/horRes; r++) {
 		//#region other
-		let isVertical, isLeft, isUp, mpv, mph;
+		let isVertical, isLeft, isUp;
+		let mpv={x:0,y:0};
+		let mph={x:0,y:0};
 		//#endregion		
 
 		//#region ---horizontal line check---
@@ -323,18 +262,19 @@ function drawRays2D() {
 		if(ray.a == 0 || ray.a == Math.PI) { //looking straight left or right
 			ray.x = player.x;
 			ray.y = player.y;
-			dof = 8;
+			dof = DOF;
 		}
-		while(dof < 8) {
+		while(dof < DOF) {
 			mx = Math.trunc(ray.x)>>6;
 			my = Math.trunc(ray.y)>>6;
-			mp = my * map.width + mx;
-			if(mp > 0 && mp < map.width * map.height && mx<8&& my<8&&/*map.grid[mp]*/map[my][mx] > 0) { //hit wall
+			//mp = my * map.width + mx;
+			if(mx < map.width && mx >= 0 && my >= 0 && my < map.height && map[my][mx] > 0) { //hit wall
 				hx = ray.x;
 				hy = ray.y;
 				disH = dist(player.x, player.y, hx, hy, ray.a);
-				mph = mp;
-				dof = 8;
+				mph.x =mx; mph.y = my;
+				//mph = mp;
+				dof = DOF;
 			} 
 			else {
 				ray.x += xo;
@@ -367,18 +307,18 @@ function drawRays2D() {
 		if(ray.a == 0 || ray.a == Math.PI) { //looking straight up or down
 			ray.x = player.x;
 			ray.y = player.y;
-			dof = 8;
+			dof = DOF;
 		}
-		while(dof < 8) {
+		while(dof < DOF) {
 			mx = Math.trunc(ray.x)>>6;
 			my = Math.trunc(ray.y)>>6;
-			mp = my * map.width + mx;
-			if(mp > 0 && mp < map.width * map.height && mx<8&& my<8&&/*map.grid[mp]*/map[my][mx] > 0) { //hit wall
+			if( mx >= 0 && my >= 0 && mx < map.width && my < map.height && map[my][mx] > 0) { //hit wall
 				vx = ray.x;
 				vy = ray.y;
 				disV = dist(player.x, player.y, vx, vy, ray.a);
-				mpv = mp;
-				dof = 8; 
+				mpv.x = mx;
+				mpv.y = my;
+				dof = DOF; 
 			}
 			else {
 				ray.x += xo;
@@ -405,7 +345,26 @@ function drawRays2D() {
 			colorMod = 0.5;
 			mp = mph;
 		}
-		//#endregion
+		//#endregion		
+
+		//#region Draw 3D Walls
+		let ca = player.a - ray.a;
+		if(ca < 0)
+			ca += TAU;
+		if(ca > TAU)
+			ca -= TAU;
+
+		if(disT > DOF * map.size)
+			continue;
+
+		disT *= Math.cos(ca);//fix fisheye
+		
+
+		let lineH = (map.s*view.height)/disT; //line height		
+
+		if(!mp || !lineH || !dof ){
+			continue;
+		}
 
 		//#region draw 2d
 		if(drawRays){
@@ -417,17 +376,6 @@ function drawRays2D() {
 			ctx.stroke();
 		}
 		//#endregion
-
-		//#region Draw 3D Walls
-		let ca = player.a - ray.a;
-		if(ca < 0)
-			ca += TAU;
-		if(ca > TAU)
-			ca -= TAU;
-
-		disT *= Math.cos(ca);//fix fisheye
-
-		let lineH = (map.s*view.height)/disT; //line height
 		
 		//create gradient here to fix warping
 		let grad= ctx.createLinearGradient(r*horRes + (view.height + halfHorRes), (view.height/2) - lineH/2, r*horRes + (view.height + halfHorRes), lineH + (view.height/2) - lineH/2);
@@ -437,16 +385,16 @@ function drawRays2D() {
 
 		let lineO = (view.height/2) - lineH/2; //line offset
 
-		let x = mp%8;
-		let y = Math.trunc(mp/8);
-		if(/*map.grid[mp]*/ map[y][x] == 1) {
+		let x = mp.x;
+		let y = mp.y;
+		if(map[y][x] == 1) {
 			ctx.beginPath();
 			ctx.moveTo(r*horRes + (view.height + halfHorRes) , lineO);
 			ctx.lineTo(r*horRes + (view.height + halfHorRes), lineH + lineO);
 			ctx.strokeStyle = `rgb(${(lineH/view.height) * 256 * colorMod},0,0)`;
 			ctx.lineWidth = horRes;
 			ctx.stroke();
-		} else if(/*map.grid[mp]*/ map[y][x] > 0 && walls[/*map.grid[mp]*/ map[y][x]] != null) {
+		} else if(map[y][x] > 0 && walls[map[y][x]] != null) {
 			let percentage;
 			if(!isVertical && isUp){ //bottom face
 				percentage = (ray.x%map.s) / map.s;
@@ -458,40 +406,26 @@ function drawRays2D() {
 				percentage = 1 - (ray.y%map.s) / map.s;
 			} 
 
-			if(/*map.grid[mp]*/ map[y][x] != lastImg){
-				imgData = walls[/*map.grid[mp]*/ map[y][x]].data;
-				imgWidth = walls[/*map.grid[mp]*/ map[y][x]].width;
-				imgHeight = walls[/*map.grid[mp]*/ map[y][x]].height;
+			if(map[y][x] != lastImg){
+				imgData = walls[map[y][x]].data;
+				imgWidth = walls[map[y][x]].width;
+				imgHeight = walls[map[y][x]].height;
 				imgSize = imgWidth * imgHeight;
 				heightFraction = 1/imgHeight;
-				lastImg = /*map.grid[mp]*/ map[y][x];
+				lastImg = map[y][x];
 			}
 
 			let pixelX = Math.trunc(imgWidth * percentage);			
-			let darken = (1.5*lineH/view.height) * colorMod;
-
-			//var grad= ctx.createLinearGradient(50, 50, 150, 150);
-			//grad.addColorStop(0, "red");
-			//grad.addColorStop(0.5, "red");
-			//grad.addColorStop(0.5, "green");
-			//grad.addColorStop(1, "green");
-			//ctx.strokeStyle = grad;
-			
+			let darken = (1.5*lineH/view.height) * colorMod;			
 			
 			for(let i = 0; i < imgHeight; i++){
-				pixelIndex = i * (imgWidth*4)  + (pixelX*4);					
-				//ctx.strokeStyle = `rgb(${imgData[pixelIndex]*darken}, ${imgData[pixelIndex+1]*darken}, ${imgData[pixelIndex+2]*darken})`;
+				pixelIndex = i * (imgWidth*4)  + (pixelX*4);		
+				if(!(imgData[pixelIndex]*darken))
+					continue;			
 				let color = `rgb(${imgData[pixelIndex]*darken}, ${imgData[pixelIndex+1]*darken}, ${imgData[pixelIndex+2]*darken})`;
 				
 				grad.addColorStop(i*heightFraction, color);
 				grad.addColorStop((i+1)*heightFraction, color);
-				
-				//ctx.lineWidth = horRes;
-				//ctx.beginPath();
-				//ctx.moveTo(r*horRes + (view.height + halfHorRes) , lineH *(i*heightFraction) +lineO);
-				//ctx.lineTo(r*horRes + (view.height + halfHorRes), lineH *((i+1)*heightFraction) + lineO);							
-				//ctx.closePath(); 
-				//ctx.stroke();
 			}
 			ctx.beginPath();
 			ctx.moveTo(r*horRes + (view.height + halfHorRes) , lineO);
