@@ -41,7 +41,86 @@ img.onload = () => {
 };
 
 let imagesLoaded = false;
-const map = {
+let map = [
+	[1,1,1,1,1,1,1,1],
+	[1,0,1,0,0,2,1,1],
+	[1,0,1,0,0,0,1,1],
+	[1,0,0,0,0,0,0,1],
+	[1,0,0,0,0,0,0,1],
+	[1,0,0,0,0,2,0,1],
+	[1,0,0,0,0,0,0,1],
+	[1,1,1,1,1,1,1,1]
+];
+
+Object.defineProperty(map, 'x', {
+	get: function() { return this.width; }
+});
+Object.defineProperty(map, 'width', {
+	get: function() { return this[0].length; }
+});
+Object.defineProperty(map, 'y', {
+	get: function() { return this.height; }
+});
+Object.defineProperty(map, 'height', {
+	get: function() { return this[0].length; }
+});
+Object.defineProperty(map, 's', {
+	get: function() { return this.size; }
+});
+Object.defineProperty(map, 'size', {
+	get: function() { return 64; }
+});
+map.img = null;
+/*map.grid = [
+	1,1,1,1,1,1,1,1,
+	1,0,1,0,0,2,1,1,
+	1,0,1,0,0,0,1,1,
+	1,0,0,0,0,0,0,1,
+	1,0,0,0,0,0,0,1,
+	1,0,0,0,0,2,0,1,
+	1,0,0,0,0,0,0,1,
+	1,1,1,1,1,1,1,1	];*/
+map.draw = () => {
+	if(map.img == null){
+		let color = 'white';
+		for(let y = 0; y < /*map.y*/map.height; y++){
+			for(let x = 0; x < /*map.x*/map.width; x++){
+				//let xo = x*map.s;
+				//let yo = y*map.s;
+				//let i = map.grid[y*map.y+x];
+
+				let xo = x*map.size;
+				let yo = y*map.size;
+				let i = map[y][x];
+
+				if(i==1) {
+					ctx.fillStyle = 'white';
+					ctx.fillRect(xo+1, yo+1, map.s-1, map.s-1);
+				}
+				else if(i > 0) {
+					ctx.drawImage(walls[i].img, xo, yo, 64, 64);
+				}
+				else{
+					ctx.fillStyle = 'black';
+					ctx.fillRect(xo+1, yo+1, map.s-1, map.s-1);
+				}					
+
+				
+			}
+		}
+		//img = ctx.createImageData(512,512);
+		map.img = ctx.getImageData(0,0,512,512);
+	} else {
+		ctx.putImageData(map.img, 0, 0);
+	}
+};
+map.setTile = (x, y, i) => {		
+	//map.grid[y*map.x + x] = i;
+	map[y][x]=i;
+	map.img = null;
+};
+/*
+map = {
 	x: 8, y: 8, s:64, img: null,
 	grid:[
 		1,1,1,1,1,1,1,1,
@@ -52,15 +131,19 @@ const map = {
 		1,0,0,0,0,2,0,1,
 		1,0,0,0,0,0,0,1,
 		1,1,1,1,1,1,1,1	
-	] ,
+	],
 	draw: () => {
 		if(map.img == null){
 			let color = 'white';
 			for(let y = 0; y < map.y; y++){
 				for(let x = 0; x < map.x; x++){
+					//let xo = x*map.s;
+					//let yo = y*map.s;
+					//let i = map.grid[y*map.y+x];
+
 					let xo = x*map.s;
 					let yo = y*map.s;
-					let i = map.grid[y*map.y+x];
+					let i = map[y][x];
 
 					if(i==1) {
 						ctx.fillStyle = 'white';
@@ -82,8 +165,14 @@ const map = {
 		} else {
 			ctx.putImageData(map.img, 0, 0);
 		}
+	},
+	setTile: (x, y, i) => {		
+		//map.grid[y*map.x + x] = i;
+		map[y][x]=i;
+		map.img = null;
 	}
 };
+*/
 
 //#region keyboard
 var myKeys = {};
@@ -239,8 +328,8 @@ function drawRays2D() {
 		while(dof < 8) {
 			mx = Math.trunc(ray.x)>>6;
 			my = Math.trunc(ray.y)>>6;
-			mp = my * map.x + mx;
-			if(mp > 0 && mp < map.x * map.y && map.grid[mp] > 0) { //hit wall
+			mp = my * map.width + mx;
+			if(mp > 0 && mp < map.width * map.height && mx<8&& my<8&&/*map.grid[mp]*/map[my][mx] > 0) { //hit wall
 				hx = ray.x;
 				hy = ray.y;
 				disH = dist(player.x, player.y, hx, hy, ray.a);
@@ -283,8 +372,8 @@ function drawRays2D() {
 		while(dof < 8) {
 			mx = Math.trunc(ray.x)>>6;
 			my = Math.trunc(ray.y)>>6;
-			mp = my * map.x + mx;
-			if(mp > 0 && mp < map.x * map.y && map.grid[mp] > 0) { //hit wall
+			mp = my * map.width + mx;
+			if(mp > 0 && mp < map.width * map.height && mx<8&& my<8&&/*map.grid[mp]*/map[my][mx] > 0) { //hit wall
 				vx = ray.x;
 				vy = ray.y;
 				disV = dist(player.x, player.y, vx, vy, ray.a);
@@ -340,19 +429,24 @@ function drawRays2D() {
 
 		let lineH = (map.s*view.height)/disT; //line height
 		
+		//create gradient here to fix warping
+		let grad= ctx.createLinearGradient(r*horRes + (view.height + halfHorRes), (view.height/2) - lineH/2, r*horRes + (view.height + halfHorRes), lineH + (view.height/2) - lineH/2);
+
 		if(lineH > view.height)
 			lineH = view.height;
 
 		let lineO = (view.height/2) - lineH/2; //line offset
 
-		if(map.grid[mp] == 1) {
+		let x = mp%8;
+		let y = Math.trunc(mp/8);
+		if(/*map.grid[mp]*/ map[y][x] == 1) {
 			ctx.beginPath();
 			ctx.moveTo(r*horRes + (view.height + halfHorRes) , lineO);
 			ctx.lineTo(r*horRes + (view.height + halfHorRes), lineH + lineO);
 			ctx.strokeStyle = `rgb(${(lineH/view.height) * 256 * colorMod},0,0)`;
 			ctx.lineWidth = horRes;
 			ctx.stroke();
-		} else if(map.grid[mp] > 0 && walls[map.grid[mp]] != null) {
+		} else if(/*map.grid[mp]*/ map[y][x] > 0 && walls[/*map.grid[mp]*/ map[y][x]] != null) {
 			let percentage;
 			if(!isVertical && isUp){ //bottom face
 				percentage = (ray.x%map.s) / map.s;
@@ -364,13 +458,13 @@ function drawRays2D() {
 				percentage = 1 - (ray.y%map.s) / map.s;
 			} 
 
-			if(map.grid[mp] != lastImg){
-				imgData = walls[map.grid[mp]].data;
-				imgWidth = walls[map.grid[mp]].width;
-				imgHeight = walls[map.grid[mp]].height;
+			if(/*map.grid[mp]*/ map[y][x] != lastImg){
+				imgData = walls[/*map.grid[mp]*/ map[y][x]].data;
+				imgWidth = walls[/*map.grid[mp]*/ map[y][x]].width;
+				imgHeight = walls[/*map.grid[mp]*/ map[y][x]].height;
 				imgSize = imgWidth * imgHeight;
 				heightFraction = 1/imgHeight;
-				lastImg = map.grid[mp];
+				lastImg = /*map.grid[mp]*/ map[y][x];
 			}
 
 			let pixelX = Math.trunc(imgWidth * percentage);			
@@ -382,8 +476,7 @@ function drawRays2D() {
 			//grad.addColorStop(0.5, "green");
 			//grad.addColorStop(1, "green");
 			//ctx.strokeStyle = grad;
-
-			let grad= ctx.createLinearGradient(r*horRes + (view.height + halfHorRes), lineO, r*horRes + (view.height + halfHorRes), lineH + lineO);
+			
 			
 			for(let i = 0; i < imgHeight; i++){
 				pixelIndex = i * (imgWidth*4)  + (pixelX*4);					
