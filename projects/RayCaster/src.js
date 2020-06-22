@@ -2,21 +2,41 @@
 
 window.onload = init;
 
+//game
+let lastTime = 0; // used by calculateDeltaTime()
+let dt = 0;
+
 //canvas stuff
-const c = document.getElementById("myCanvas");
+const c = document.getElementById("view");
 const ctx = c.getContext("2d");
 ctx.imageSmoothingEnabled = false;
+
+//canvas stuff
+const map_c = document.getElementById("map");
+const map_ctx = map_c.getContext("2d");
+map_ctx.imageSmoothingEnabled = false;
 
 //cosntants
 const TAU = Math.PI * 2;
 const P2 = Math.PI / 2;
 const P3 = 3 * Math.PI / 2;
 const DR = Math.PI / 180; // one degree in radians
-const DOF = 8;
+const DOF = 64;
 
 //view stuff
-const view = {width: 512, height: 512};
-const fov = 60;
+const view = {
+	_halfHeight: c.height/2,
+	get width() {
+		return c.width;
+	} ,
+	get height() {
+		return c.height;
+	},
+	get halfHeight() {
+		return this._halfHeight;
+	}
+};
+const fov = 75;
 let horRes = 8; //horizontal resolution, higher number = less resolution
 let halfHorRes = horRes/2;
 let drawRays = true;
@@ -56,6 +76,12 @@ let map = [
 	[1,0,0,0,0,0,0,1],
 	[1,0,0,0,0,2,0,1],
 	[1,0,0,0,0,0,0,1],
+	[1,0,2,0,0,2,1,1],
+	[1,0,2,0,0,0,1,1],
+	[1,0,0,0,0,0,0,1],
+	[1,0,0,0,0,0,0,1],
+	[1,0,0,0,0,2,0,1],
+	[1,0,0,0,0,0,0,1],
 	[1,1,1,1,1,1,1,1]
 ];
 
@@ -69,7 +95,7 @@ Object.defineProperty(map, 'y', {
 	get: function() { return this.height; }
 });
 Object.defineProperty(map, 'height', {
-	get: function() { return this[0].length; }
+	get: function() { return this.length; }
 });
 Object.defineProperty(map, 's', {
 	get: function() { return this.size; }
@@ -89,23 +115,23 @@ map.draw = () => {
 				let i = map[y][x];
 
 				if(i==1) {
-					ctx.fillStyle = 'white';
-					ctx.fillRect(xo+1, yo+1, map.s-1, map.s-1);
+					map_ctx.fillStyle = 'white';
+					map_ctx.fillRect(xo+1, yo+1, map.s-1, map.s-1);
 				}
 				else if(i > 0) {
-					ctx.drawImage(walls[i].img, xo, yo, 64, 64);
+					map_ctx.drawImage(walls[i].img, xo, yo, 64, 64);
 				}
 				else{
-					ctx.fillStyle = 'black';
-					ctx.fillRect(xo+1, yo+1, map.s-1, map.s-1);
+					map_ctx.fillStyle = 'black';
+					map_ctx.fillRect(xo+1, yo+1, map.s-1, map.s-1);
 				}					
 
 				
 			}
 		}
-		map.img = ctx.getImageData(0,0,512,512);
+		map.img = map_ctx.getImageData(0,0,512,512);
 	} else {
-		ctx.putImageData(map.img, 0, 0);
+		map_ctx.putImageData(map.img, 0, 0);
 	}
 };
 map.setTile = (x, y, i) => {	
@@ -114,97 +140,30 @@ map.setTile = (x, y, i) => {
 };
 //#endregion
 
-//#region keyboard
-var myKeys = {};
+const myKeys = new Keyboard();
 
-myKeys.KEYBOARD = Object.freeze({
-	"KEY_LEFT": 37, 
-	"KEY_UP": 38, 
-	"KEY_RIGHT": 39, 
-	"KEY_DOWN": 40,
-	"KEY_SPACE": 32,
-	"KEY_SHIFT": 16,
-	"KEY_W": 87,
-	"KEY_S": 83,
-	"KEY_A": 65,
-	"KEY_D": 68
-});
+const player = new Player(300,300);
 
-myKeys.keydown = [];
-myKeys.previousKeydown = [];
-
-
-// event listeners
-window.addEventListener("keydown",function(e){
-	//console.log("keydown=" + e.keyCode);
-	myKeys.keydown[e.keyCode] = true;
-});
-	
-window.addEventListener("keyup",function(e){
-	//console.log("keyup=" + e.keyCode);
-	myKeys.keydown[e.keyCode] = false;
-});
-//#endregion
-
-const player =  {
-	x:0, y:0, dx:0, dy:0, a:0, speed: 5,
-	draw: () => {
-		ctx.fillStyle = 'yellow';
-		ctx.fillRect(player.x-5, player.y-5, 10, 10);
-		ctx.beginPath();
-		ctx.moveTo(player.x, player.y);
-		ctx.lineTo(player.x + player.dx * 5, player.y + player.dy * 5);
-		ctx.strokeStyle = 'yellow';
-		ctx.lineWidth = 1;
-		ctx.stroke();
-	}
-}
-
-function init() {	
-	player.x = 300;
-	player.y = 300;
-	player.dx = Math.cos(player.a) *5;
-	player.dy = Math.sin(player.a) *5;
+function init() {
 	update();
 }
 
 function update() {
-	playerControls();	
-	draw();
 	requestAnimationFrame(update);
+	dt = calculateDeltaTime();
+	player.update(dt, myKeys);
+	draw();
+	//requestAnimationFrame(update);
 }
 
 function draw() {
 	if(imagesLoaded){
-		ctx.fillStyle = 'gray';
-		ctx.fillRect(0, 0, 1024, 512);
+		//ctx.fillStyle = 'gray';
+		//ctx.fillRect(0, 0, 1024, 512);
 		map.draw();
 		
 		drawRays2D();
-		player.draw();
-	}
-}
-
-function playerControls() {
-	if(myKeys.keydown[myKeys.KEYBOARD.KEY_RIGHT] || myKeys.keydown[myKeys.KEYBOARD.KEY_D]){
-		player.a += 0.05;
-		if(player.a > TAU ) player.a = 0;
-		player.dx = Math.cos(player.a) * player.speed;
-		player.dy = Math.sin(player.a) * player.speed;
-	}
-	if(myKeys.keydown[myKeys.KEYBOARD.KEY_LEFT] || myKeys.keydown[myKeys.KEYBOARD.KEY_A]){
-		player.a -= 0.05;
-		if(player.a < 0 ) player.a = TAU;
-		player.dx = Math.cos(player.a) * player.speed;
-		player.dy = Math.sin(player.a) * player.speed;
-	}
-	if(myKeys.keydown[myKeys.KEYBOARD.KEY_UP] || myKeys.keydown[myKeys.KEYBOARD.KEY_W]){
-		player.x += player.dx;
-		player.y += player.dy;
-	}
-	if(myKeys.keydown[myKeys.KEYBOARD.KEY_DOWN] || myKeys.keydown[myKeys.KEYBOARD.KEY_S]){
-		player.x -= player.dx;
-		player.y -= player.dy;
+		player.draw(map_ctx);
 	}
 }
 
@@ -214,9 +173,9 @@ function dist( ax, ay, bx, by, ang){
 
 function drawRays2D() {
 	ctx.fillStyle = '#333';
-	ctx.fillRect(512,0,512,256);
+	ctx.fillRect(0,0,view.width,view.halfHeight);
 	ctx.fillStyle = 'gray';
-	ctx.fillRect(512,256,512,256);
+	ctx.fillRect(0,view.halfHeight,view.width,view.halfHeight);
 
 	let colorMod = 1;
 
@@ -354,43 +313,43 @@ function drawRays2D() {
 		if(ca > TAU)
 			ca -= TAU;
 
-		if(disT > DOF * map.size)
-			continue;
+		//if(disT > DOF * map.size)
+			//continue;
 
 		disT *= Math.cos(ca);//fix fisheye
 		
 
 		let lineH = (map.s*view.height)/disT; //line height		
 
-		if(!mp || !lineH || !dof ){
-			continue;
-		}
+		//if(!mp || !lineH || !dof ){
+			//continue;
+		//}
 
 		//#region draw 2d
 		if(drawRays){
-			ctx.beginPath();
-			ctx.moveTo(player.x, player.y);
-			ctx.lineTo(ray.x, ray.y);
-			ctx.strokeStyle = 'red';
-			ctx.lineWidth = 1;
-			ctx.stroke();
+			map_ctx.beginPath();
+			map_ctx.moveTo(player.x, player.y);
+			map_ctx.lineTo(ray.x, ray.y);
+			map_ctx.strokeStyle = 'red';
+			map_ctx.lineWidth = 1;
+			map_ctx.stroke();
 		}
 		//#endregion
 		
 		//create gradient here to fix warping
-		let grad= ctx.createLinearGradient(r*horRes + (view.height + halfHorRes), (view.height/2) - lineH/2, r*horRes + (view.height + halfHorRes), lineH + (view.height/2) - lineH/2);
+		let grad= ctx.createLinearGradient(r*horRes + halfHorRes, view.halfHeight - lineH/2, r*horRes + halfHorRes, lineH + view.halfHeight - lineH/2);
 
 		if(lineH > view.height)
 			lineH = view.height;
 
-		let lineO = (view.height/2) - lineH/2; //line offset
+		let lineO = view.halfHeight - lineH/2; //line offset
 
 		let x = mp.x;
 		let y = mp.y;
 		if(map[y][x] == 1) {
 			ctx.beginPath();
-			ctx.moveTo(r*horRes + (view.height + halfHorRes) , lineO);
-			ctx.lineTo(r*horRes + (view.height + halfHorRes), lineH + lineO);
+			ctx.moveTo(r*horRes +  halfHorRes , lineO);
+			ctx.lineTo(r*horRes +  halfHorRes, lineH + lineO);
 			ctx.strokeStyle = `rgb(${(lineH/view.height) * 256 * colorMod},0,0)`;
 			ctx.lineWidth = horRes;
 			ctx.stroke();
@@ -420,16 +379,16 @@ function drawRays2D() {
 			
 			for(let i = 0; i < imgHeight; i++){
 				pixelIndex = i * (imgWidth*4)  + (pixelX*4);		
-				if(!(imgData[pixelIndex]*darken))
-					continue;			
+				//if(!(imgData[pixelIndex]*darken))
+					//continue;			
 				let color = `rgb(${imgData[pixelIndex]*darken}, ${imgData[pixelIndex+1]*darken}, ${imgData[pixelIndex+2]*darken})`;
 				
 				grad.addColorStop(i*heightFraction, color);
 				grad.addColorStop((i+1)*heightFraction, color);
 			}
 			ctx.beginPath();
-			ctx.moveTo(r*horRes + (view.height + halfHorRes) , lineO);
-			ctx.lineTo(r*horRes + (view.height + halfHorRes), lineH + lineO);
+			ctx.moveTo(r*horRes + halfHorRes , lineO);
+			ctx.lineTo(r*horRes + halfHorRes, lineH + lineO);
 			ctx.strokeStyle = grad;
 			ctx.lineWidth = horRes;
 			ctx.stroke();
@@ -442,4 +401,15 @@ function drawRays2D() {
 		if(ray.a > TAU)
 			ray.a -= TAU;
 	}
+}
+
+function calculateDeltaTime() {
+	let now = performance.now();
+	let lt = lastTime;
+	lastTime = now;
+	return (now - lt)/1000;
+	//let fps = 1000 / (now - lastTime);
+	//fps = clamp(fps, 12, 60);
+	//lastTime = now;
+	//return 1 / fps;
 }
