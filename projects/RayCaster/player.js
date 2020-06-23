@@ -3,12 +3,11 @@ class Player {
 		this.x = x;
 		this.y = y;
 		this.a = a;
-		this.dx = Math.cos(this.a) * this.speed * 0.016;
-		this.dy = Math.sin(this.a) * this.speed * 0.016;
-		this.a = a;
 		this.speed = speed;
 		this.lookSpeed = lookSpeed;
 		this.ctx = ctx;
+		this.dx = Math.cos(this.a) * this.speed * 0.016;
+		this.dy = Math.sin(this.a) * this.speed * 0.016;
 	}
 
 	update(dt, kb) {

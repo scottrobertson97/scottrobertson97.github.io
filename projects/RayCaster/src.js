@@ -11,6 +11,9 @@ const c = document.getElementById("view");
 const ctx = c.getContext("2d");
 ctx.imageSmoothingEnabled = false;
 
+var offscreen = new OffscreenCanvas(c.width, c.height);
+var off_ctx = offscreen.getContext("2d");
+
 //canvas stuff
 const map_c = document.getElementById("map");
 const map_ctx = map_c.getContext("2d");
@@ -47,6 +50,7 @@ function updateHorRes(num){
 
 //#region wall texture stuff
 const walls = [];
+const walls_img = [];
 walls[0] = [];
 walls[1] = ['#FF0000', '#FF0000', '#FF0000', '#FF0000',];
 //#endregion
@@ -57,11 +61,13 @@ img.src = 'https://i.imgur.com/W8PJYFY.png';
 img.setAttribute('crossOrigin', '');
 const img_ctx = document.getElementById('imageCanvas').getContext('2d');
 walls[2] = img_ctx.createImageData(16, 16);
+
 img.onload = () => {
 	img_ctx.drawImage(img, 0, 0);
 	img.style.display = 'none';
 	walls[2] = img_ctx.getImageData(0,0,16,16);
-	walls[2].img = img;
+	//walls[2].img = img;
+	walls_img[2] = img;
 	imagesLoaded = true;
 };
 let imagesLoaded = true;
@@ -119,7 +125,7 @@ map.draw = () => {
 					map_ctx.fillRect(xo+1, yo+1, map.s-1, map.s-1);
 				}
 				else if(i > 0) {
-					map_ctx.drawImage(walls[i].img, xo, yo, 64, 64);
+					map_ctx.drawImage(walls_img[i], xo, yo, 64, 64);
 				}
 				else{
 					map_ctx.fillStyle = 'black';
@@ -189,12 +195,13 @@ function drawRays2D() {
 	if(ray.a > TAU)
 		ray.a -= TAU;
 
-	let lastImg, imgData, imgWidth, imgHeight, imgSize, pixelIndex, heightFraction;
-	
+	let lastImg, pixelIndex, heightFraction;
+	let currImg = {};
+
 	for(let r = 0; r < view.width/horRes; r++) {
 		//#region other
 		let isVertical, isLeft, isUp;
-		let mpv={x:0,y:0};
+		let mpv={x:1,y:0};
 		let mph={x:0,y:0};
 		//#endregion		
 
@@ -288,7 +295,7 @@ function drawRays2D() {
 		//#endregion
 		
 		//#region  vertical or horizontal
-		if(disV < disH) {
+		if(disV <= disH) {
 			ray.x = vx;
 			ray.y = vy;
 			disT = disV;
@@ -319,10 +326,10 @@ function drawRays2D() {
 		disT *= Math.cos(ca);//fix fisheye
 		
 
-		let lineH = (map.s*view.height)/disT; //line height		
+		let lineH = Math.trunc((map.s*view.height)/disT); //line height		
 
 		//if(!mp || !lineH || !dof ){
-			//continue;
+		//	continue;
 		//}
 
 		//#region draw 2d
@@ -335,15 +342,9 @@ function drawRays2D() {
 			map_ctx.stroke();
 		}
 		//#endregion
-		
-		//create gradient here to fix warping
-		let grad= ctx.createLinearGradient(r*horRes + halfHorRes, view.halfHeight - lineH/2, r*horRes + halfHorRes, lineH + view.halfHeight - lineH/2);
-
-		if(lineH > view.height)
-			lineH = view.height;
 
 		let lineO = view.halfHeight - lineH/2; //line offset
-
+		
 		let x = mp.x;
 		let y = mp.y;
 		if(map[y][x] == 1) {
@@ -366,32 +367,17 @@ function drawRays2D() {
 			} 
 
 			if(map[y][x] != lastImg){
-				imgData = walls[map[y][x]].data;
-				imgWidth = walls[map[y][x]].width;
-				imgHeight = walls[map[y][x]].height;
-				imgSize = imgWidth * imgHeight;
-				heightFraction = 1/imgHeight;
 				lastImg = map[y][x];
 			}
 
-			let pixelX = Math.trunc(imgWidth * percentage);			
-			let darken = (1.5*lineH/view.height) * colorMod;			
+			let pixelX = Math.trunc(walls[lastImg].width * percentage);			
 			
-			for(let i = 0; i < imgHeight; i++){
-				pixelIndex = i * (imgWidth*4)  + (pixelX*4);		
-				//if(!(imgData[pixelIndex]*darken))
-					//continue;			
-				let color = `rgb(${imgData[pixelIndex]*darken}, ${imgData[pixelIndex+1]*darken}, ${imgData[pixelIndex+2]*darken})`;
-				
-				grad.addColorStop(i*heightFraction, color);
-				grad.addColorStop((i+1)*heightFraction, color);
-			}
-			ctx.beginPath();
-			ctx.moveTo(r*horRes + halfHorRes , lineO);
-			ctx.lineTo(r*horRes + halfHorRes, lineH + lineO);
-			ctx.strokeStyle = grad;
-			ctx.lineWidth = horRes;
-			ctx.stroke();
+			ctx.drawImage(walls_img[lastImg], pixelX, 0, 1, walls[lastImg].height, r*horRes, lineO, horRes, lineH);
+
+			ctx.globalAlpha = 1-((Math.min(lineH, view.height)/view.height) * colorMod);
+			ctx.fillStyle = 'black';
+    		ctx.fillRect(r*horRes, lineO, horRes, lineH);
+    		ctx.globalAlpha = 1.0;
 		}
 		//#endregion
 
@@ -408,8 +394,4 @@ function calculateDeltaTime() {
 	let lt = lastTime;
 	lastTime = now;
 	return (now - lt)/1000;
-	//let fps = 1000 / (now - lastTime);
-	//fps = clamp(fps, 12, 60);
-	//lastTime = now;
-	//return 1 / fps;
 }
