@@ -1,6 +1,5 @@
 map can be toggled
-image loader
-collisions with wall, bounding box
+bounding box collide
 load map from file
 map class
 image tiling on block

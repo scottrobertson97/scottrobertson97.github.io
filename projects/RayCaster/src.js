@@ -56,39 +56,38 @@ walls[1] = ['#FF0000', '#FF0000', '#FF0000', '#FF0000',];
 //#endregion
 
 //#region texture loading
-let img = new Image();
-img.src = 'https://i.imgur.com/W8PJYFY.png';
-img.setAttribute('crossOrigin', '');
-const img_ctx = document.getElementById('imageCanvas').getContext('2d');
-walls[2] = img_ctx.createImageData(16, 16);
-
-img.onload = () => {
-	img_ctx.drawImage(img, 0, 0);
-	img.style.display = 'none';
-	walls[2] = img_ctx.getImageData(0,0,16,16);
-	//walls[2].img = img;
-	walls_img[2] = img;
-	imagesLoaded = true;
-};
-let imagesLoaded = true;
+let imgSrcs = ['','','https://i.imgur.com/W8PJYFY.png','https://i.imgur.com/pRpAqeP.png'];
+imgSrcs.forEach((src, i) => {
+	let img = new Image();
+	img.src = src;
+	img.setAttribute('crossOrigin', '');
+	const img_ctx = document.getElementById('imageCanvas').getContext('2d');
+	walls[i] = img_ctx.createImageData(16, 16);
+	img.onload = () => {
+		img_ctx.drawImage(img, 0, 0);
+		img.style.display = 'none';
+		walls[i] = img_ctx.getImageData(0,0,16,16);
+		walls_img[i] = img;
+	};
+});
 //#endregion
 
 //#region map
 let map = [
-	[1,2,2,2,2,1,1,1],
-	[1,0,2,0,0,2,1,1],
-	[1,0,2,0,0,0,1,1],
-	[1,0,0,0,0,0,0,1],
-	[1,0,0,0,0,0,0,1],
-	[1,0,0,0,0,2,0,1],
-	[1,0,0,0,0,0,0,1],
-	[1,0,2,0,0,2,1,1],
-	[1,0,2,0,0,0,1,1],
-	[1,0,0,0,0,0,0,1],
-	[1,0,0,0,0,0,0,1],
-	[1,0,0,0,0,2,0,1],
-	[1,0,0,0,0,0,0,1],
-	[1,1,1,1,1,1,1,1]
+	[1,2,2,2,2,1,1,1,1,1,1],
+	[1,0,2,0,0,2,1,0,0,0,3],
+	[1,0,2,0,0,0,3,0,0,0,3],
+	[1,0,0,0,0,0,0,0,0,0,3],
+	[1,0,0,0,0,0,0,0,0,0,3],
+	[1,0,0,0,0,3,0,0,0,0,3],
+	[1,0,0,0,0,0,0,0,0,0,3],
+	[1,0,2,0,0,2,1,0,0,0,3],
+	[1,0,2,0,0,0,1,0,0,0,3],
+	[1,0,0,0,0,0,0,0,0,0,3],
+	[1,0,0,0,0,0,0,0,0,0,3],
+	[1,0,0,0,0,2,0,0,0,0,3],
+	[1,0,0,0,0,0,0,0,0,0,3],
+	[1,1,1,1,1,1,1,1,1,1,1]
 ];
 
 Object.defineProperty(map, 'x', {
@@ -157,20 +156,15 @@ function init() {
 function update() {
 	requestAnimationFrame(update);
 	dt = calculateDeltaTime();
-	player.update(dt, myKeys);
+	player.update(dt, myKeys, map);
 	draw();
 	//requestAnimationFrame(update);
 }
 
 function draw() {
-	if(imagesLoaded){
-		//ctx.fillStyle = 'gray';
-		//ctx.fillRect(0, 0, 1024, 512);
-		map.draw();
-		
-		drawRays2D();
-		player.draw(map_ctx);
-	}
+	map.draw();		
+	drawRays2D();
+	player.draw(map_ctx);
 }
 
 function dist( ax, ay, bx, by, ang){	
@@ -308,7 +302,7 @@ function drawRays2D() {
 			ray.y = hy;
 			disT = disH;
 			isVertical = false;
-			colorMod = 0.5;
+			colorMod = 0.7;
 			mp = mph;
 		}
 		//#endregion		
@@ -351,7 +345,7 @@ function drawRays2D() {
 			ctx.beginPath();
 			ctx.moveTo(r*horRes +  halfHorRes , lineO);
 			ctx.lineTo(r*horRes +  halfHorRes, lineH + lineO);
-			ctx.strokeStyle = `rgb(${(lineH/view.height) * 256 * colorMod},0,0)`;
+			ctx.strokeStyle = `rgb(${Math.min((Math.min(lineH, view.height)/view.height)+0.2, 1) * 200 * colorMod},0,0)`;
 			ctx.lineWidth = horRes;
 			ctx.stroke();
 		} else if(map[y][x] > 0 && walls[map[y][x]] != null) {
@@ -374,7 +368,7 @@ function drawRays2D() {
 			
 			ctx.drawImage(walls_img[lastImg], pixelX, 0, 1, walls[lastImg].height, r*horRes, lineO, horRes, lineH);
 
-			ctx.globalAlpha = 1-((Math.min(lineH, view.height)/view.height) * colorMod);
+			ctx.globalAlpha = 1-(Math.min((Math.min(lineH, view.height)/view.height)+0.3, 1) * colorMod);
 			ctx.fillStyle = 'black';
     		ctx.fillRect(r*horRes, lineO, horRes, lineH);
     		ctx.globalAlpha = 1.0;
@@ -395,3 +389,13 @@ function calculateDeltaTime() {
 	lastTime = now;
 	return (now - lt)/1000;
 }
+
+//#region Quality select
+document.querySelectorAll('input[type=radio][name="quality"]').forEach(r => {
+	r.addEventListener("change", changeQualityHandler);
+});
+updateHorRes(6);
+function changeQualityHandler(e) {
+	updateHorRes(e.target.value);
+}
+//#endregion

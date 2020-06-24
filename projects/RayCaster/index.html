@@ -2,9 +2,29 @@
 <html>
 	<head></head>
 	<body>
-		<canvas id="map" width="512" height="512"></canvas>
-		<canvas id="view" width="800" height="600"></canvas>
-		<canvas id="imageCanvas" width="16" height="16" style="display: none;"></canvas>
+		<div style="float: left;">
+			<canvas id="map" width="512" height="512"></canvas>
+			<canvas id="view" width="800" height="600"></canvas>
+			<canvas id="imageCanvas" width="16" height="16" style="display: none;"></canvas>
+		</div>
+
+		<div style="float: left;margin-left: 20px;">
+			<h2 style="margin-bottom: 10px;">Quality</h2>
+			<div>
+				<input type="radio" id="high" name="quality" value="3">
+				<label for="high">High</label>
+				<div>
+			</div>
+				<input type="radio" id="med" name="quality" value="6" checked>
+				<label for="med">Medium</label>
+				<div>
+			</div>
+			<div>
+				<input type="radio" id="low" name="quality" value="12">
+				<label for="low">Low</label>	
+			</div>		
+		</div>
+
 		<script src="keyboard.js"></script>
 		<script src="player.js"></script>
 		<script src="src.js"></script>
