@@ -6,7 +6,7 @@ window.onload = init;
 let lastTime = 0; // used by calculateDeltaTime()
 let dt = 0;
 
-//canvas stuff
+//#region canvas
 const c = document.getElementById("view");
 const ctx = c.getContext("2d");
 ctx.imageSmoothingEnabled = false;
@@ -14,19 +14,21 @@ ctx.imageSmoothingEnabled = false;
 var offscreen = new OffscreenCanvas(c.width, c.height);
 var off_ctx = offscreen.getContext("2d");
 
-//canvas stuff
+
 const map_c = document.getElementById("map");
 const map_ctx = map_c.getContext("2d");
 map_ctx.imageSmoothingEnabled = false;
+//#endregion
 
-//cosntants
+//#region constants
 const TAU = Math.PI * 2;
 const P2 = Math.PI / 2;
 const P3 = 3 * Math.PI / 2;
 const DR = Math.PI / 180; // one degree in radians
 const DOF = 64;
+//#endregion
 
-//view stuff
+//#region view
 const view = {
 	_halfHeight: c.height/2,
 	get width() {
@@ -47,6 +49,7 @@ function updateHorRes(num){
 	horRes = num;
 	halfHorRes = horRes/2;
 }
+//#endregion
 
 //#region wall texture stuff
 const walls = [];
@@ -112,6 +115,8 @@ map.img = null;
 map.draw = () => {
 	if(map.img == null){
 		let color = 'white';
+		map_ctx.fillStyle = 'gray';
+		map_ctx.fillRect(0, 0, map_c.width, map_c.height);
 		for(let y = 0; y < map.height; y++){
 			for(let x = 0; x < map.width; x++){
 
@@ -134,7 +139,7 @@ map.draw = () => {
 				
 			}
 		}
-		map.img = map_ctx.getImageData(0,0,512,512);
+		map.img = map_ctx.getImageData(0, 0, map_c.width, map_c.height);
 	} else {
 		map_ctx.putImageData(map.img, 0, 0);
 	}
@@ -150,6 +155,14 @@ const myKeys = new Keyboard();
 const player = new Player(300,300);
 
 function init() {
+	document.querySelectorAll('input[type=radio][name="quality"]').forEach(r => {
+		r.addEventListener("change", changeQualityHandler);
+	});
+	updateHorRes(8);
+
+	map_c.width = map[0].length * 64;
+	map_c.height = map.length * 64;
+	map_c.style.width = '400px';
 	update();
 }
 
@@ -158,7 +171,6 @@ function update() {
 	dt = calculateDeltaTime();
 	player.update(dt, myKeys, map);
 	draw();
-	//requestAnimationFrame(update);
 }
 
 function draw() {
@@ -337,7 +349,7 @@ function drawRays2D() {
 		}
 		//#endregion
 
-		let lineO = view.halfHeight - lineH/2; //line offset
+		let lineO = view.halfHeight - Math.trunc(lineH/2); //line offset
 		
 		let x = mp.x;
 		let y = mp.y;
@@ -390,12 +402,6 @@ function calculateDeltaTime() {
 	return (now - lt)/1000;
 }
 
-//#region Quality select
-document.querySelectorAll('input[type=radio][name="quality"]').forEach(r => {
-	r.addEventListener("change", changeQualityHandler);
-});
-updateHorRes(6);
 function changeQualityHandler(e) {
 	updateHorRes(e.target.value);
 }
-//#endregion
