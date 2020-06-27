@@ -10,6 +10,7 @@ let enemy = {
 	y: 300,
 	size: 11.5,
 	src: 'https://i.imgur.com/FcIXhVp.png',
+	needsToBeDrawn: false,
 	drawn: false,
 	draw(ctx) {
 		ctx.beginPath();
@@ -194,6 +195,8 @@ function drawRays2D() {
 
 	let colorMod = 1;
 
+	let rays = [];
+
 	let ray = {x:0, y:0, a:0};
 	//map x, map y, map pos, depth of field, x offset, y offset, final distance
 	let mx, my, mp, dof, xo, yo, disT;
@@ -204,10 +207,8 @@ function drawRays2D() {
 	if(ray.a > TAU)
 		ray.a -= TAU;
 
-	let lastImg, pixelIndex, heightFraction;
-	let currImg = {};
-
 	enemy.drawn = false;
+	enemy.needsToBeDrawn = false;
 
 	for(let r = 0; r < view.width/horRes; r++) {
 		//#region other
@@ -324,74 +325,6 @@ function drawRays2D() {
 		}
 		//#endregion		
 
-		//#region Draw 3D Walls
-		let ca = player.a - ray.a;
-		if(ca < 0)
-			ca += TAU;
-		if(ca > TAU)
-			ca -= TAU;
-
-		//if(disT > DOF * map.size)
-			//continue;
-
-		disT *= Math.cos(ca);//fix fisheye
-		
-
-		let lineH = Math.trunc((map.s*view.height)/disT); //line height		
-
-		//if(!mp || !lineH || !dof ){
-		//	continue;
-		//}
-
-		//#region draw 2d
-		if(drawRays){
-			map_ctx.beginPath();
-			map_ctx.moveTo(player.x, player.y);
-			map_ctx.lineTo(ray.x, ray.y);
-			map_ctx.strokeStyle = 'red';
-			map_ctx.lineWidth = 1;
-			map_ctx.stroke();
-		}
-		//#endregion		
-
-		let lineO = view.halfHeight - Math.trunc(lineH/2); //line offset
-		
-		let x = mp.x;
-		let y = mp.y;
-		/*if(map[y][x] == 1) {
-			ctx.beginPath();
-			ctx.moveTo(r*horRes +  halfHorRes , lineO);
-			ctx.lineTo(r*horRes +  halfHorRes, lineH + lineO);
-			ctx.strokeStyle = `rgb(${Math.min((Math.min(lineH, view.height)/view.height)+0.2, 1) * 200 * colorMod},0,0)`;
-			ctx.lineWidth = horRes;
-			ctx.stroke();
-		} else*/ if(map[y][x] > 0 && walls[map[y][x]] != null) {
-			let percentage;
-			if(!isVertical && isUp){ //bottom face
-				percentage = (ray.x%map.s) / map.s;
-			} else if(!isVertical && !isUp){ //top face
-				percentage = 1 - (ray.x%map.s) / map.s;
-			} else if(isVertical && !isLeft){ //left face
-				percentage = (ray.y%map.s) / map.s;
-			} else if(isVertical && isLeft){ //right face
-				percentage = 1 - (ray.y%map.s) / map.s;
-			} 
-
-			if(map[y][x] != lastImg){
-				lastImg = map[y][x];
-			}
-
-			let pixelX = Math.trunc(walls[lastImg].width * percentage);			
-			
-			ctx.drawImage(walls[lastImg], pixelX, 0, 1, walls[lastImg].height, r*horRes, lineO, horRes, lineH);
-
-			ctx.globalAlpha = 1-(Math.min((Math.min(lineH, view.height)/view.height)+0.3, 1) * colorMod);
-			ctx.fillStyle = 'black';
-    		ctx.fillRect(r*horRes, lineO, horRes, lineH);
-    		ctx.globalAlpha = 1.0;
-		}
-		//#endregion
-
 		//#region enemies
 		let rls = {x1:ray.x, y1:ray.y, x2:player.x, y2:player.y}; //ray line segment
 		let els1 = {x1:enemy.x - enemy.size,y1:enemy.y - enemy.size,x2:enemy.x + enemy.size,y2:enemy.y + enemy.size}; //enemy line segment 1
@@ -413,95 +346,175 @@ function drawRays2D() {
 		}
 		//#endregion
 
+		//#region draw 2d
+		if(drawRays){
+			map_ctx.beginPath();
+			map_ctx.moveTo(player.x, player.y);
+			map_ctx.lineTo(ray.x, ray.y);
+			map_ctx.strokeStyle = 'red';
+			map_ctx.lineWidth = 1;
+			map_ctx.stroke();
+		}
+		//#endregion
+
+		rays.push({ray:{x:ray.x, y:ray.y, a:ray.a}, mp:{x:mp.x,y:mp.y}, disT, isVertical, isUp, isLeft, r, colorMod});
+
+		//#region  change angle of next ray
 		ray.a += (fov/view.width)*horRes*DR;
 		if(ray.a < 0)
 			ray.a += TAU;
 		if(ray.a > TAU)
 			ray.a -= TAU;
+		//#endregion 
 	}
+
+	if(enemy.drawn){
+		let distToEnemy = dist(enemy.x,enemy.y,player.x,player.y);
+		rays.push({disT:distToEnemy, isSprite:true})
+	}
+
+	//sort so it is drawn back to front
+	rays.sort((a,b) => b.disT - a.disT);
+	rays.forEach(_r => {
+		if(_r.isSprite){
+			drawEnemy();
+		} else {
+			drawRayWall(_r.ray, _r.mp, _r.disT, _r.isVertical, _r.isUp, _r.isLeft, _r.r, _r.colorMod);
+		}
+	});
+
+	_rays = rays;
 
 	//#region draw enemy
-	if(enemy.drawn){		
-		let disT= dist(player.x, player.y, enemy.x, enemy.y);
-
-		let minT = player.a - (fov/2)* (Math.PI/180);
-		let maxT = player.a + (fov/2)* (Math.PI/180);
-		let wideMinT = minT - 0.3;
-		let wideMaxT = maxT + 0.3;
-		let x = enemy.x - player.x;
-		let y = enemy.y - player.y;
-		let length = dist(0,0,x,y);
-		x = x/length;
-		y = y/length;
-		let t = 0;
-		if(y>0 && x>0) {
-			t = Math.atan(y/x);
-		}else if(y>0 && x<0){
-			t = Math.atan(y/x)+Math.PI;
-		}else if(y<0 && x<0){
-			t = Math.atan(y/x)+Math.PI;
-		}else if(y<0 && x>0){
-			t = Math.atan(y/x)+Math.PI+Math.PI;	
-		}
-		if(t > Math.PI*2)
-			t-=Math.PI*2;
-		if(t<0)
-			t+=Math.PI*2
-			
-		let ca = player.a - t;
-		if(ca < 0)
-			ca += TAU;
-		if(ca > TAU)
-			ca -= TAU;
-		disT *= Math.cos(ca);//fix fisheye	
-
-		let lineH = Math.trunc((map.s*view.height)/disT);
-		let lineO = view.halfHeight - Math.trunc(lineH/2); //line offset
-		
-		map_ctx.strokeStyle = 'blue';
-		map_ctx.lineWidth = 5;
-		map_ctx.beginPath();
-		map_ctx.moveTo(enemy.x + enemy.size, enemy.y - enemy.size);
-		map_ctx.lineTo(enemy.x - enemy.size, enemy.y + enemy.size);	
-		map_ctx.stroke();
-		map_ctx.beginPath();
-		map_ctx.moveTo(enemy.x - enemy.size, enemy.y - enemy.size);
-		map_ctx.lineTo(enemy.x + enemy.size, enemy.y + enemy.size);	
-		map_ctx.stroke();
-
-		map_ctx.beginPath();
-		map_ctx.moveTo(player.x, player.y);
-		map_ctx.lineTo(enemy.x, enemy.y);
-		map_ctx.strokeStyle = 'green';
-		map_ctx.lineWidth = 5;
-		map_ctx.stroke();
-
-		
-
-
-		//if(t > minT-0.3 && t < maxT+0.3){
-			
-			let width = (lineH/enemy.img.height) * (enemy.size*2)/*enemy.img.width*/;
-			let percent = (t-minT) / (maxT-minT);
-			if(t > wideMaxT){
-				percent = (t - (minT + (Math.PI*2))) / (maxT-minT);
-			} else if(t < wideMinT){
-				percent = ((t+(Math.PI*2)) - minT) / (maxT-minT);
-			}
-			let CX = (percent)*view.width;
-			ctx.drawImage(enemy.img, CX-width/2, lineO, width, lineH);
-		//}
-		
-		
-			t *= (180/Math.PI);
-			minT*= (180/Math.PI);
-			maxT*= (180/Math.PI);
-		a = {t, minT, maxT};
-		
-	}
+	
 	//#endregion
 }
+let _rays;
 let a;
+
+function drawRayWall(ray, mp, disT, isVertical, isUp, isLeft, r, colorMod){
+	let ca = player.a - ray.a;
+	if(ca < 0)
+		ca += TAU;
+	if(ca > TAU)
+		ca -= TAU;
+	//if(disT > DOF * map.size)
+		//continue;
+
+	disT *= Math.cos(ca);//fix fisheye
+	let lineH = Math.trunc((map.s*view.height)/disT); //line height		
+
+	//if(!mp || !lineH || !dof ){
+	//	continue;
+	//}
+	let lineO = view.halfHeight - Math.trunc(lineH/2); //line offset
+	
+	let x = mp.x;
+	let y = mp.y;
+
+	let imgID = map[y][x];
+
+	/*if(map[y][x] == 1) {
+		ctx.beginPath();
+		ctx.moveTo(r*horRes +  halfHorRes , lineO);
+		ctx.lineTo(r*horRes +  halfHorRes, lineH + lineO);
+		ctx.strokeStyle = `rgb(${Math.min((Math.min(lineH, view.height)/view.height)+0.2, 1) * 200 * colorMod},0,0)`;
+		ctx.lineWidth = horRes;
+		ctx.stroke();
+	} else*/ if(imgID > 0 && walls[imgID] != null) {
+		let percentage;
+		if(!isVertical && isUp){ //bottom face
+			percentage = (ray.x%map.s) / map.s;
+		} else if(!isVertical && !isUp){ //top face
+			percentage = 1 - (ray.x%map.s) / map.s;
+		} else if(isVertical && !isLeft){ //left face
+			percentage = (ray.y%map.s) / map.s;
+		} else if(isVertical && isLeft){ //right face
+			percentage = 1 - (ray.y%map.s) / map.s;
+		} 
+
+		let pixelX = Math.trunc(walls[imgID].width * percentage);			
+		
+		ctx.drawImage(walls[imgID], pixelX, 0, 1, walls[imgID].height, r*horRes, lineO, horRes, lineH);
+
+		ctx.globalAlpha = 1-(Math.min((Math.min(lineH, view.height)/view.height)+0.3, 1) * colorMod);
+		ctx.fillStyle = 'black';
+		ctx.fillRect(r*horRes, lineO, horRes, lineH);
+		ctx.globalAlpha = 1.0;
+	}
+}
+
+function drawEnemy(){
+	let disT= dist(player.x, player.y, enemy.x, enemy.y);
+
+	let minT = player.a - (fov/2)* (Math.PI/180);
+	let maxT = player.a + (fov/2)* (Math.PI/180);
+	let wideMinT = minT - 0.3;
+	let wideMaxT = maxT + 0.3;
+	let x = enemy.x - player.x;
+	let y = enemy.y - player.y;
+	let length = dist(0,0,x,y);
+	x = x/length;
+	y = y/length;
+	let t = 0;
+	if(y>0 && x>0) {
+		t = Math.atan(y/x);
+	}else if(y>0 && x<0){
+		t = Math.atan(y/x)+Math.PI;
+	}else if(y<0 && x<0){
+		t = Math.atan(y/x)+Math.PI;
+	}else if(y<0 && x>0){
+		t = Math.atan(y/x)+Math.PI+Math.PI;	
+	}
+	if(t > Math.PI*2)
+		t-=Math.PI*2;
+	if(t<0)
+		t+=Math.PI*2
+		
+	let ca = player.a - t;
+	if(ca < 0)
+		ca += TAU;
+	if(ca > TAU)
+		ca -= TAU;
+	disT *= Math.cos(ca);//fix fisheye	
+
+	let lineH = Math.trunc((map.s*view.height)/disT);
+	let lineO = view.halfHeight - Math.trunc(lineH/2); //line offset
+	
+	//#region draw lines
+	map_ctx.strokeStyle = 'blue';
+	map_ctx.lineWidth = 5;
+	map_ctx.beginPath();
+	map_ctx.moveTo(enemy.x + enemy.size, enemy.y - enemy.size);
+	map_ctx.lineTo(enemy.x - enemy.size, enemy.y + enemy.size);	
+	map_ctx.stroke();
+	map_ctx.beginPath();
+	map_ctx.moveTo(enemy.x - enemy.size, enemy.y - enemy.size);
+	map_ctx.lineTo(enemy.x + enemy.size, enemy.y + enemy.size);	
+	map_ctx.stroke();
+	map_ctx.beginPath();
+	map_ctx.moveTo(player.x, player.y);
+	map_ctx.lineTo(enemy.x, enemy.y);
+	map_ctx.strokeStyle = 'green';
+	map_ctx.lineWidth = 5;
+	map_ctx.stroke();
+	//#endregion
+
+	let width = (lineH/enemy.img.height) * (enemy.size*2)/*enemy.img.width*/;
+	let percent = (t-minT) / (maxT-minT);
+	if(t > wideMaxT){
+		percent = (t - (minT + (Math.PI*2))) / (maxT-minT);
+	} else if(t < wideMinT){
+		percent = ((t+(Math.PI*2)) - minT) / (maxT-minT);
+	}
+	let CX = (percent)*view.width;
+	ctx.drawImage(enemy.img, CX-width/2, lineO, width, lineH);
+	
+			t *= (180/Math.PI);
+	minT*= (180/Math.PI);
+	maxT*= (180/Math.PI);
+	a = {t, minT, maxT};
+}
 
 function calculateDeltaTime() {
 	let now = performance.now();

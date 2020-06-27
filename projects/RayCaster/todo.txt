@@ -2,4 +2,4 @@ map can be toggled
 load map from file
 map class
 image tiling on block
-sprite clipping
+sprite object and list to check collisions and then draw
