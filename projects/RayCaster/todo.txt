@@ -1,6 +1,5 @@
 map can be toggled
-bounding box collide
 load map from file
 map class
 image tiling on block
-sprite render
+sprite clipping

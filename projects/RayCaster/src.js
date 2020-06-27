@@ -5,6 +5,29 @@ window.onload = init;
 //game
 let lastTime = 0; // used by calculateDeltaTime()
 let dt = 0;
+let enemy = {
+	x: 200,
+	y: 300,
+	size: 11.5,
+	src: 'https://i.imgur.com/FcIXhVp.png',
+	drawn: false,
+	draw(ctx) {
+		ctx.beginPath();
+		ctx.moveTo(enemy.x - enemy.size, enemy.y - enemy.size);		
+		ctx.lineTo(enemy.x + enemy.size, enemy.y - enemy.size);
+		ctx.lineTo(enemy.x + enemy.size, enemy.y + enemy.size);
+		ctx.lineTo(enemy.x - enemy.size, enemy.y + enemy.size);
+		ctx.lineTo(enemy.x - enemy.size, enemy.y - enemy.size);
+		ctx.strokeStyle = 'green';
+		ctx.lineWidth = 1;
+		ctx.stroke();
+		//ctx.fillStyle = 'green';
+		//ctx.fillRect(this.x-this.size, this.y-this.size, this.size*2, this.size*2);
+	}	
+}
+enemy.img = new Image();
+enemy.img.src = enemy.src;
+enemy.img.setAttribute('crossOrigin', '');
 
 //#region canvas
 const c = document.getElementById("view");
@@ -41,7 +64,7 @@ const view = {
 		return this._halfHeight;
 	}
 };
-const fov = 75;
+let fov = 75;
 let horRes = 8; //horizontal resolution, higher number = less resolution
 let halfHorRes = horRes/2;
 let drawRays = true;
@@ -53,43 +76,29 @@ function updateHorRes(num){
 
 //#region wall texture stuff
 const walls = [];
-const walls_img = [];
-walls[0] = [];
-walls[1] = ['#FF0000', '#FF0000', '#FF0000', '#FF0000',];
-//#endregion
-
-//#region texture loading
-let imgSrcs = ['','','https://i.imgur.com/W8PJYFY.png','https://i.imgur.com/pRpAqeP.png'];
+const imgSrcs = ['','https://i.imgur.com/W8PJYFY.png','https://i.imgur.com/pRpAqeP.png'];
 imgSrcs.forEach((src, i) => {
-	let img = new Image();
-	img.src = src;
-	img.setAttribute('crossOrigin', '');
-	const img_ctx = document.getElementById('imageCanvas').getContext('2d');
-	walls[i] = img_ctx.createImageData(16, 16);
-	img.onload = () => {
-		img_ctx.drawImage(img, 0, 0);
-		img.style.display = 'none';
-		walls[i] = img_ctx.getImageData(0,0,16,16);
-		walls_img[i] = img;
-	};
+	walls[i] = new Image();
+	walls[i].src = src;
+	walls[i].setAttribute('crossOrigin', '');
 });
 //#endregion
 
 //#region map
 let map = [
 	[1,2,2,2,2,1,1,1,1,1,1],
-	[1,0,2,0,0,2,1,0,0,0,3],
-	[1,0,2,0,0,0,3,0,0,0,3],
-	[1,0,0,0,0,0,0,0,0,0,3],
-	[1,0,0,0,0,0,0,0,0,0,3],
-	[1,0,0,0,0,3,0,0,0,0,3],
-	[1,0,0,0,0,0,0,0,0,0,3],
-	[1,0,2,0,0,2,1,0,0,0,3],
-	[1,0,2,0,0,0,1,0,0,0,3],
-	[1,0,0,0,0,0,0,0,0,0,3],
-	[1,0,0,0,0,0,0,0,0,0,3],
-	[1,0,0,0,0,2,0,0,0,0,3],
-	[1,0,0,0,0,0,0,0,0,0,3],
+	[1,0,2,0,0,2,1,0,0,0,2],
+	[1,0,2,0,0,0,2,0,0,0,2],
+	[1,0,0,0,0,0,0,0,0,0,2],
+	[1,0,0,0,0,0,0,0,0,0,2],
+	[1,0,0,0,0,2,0,0,0,0,2],
+	[1,0,0,0,0,0,0,0,0,0,2],
+	[1,0,2,0,0,2,1,0,0,0,2],
+	[1,0,2,0,0,0,1,0,0,0,2],
+	[1,0,0,0,0,0,0,0,0,0,2],
+	[1,0,0,0,0,0,0,0,0,0,2],
+	[1,0,0,0,0,2,0,0,0,0,2],
+	[1,0,0,0,0,0,0,0,0,0,2],
 	[1,1,1,1,1,1,1,1,1,1,1]
 ];
 
@@ -124,19 +133,13 @@ map.draw = () => {
 				let yo = y*map.size;
 				let i = map[y][x];
 
-				if(i==1) {
-					map_ctx.fillStyle = 'white';
-					map_ctx.fillRect(xo+1, yo+1, map.s-1, map.s-1);
-				}
-				else if(i > 0) {
-					map_ctx.drawImage(walls_img[i], xo, yo, 64, 64);
+				if(i > 0) {
+					map_ctx.drawImage(walls[i], xo, yo, 64, 64);
 				}
 				else{
 					map_ctx.fillStyle = 'black';
 					map_ctx.fillRect(xo+1, yo+1, map.s-1, map.s-1);
-				}					
-
-				
+				}				
 			}
 		}
 		map.img = map_ctx.getImageData(0, 0, map_c.width, map_c.height);
@@ -162,24 +165,24 @@ function init() {
 
 	map_c.width = map[0].length * 64;
 	map_c.height = map.length * 64;
-	map_c.style.width = '400px';
 	update();
 }
 
-function update() {
-	requestAnimationFrame(update);
+function update() {	
 	dt = calculateDeltaTime();
 	player.update(dt, myKeys, map);
 	draw();
+	requestAnimationFrame(update);
 }
 
 function draw() {
 	map.draw();		
 	drawRays2D();
 	player.draw(map_ctx);
+	enemy.draw(map_ctx);
 }
 
-function dist( ax, ay, bx, by, ang){	
+function dist( ax, ay, bx, by){	
 	return (Math.sqrt(Math.pow((bx-ax), 2) + Math.pow((by-ay), 2)));
 }
 
@@ -203,6 +206,8 @@ function drawRays2D() {
 
 	let lastImg, pixelIndex, heightFraction;
 	let currImg = {};
+
+	enemy.drawn = false;
 
 	for(let r = 0; r < view.width/horRes; r++) {
 		//#region other
@@ -243,7 +248,7 @@ function drawRays2D() {
 			if(mx < map.width && mx >= 0 && my >= 0 && my < map.height && map[my][mx] > 0) { //hit wall
 				hx = ray.x;
 				hy = ray.y;
-				disH = dist(player.x, player.y, hx, hy, ray.a);
+				disH = dist(player.x, player.y, hx, hy);
 				mph.x =mx; mph.y = my;
 				//mph = mp;
 				dof = DOF;
@@ -287,7 +292,7 @@ function drawRays2D() {
 			if( mx >= 0 && my >= 0 && mx < map.width && my < map.height && map[my][mx] > 0) { //hit wall
 				vx = ray.x;
 				vy = ray.y;
-				disV = dist(player.x, player.y, vx, vy, ray.a);
+				disV = dist(player.x, player.y, vx, vy);
 				mpv.x = mx;
 				mpv.y = my;
 				dof = DOF; 
@@ -347,20 +352,20 @@ function drawRays2D() {
 			map_ctx.lineWidth = 1;
 			map_ctx.stroke();
 		}
-		//#endregion
+		//#endregion		
 
 		let lineO = view.halfHeight - Math.trunc(lineH/2); //line offset
 		
 		let x = mp.x;
 		let y = mp.y;
-		if(map[y][x] == 1) {
+		/*if(map[y][x] == 1) {
 			ctx.beginPath();
 			ctx.moveTo(r*horRes +  halfHorRes , lineO);
 			ctx.lineTo(r*horRes +  halfHorRes, lineH + lineO);
 			ctx.strokeStyle = `rgb(${Math.min((Math.min(lineH, view.height)/view.height)+0.2, 1) * 200 * colorMod},0,0)`;
 			ctx.lineWidth = horRes;
 			ctx.stroke();
-		} else if(map[y][x] > 0 && walls[map[y][x]] != null) {
+		} else*/ if(map[y][x] > 0 && walls[map[y][x]] != null) {
 			let percentage;
 			if(!isVertical && isUp){ //bottom face
 				percentage = (ray.x%map.s) / map.s;
@@ -378,12 +383,33 @@ function drawRays2D() {
 
 			let pixelX = Math.trunc(walls[lastImg].width * percentage);			
 			
-			ctx.drawImage(walls_img[lastImg], pixelX, 0, 1, walls[lastImg].height, r*horRes, lineO, horRes, lineH);
+			ctx.drawImage(walls[lastImg], pixelX, 0, 1, walls[lastImg].height, r*horRes, lineO, horRes, lineH);
 
 			ctx.globalAlpha = 1-(Math.min((Math.min(lineH, view.height)/view.height)+0.3, 1) * colorMod);
 			ctx.fillStyle = 'black';
     		ctx.fillRect(r*horRes, lineO, horRes, lineH);
     		ctx.globalAlpha = 1.0;
+		}
+		//#endregion
+
+		//#region enemies
+		let rls = {x1:ray.x, y1:ray.y, x2:player.x, y2:player.y}; //ray line segment
+		let els1 = {x1:enemy.x - enemy.size,y1:enemy.y - enemy.size,x2:enemy.x + enemy.size,y2:enemy.y + enemy.size}; //enemy line segment 1
+		let els2 = {
+			x1:enemy.x + enemy.size,
+			y1:enemy.y - enemy.size,
+			x2:enemy.x - enemy.size,
+			y2:enemy.y + enemy.size
+		};
+		if(!enemy.drawn && (lineIntersect(rls, els1) || lineIntersect(rls, els2))) {
+			{				
+				map_ctx.beginPath();
+				map_ctx.moveTo(ray.x, ray.y);
+				map_ctx.lineTo(player.x, player.y);	
+				map_ctx.strokeStyle = 'pink';
+				map_ctx.stroke();
+			}		
+			enemy.drawn = true;
 		}
 		//#endregion
 
@@ -393,7 +419,89 @@ function drawRays2D() {
 		if(ray.a > TAU)
 			ray.a -= TAU;
 	}
+
+	//#region draw enemy
+	if(enemy.drawn){		
+		let disT= dist(player.x, player.y, enemy.x, enemy.y);
+
+		let minT = player.a - (fov/2)* (Math.PI/180);
+		let maxT = player.a + (fov/2)* (Math.PI/180);
+		let wideMinT = minT - 0.3;
+		let wideMaxT = maxT + 0.3;
+		let x = enemy.x - player.x;
+		let y = enemy.y - player.y;
+		let length = dist(0,0,x,y);
+		x = x/length;
+		y = y/length;
+		let t = 0;
+		if(y>0 && x>0) {
+			t = Math.atan(y/x);
+		}else if(y>0 && x<0){
+			t = Math.atan(y/x)+Math.PI;
+		}else if(y<0 && x<0){
+			t = Math.atan(y/x)+Math.PI;
+		}else if(y<0 && x>0){
+			t = Math.atan(y/x)+Math.PI+Math.PI;	
+		}
+		if(t > Math.PI*2)
+			t-=Math.PI*2;
+		if(t<0)
+			t+=Math.PI*2
+			
+		let ca = player.a - t;
+		if(ca < 0)
+			ca += TAU;
+		if(ca > TAU)
+			ca -= TAU;
+		disT *= Math.cos(ca);//fix fisheye	
+
+		let lineH = Math.trunc((map.s*view.height)/disT);
+		let lineO = view.halfHeight - Math.trunc(lineH/2); //line offset
+		
+		map_ctx.strokeStyle = 'blue';
+		map_ctx.lineWidth = 5;
+		map_ctx.beginPath();
+		map_ctx.moveTo(enemy.x + enemy.size, enemy.y - enemy.size);
+		map_ctx.lineTo(enemy.x - enemy.size, enemy.y + enemy.size);	
+		map_ctx.stroke();
+		map_ctx.beginPath();
+		map_ctx.moveTo(enemy.x - enemy.size, enemy.y - enemy.size);
+		map_ctx.lineTo(enemy.x + enemy.size, enemy.y + enemy.size);	
+		map_ctx.stroke();
+
+		map_ctx.beginPath();
+		map_ctx.moveTo(player.x, player.y);
+		map_ctx.lineTo(enemy.x, enemy.y);
+		map_ctx.strokeStyle = 'green';
+		map_ctx.lineWidth = 5;
+		map_ctx.stroke();
+
+		
+
+
+		//if(t > minT-0.3 && t < maxT+0.3){
+			
+			let width = (lineH/enemy.img.height) * (enemy.size*2)/*enemy.img.width*/;
+			let percent = (t-minT) / (maxT-minT);
+			if(t > wideMaxT){
+				percent = (t - (minT + (Math.PI*2))) / (maxT-minT);
+			} else if(t < wideMinT){
+				percent = ((t+(Math.PI*2)) - minT) / (maxT-minT);
+			}
+			let CX = (percent)*view.width;
+			ctx.drawImage(enemy.img, CX-width/2, lineO, width, lineH);
+		//}
+		
+		
+			t *= (180/Math.PI);
+			minT*= (180/Math.PI);
+			maxT*= (180/Math.PI);
+		a = {t, minT, maxT};
+		
+	}
+	//#endregion
 }
+let a;
 
 function calculateDeltaTime() {
 	let now = performance.now();
