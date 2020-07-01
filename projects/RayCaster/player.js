@@ -48,13 +48,27 @@ class Player {
 			}		
 		}
 		if(kb.keydown[Keyboard.KEYBOARD.KEY_DOWN] || kb.keydown[Keyboard.KEYBOARD.KEY_S]){
+			let oldX = Math.trunc(this.x)>>6;
+			let oldY = Math.trunc(this.y)>>6;
 			this.x -= this.dx;
 			this.y -= this.dy;
-			let mx = Math.trunc(this.x)>>6;
-			let my = Math.trunc(this.y)>>6;
-			if(map[my][mx] > 0){
-				this.x += this.dx;
-				this.y += this.dy;
+			let newX = Math.trunc(this.x)>>6;
+			let newY = Math.trunc(this.y)>>6;
+			if(map[newY][newX] > 0){
+				if(newX != oldX){
+					this.x += this.dx;
+				}
+				if(newY != oldY) {
+					this.y += this.dy;
+				}
+				if(newX != oldX && newY != oldY){					
+					if(map[oldY][newX] == 0){
+						this.x -= this.dx;
+					}
+					if(map[newY][oldX] == 0){
+						this.y -= this.dy;
+					}
+				} 
 			}	
 		}
 	}

@@ -33,15 +33,8 @@ enemy.img.setAttribute('crossOrigin', '');
 //#region canvas
 const c = document.getElementById("view");
 const ctx = c.getContext("2d");
-ctx.imageSmoothingEnabled = false;
-
-var offscreen = new OffscreenCanvas(c.width, c.height);
-var off_ctx = offscreen.getContext("2d");
-
-
 const map_c = document.getElementById("map");
 const map_ctx = map_c.getContext("2d");
-map_ctx.imageSmoothingEnabled = false;
 //#endregion
 
 //#region constants
@@ -85,8 +78,7 @@ imgSrcs.forEach((src, i) => {
 });
 //#endregion
 
-//#region map
-let map = [
+let _m = [
 	[1,2,2,2,2,1,1,1,1,1,1],
 	[1,0,2,0,0,2,1,0,0,0,2],
 	[1,0,2,0,0,0,2,0,0,0,2],
@@ -103,69 +95,24 @@ let map = [
 	[1,1,1,1,1,1,1,1,1,1,1]
 ];
 
-Object.defineProperty(map, 'x', {
-	get: function() { return this.width; }
-});
-Object.defineProperty(map, 'width', {
-	get: function() { return this[0].length; }
-});
-Object.defineProperty(map, 'y', {
-	get: function() { return this.height; }
-});
-Object.defineProperty(map, 'height', {
-	get: function() { return this.length; }
-});
-Object.defineProperty(map, 's', {
-	get: function() { return this.size; }
-});
-Object.defineProperty(map, 'size', {
-	get: function() { return 64; }
-});
-map.img = null;
-map.draw = () => {
-	if(map.img == null){
-		let color = 'white';
-		map_ctx.fillStyle = 'gray';
-		map_ctx.fillRect(0, 0, map_c.width, map_c.height);
-		for(let y = 0; y < map.height; y++){
-			for(let x = 0; x < map.width; x++){
-
-				let xo = x*map.size;
-				let yo = y*map.size;
-				let i = map[y][x];
-
-				if(i > 0) {
-					map_ctx.drawImage(walls[i], xo, yo, 64, 64);
-				}
-				else{
-					map_ctx.fillStyle = 'black';
-					map_ctx.fillRect(xo+1, yo+1, map.s-1, map.s-1);
-				}				
-			}
-		}
-		map.img = map_ctx.getImageData(0, 0, map_c.width, map_c.height);
-	} else {
-		map_ctx.putImageData(map.img, 0, 0);
-	}
-};
-map.setTile = (x, y, i) => {	
-	map[y][x]=i;
-	map.img = null;
-};
-//#endregion
+const map = new Map(_m);
 
 const myKeys = new Keyboard();
 
 const player = new Player(300,300);
 
 function init() {
+	//hook up quality buttons
 	document.querySelectorAll('input[type=radio][name="quality"]').forEach(r => {
 		r.addEventListener("change", changeQualityHandler);
 	});
 	updateHorRes(8);
 
-	map_c.width = map[0].length * 64;
-	map_c.height = map.length * 64;
+	
+	map_c.width = map[0].length * Map.size;
+	map_c.height = map.length * Map.size;
+	map_ctx.imageSmoothingEnabled = false;
+	ctx.imageSmoothingEnabled = false;
 	update();
 }
 
@@ -177,7 +124,7 @@ function update() {
 }
 
 function draw() {
-	map.draw();		
+	map.draw(map_ctx,map_c);		
 	drawRays2D();
 	player.draw(map_ctx);
 	enemy.draw(map_ctx);
@@ -228,13 +175,13 @@ function drawRays2D() {
 		if(ray.a>Math.PI) { //looking up
 			ray.y = ((Math.trunc(player.y) >>6)<<6)-0.0001;
 			ray.x = (player.y- ray.y) * aTan + player.x;
-			yo=-64; xo=-yo*aTan;
+			yo=-Map.size; xo=-yo*aTan;
 			isUp = true;	
 		}
 		if(ray.a<Math.PI) { //looking down
-			ray.y = ((Math.trunc(player.y) >>6)<<6)+64;
+			ray.y = ((Math.trunc(player.y) >>6)<<6)+Map.size;
 			ray.x = (player.y- ray.y) * aTan + player.x;
-			yo=64; xo=-yo*aTan;
+			yo=Map.size; xo=-yo*aTan;
 			isUp = false;
 		}
 		if(ray.a == 0 || ray.a == Math.PI) { //looking straight left or right
@@ -273,13 +220,13 @@ function drawRays2D() {
 		if(ray.a > P2 && ray.a < P3) { //looking left
 			ray.x = ((Math.trunc(player.x) >>6)<<6)-0.0001;
 			ray.y = (player.x- ray.x) * nTan + player.y;
-			xo=-64; yo=-xo*nTan;
+			xo=-Map.size; yo=-xo*nTan;
 			isLeft = true;
 		}
 		if(ray.a < P2 || ray.a > P3) { //looking right
-			ray.x = ((Math.trunc(player.x) >>6)<<6)+64;
+			ray.x = ((Math.trunc(player.x) >>6)<<6)+Map.size;
 			ray.y = (player.x- ray.x) * nTan + player.y;
-			xo=64; yo=-xo*nTan;
+			xo=Map.size; yo=-xo*nTan;
 			isLeft = false;
 		}
 		if(ray.a == 0 || ray.a == Math.PI) { //looking straight up or down
@@ -334,6 +281,7 @@ function drawRays2D() {
 			x2:enemy.x - enemy.size,
 			y2:enemy.y + enemy.size
 		};
+		
 		if(!enemy.drawn && (lineIntersect(rls, els1) || lineIntersect(rls, els2))) {
 			{				
 				map_ctx.beginPath();
@@ -402,7 +350,7 @@ function drawRayWall(ray, mp, disT, isVertical, isUp, isLeft, r, colorMod){
 		//continue;
 
 	disT *= Math.cos(ca);//fix fisheye
-	let lineH = Math.trunc((map.s*view.height)/disT); //line height		
+	let lineH = Math.trunc((Map.size*view.height)/disT); //line height		
 
 	//if(!mp || !lineH || !dof ){
 	//	continue;
@@ -424,13 +372,13 @@ function drawRayWall(ray, mp, disT, isVertical, isUp, isLeft, r, colorMod){
 	} else*/ if(imgID > 0 && walls[imgID] != null) {
 		let percentage;
 		if(!isVertical && isUp){ //bottom face
-			percentage = (ray.x%map.s) / map.s;
+			percentage = (ray.x%Map.size) / Map.size;
 		} else if(!isVertical && !isUp){ //top face
-			percentage = 1 - (ray.x%map.s) / map.s;
+			percentage = 1 - (ray.x%Map.size) / Map.size;
 		} else if(isVertical && !isLeft){ //left face
-			percentage = (ray.y%map.s) / map.s;
+			percentage = (ray.y%Map.size) / Map.size;
 		} else if(isVertical && isLeft){ //right face
-			percentage = 1 - (ray.y%map.s) / map.s;
+			percentage = 1 - (ray.y%Map.size) / Map.size;
 		} 
 
 		let pixelX = Math.trunc(walls[imgID].width * percentage);			
@@ -478,7 +426,7 @@ function drawEnemy(){
 		ca -= TAU;
 	disT *= Math.cos(ca);//fix fisheye	
 
-	let lineH = Math.trunc((map.s*view.height)/disT);
+	let lineH = Math.trunc((Map.size*view.height)/disT);
 	let lineO = view.halfHeight - Math.trunc(lineH/2); //line offset
 	
 	//#region draw lines
