@@ -5,30 +5,12 @@ window.onload = init;
 //game
 let lastTime = 0; // used by calculateDeltaTime()
 let dt = 0;
-let enemy = {
-	x: 200,
-	y: 300,
-	size: 11.5,
-	src: 'https://i.imgur.com/FcIXhVp.png',
-	needsToBeDrawn: false,
-	drawn: false,
-	draw(ctx) {
-		ctx.beginPath();
-		ctx.moveTo(enemy.x - enemy.size, enemy.y - enemy.size);		
-		ctx.lineTo(enemy.x + enemy.size, enemy.y - enemy.size);
-		ctx.lineTo(enemy.x + enemy.size, enemy.y + enemy.size);
-		ctx.lineTo(enemy.x - enemy.size, enemy.y + enemy.size);
-		ctx.lineTo(enemy.x - enemy.size, enemy.y - enemy.size);
-		ctx.strokeStyle = 'green';
-		ctx.lineWidth = 1;
-		ctx.stroke();
-		//ctx.fillStyle = 'green';
-		//ctx.fillRect(this.x-this.size, this.y-this.size, this.size*2, this.size*2);
-	}	
-}
-enemy.img = new Image();
-enemy.img.src = enemy.src;
-enemy.img.setAttribute('crossOrigin', '');
+
+let entities = [];
+entities.push(new Entity(200, 300, 11.5, 'https://i.imgur.com/FcIXhVp.png'));
+entities.push(new Entity(600, 450, 11.5, 'https://i.imgur.com/FcIXhVp.png'));
+entities.push(new Entity(200, 700, 11.5, 'https://i.imgur.com/FcIXhVp.png'));
+entities.push(new Entity(600, 700, 11.5, 'https://i.imgur.com/FcIXhVp.png'));
 
 //#region canvas
 const c = document.getElementById("view");
@@ -127,7 +109,7 @@ function draw() {
 	map.draw(map_ctx,map_c);		
 	drawRays2D();
 	player.draw(map_ctx);
-	enemy.draw(map_ctx);
+	entities.forEach(e => e.draw2D(map_ctx));
 }
 
 function dist( ax, ay, bx, by){	
@@ -154,8 +136,7 @@ function drawRays2D() {
 	if(ray.a > TAU)
 		ray.a -= TAU;
 
-	enemy.drawn = false;
-	enemy.needsToBeDrawn = false;
+	entities.forEach(e => e.drawn = false);
 
 	for(let r = 0; r < view.width/horRes; r++) {
 		//#region other
@@ -274,24 +255,26 @@ function drawRays2D() {
 
 		//#region enemies
 		let rls = {x1:ray.x, y1:ray.y, x2:player.x, y2:player.y}; //ray line segment
-		let els1 = {x1:enemy.x - enemy.size,y1:enemy.y - enemy.size,x2:enemy.x + enemy.size,y2:enemy.y + enemy.size}; //enemy line segment 1
-		let els2 = {
-			x1:enemy.x + enemy.size,
-			y1:enemy.y - enemy.size,
-			x2:enemy.x - enemy.size,
-			y2:enemy.y + enemy.size
-		};
-		
-		if(!enemy.drawn && (lineIntersect(rls, els1) || lineIntersect(rls, els2))) {
-			{				
-				map_ctx.beginPath();
-				map_ctx.moveTo(ray.x, ray.y);
-				map_ctx.lineTo(player.x, player.y);	
-				map_ctx.strokeStyle = 'pink';
-				map_ctx.stroke();
-			}		
-			enemy.drawn = true;
-		}
+		entities.forEach(e => {
+			let els1 = {x1:e.x - e.size,y1:e.y - e.size,x2:e.x + e.size,y2:e.y + e.size}; //enemy line segment 1
+			let els2 = {
+				x1:e.x + e.size,
+				y1:e.y - e.size,
+				x2:e.x - e.size,
+				y2:e.y + e.size
+			};
+			
+			if(!e.drawn && (lineIntersect(rls, els1) || lineIntersect(rls, els2))) {
+				{				
+					map_ctx.beginPath();
+					map_ctx.moveTo(ray.x, ray.y);
+					map_ctx.lineTo(player.x, player.y);	
+					map_ctx.strokeStyle = 'pink';
+					map_ctx.stroke();
+				}		
+				e.drawn = true;
+			}
+		});
 		//#endregion
 
 		//#region draw 2d
@@ -316,16 +299,18 @@ function drawRays2D() {
 		//#endregion 
 	}
 
-	if(enemy.drawn){
-		let distToEnemy = dist(enemy.x,enemy.y,player.x,player.y);
-		rays.push({disT:distToEnemy, isSprite:true})
-	}
+	entities.forEach((e, i) => {
+		if(e.drawn){
+			let distToEnemy = dist(e.x,e.y,player.x,player.y);
+			rays.push({disT:distToEnemy, isSprite:true, index:i});
+		}
+	});
 
 	//sort so it is drawn back to front
 	rays.sort((a,b) => b.disT - a.disT);
 	rays.forEach(_r => {
 		if(_r.isSprite){
-			drawEnemy();
+			entities[_r.index].draw(player, ctx, map_ctx, view);
 		} else {
 			drawRayWall(_r.ray, _r.mp, _r.disT, _r.isVertical, _r.isUp, _r.isLeft, _r.r, _r.colorMod);
 		}
@@ -390,78 +375,6 @@ function drawRayWall(ray, mp, disT, isVertical, isUp, isLeft, r, colorMod){
 		ctx.fillRect(r*horRes, lineO, horRes, lineH);
 		ctx.globalAlpha = 1.0;
 	}
-}
-
-function drawEnemy(){
-	let disT= dist(player.x, player.y, enemy.x, enemy.y);
-
-	let minT = player.a - (fov/2)* (Math.PI/180);
-	let maxT = player.a + (fov/2)* (Math.PI/180);
-	let wideMinT = minT - 0.3;
-	let wideMaxT = maxT + 0.3;
-	let x = enemy.x - player.x;
-	let y = enemy.y - player.y;
-	let length = dist(0,0,x,y);
-	x = x/length;
-	y = y/length;
-	let t = 0;
-	if(y>0 && x>0) {
-		t = Math.atan(y/x);
-	}else if(y>0 && x<0){
-		t = Math.atan(y/x)+Math.PI;
-	}else if(y<0 && x<0){
-		t = Math.atan(y/x)+Math.PI;
-	}else if(y<0 && x>0){
-		t = Math.atan(y/x)+Math.PI+Math.PI;	
-	}
-	if(t > Math.PI*2)
-		t-=Math.PI*2;
-	if(t<0)
-		t+=Math.PI*2
-		
-	let ca = player.a - t;
-	if(ca < 0)
-		ca += TAU;
-	if(ca > TAU)
-		ca -= TAU;
-	disT *= Math.cos(ca);//fix fisheye	
-
-	let lineH = Math.trunc((Map.size*view.height)/disT);
-	let lineO = view.halfHeight - Math.trunc(lineH/2); //line offset
-	
-	//#region draw lines
-	map_ctx.strokeStyle = 'blue';
-	map_ctx.lineWidth = 5;
-	map_ctx.beginPath();
-	map_ctx.moveTo(enemy.x + enemy.size, enemy.y - enemy.size);
-	map_ctx.lineTo(enemy.x - enemy.size, enemy.y + enemy.size);	
-	map_ctx.stroke();
-	map_ctx.beginPath();
-	map_ctx.moveTo(enemy.x - enemy.size, enemy.y - enemy.size);
-	map_ctx.lineTo(enemy.x + enemy.size, enemy.y + enemy.size);	
-	map_ctx.stroke();
-	map_ctx.beginPath();
-	map_ctx.moveTo(player.x, player.y);
-	map_ctx.lineTo(enemy.x, enemy.y);
-	map_ctx.strokeStyle = 'green';
-	map_ctx.lineWidth = 5;
-	map_ctx.stroke();
-	//#endregion
-
-	let width = (lineH/enemy.img.height) * (enemy.size*2)/*enemy.img.width*/;
-	let percent = (t-minT) / (maxT-minT);
-	if(t > wideMaxT){
-		percent = (t - (minT + (Math.PI*2))) / (maxT-minT);
-	} else if(t < wideMinT){
-		percent = ((t+(Math.PI*2)) - minT) / (maxT-minT);
-	}
-	let CX = (percent)*view.width;
-	ctx.drawImage(enemy.img, CX-width/2, lineO, width, lineH);
-	
-			t *= (180/Math.PI);
-	minT*= (180/Math.PI);
-	maxT*= (180/Math.PI);
-	a = {t, minT, maxT};
 }
 
 function calculateDeltaTime() {
