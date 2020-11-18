@@ -101,6 +101,7 @@ function init() {
 function update() {	
 	dt = calculateDeltaTime();
 	player.update(dt, myKeys, map);
+	updateEntites();
 	draw();
 	requestAnimationFrame(update);
 }
@@ -109,11 +110,24 @@ function draw() {
 	map.draw(map_ctx,map_c);		
 	drawRays2D();
 	player.draw(map_ctx);
+	drawEntites();
+}
+
+function updateEntites(){
+	entities.forEach(e => e.update(player, norm));
+}
+
+function drawEntites(){
 	entities.forEach(e => e.draw2D(map_ctx));
 }
 
 function dist( ax, ay, bx, by){	
 	return (Math.sqrt(Math.pow((bx-ax), 2) + Math.pow((by-ay), 2)));
+}
+
+function norm(vec) {
+	let mag = dist(vec.x, vec.y, 0, 0);
+	return {x: vec.x/mag, y: vec.y/mag};
 }
 
 function drawRays2D() {

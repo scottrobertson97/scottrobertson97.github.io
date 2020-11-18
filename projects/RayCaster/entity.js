@@ -7,6 +7,7 @@ class Entity {
 		this.img = new Image();
 		this.img.src = src;
 		this.img.setAttribute('crossOrigin', '');
+		this.speed = 0.2;
 	}
 	
 	draw(player, ctx, map_ctx, view){
@@ -91,5 +92,36 @@ class Entity {
 		ctx.strokeStyle = 'green';
 		ctx.lineWidth = 1;
 		ctx.stroke();
+	}
+
+	update(player, norm){
+		let vecToPlayer = {x: player.x - this.x, y: player.y - this.y};
+		let direction = norm(vecToPlayer);
+		//let direction = {x:1, y:1};		
+
+		let oldX = Math.trunc(this.x)>>6;
+		let oldY = Math.trunc(this.y)>>6;
+
+		this.x += direction.x*this.speed;
+		this.y += direction.y*this.speed;
+
+		let newX = Math.trunc(this.x)>>6;
+		let newY = Math.trunc(this.y)>>6;
+		if(map[newY][newX] > 0){
+			if(newX != oldX){
+				this.x -= direction.x*this.speed;
+			}
+			if(newY != oldY) {
+				this.y -= direction.y*this.speed;
+			}
+			//if(newX != oldX && newY != oldY){					
+			//	if(map[oldY][newX] == 0){
+			//		this.x -= this.dx;
+			//	}
+			//	if(map[newY][oldX] == 0){
+			//		this.y -= this.dy;
+			//	}
+			//} 
+		}
 	}
 }
