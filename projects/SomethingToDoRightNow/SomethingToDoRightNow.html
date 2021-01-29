@@ -24,13 +24,15 @@
 		}
 
 		button {
-			//font-size: 11px;
-			//position: absolute;
-			//color: red;
-			//font-weight: bold;
-			//height: 30px;
-			//width: 130px;
-			//z-index: 100;
+			/*
+			font-size: 11px;
+			position: absolute;
+			color: red;
+			font-weight: bold;
+			height: 30px;
+			width: 130px;
+			z-index: 100;
+			*/
 		}
 
 		img {
@@ -133,10 +135,9 @@
 				for (var i = 0; i < results.length; i++) {
 					var place = results[i];
 					//console.dir(place);
-					//get the opening hours, if it doesnt exist, just make one and say it is open
-					var open = place.opening_hours || {open_now: true};
+
 					//if it is open, add it
-					if (open.open_now) {
+					if (!place.opening_hours || place.opening_hours.isOpen()) {
 						addPlace(place);
 						addMarker(place);
 					}
