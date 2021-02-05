@@ -1,8 +1,0 @@
-map can be toggled
-load map from file
-image tiling on block
-sprite object and list to check collisions and then draw
-enemy class
-sprite class?
-ai movement
-implement vector class
