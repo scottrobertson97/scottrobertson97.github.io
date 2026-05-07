@@ -58,6 +58,46 @@
           <p class="section-intro">Selected web apps and interactive projects built with JavaScript, React, canvas, APIs, and database-backed services.</p>
 
           <div class="project-grid">
+            <button class="project-card" type="button" data-modal-target="portfolio-modal-8">
+              <span class="portfolio-image">
+                <img src="img/portfolio/shape-invaders.png" alt="Screenshot of the Shape Invaders browser game">
+                <span class="project-overlay">
+                  <svg class="icon icon-large" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="m21 21-5.2-5.2M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z"></path>
+                  </svg>
+                </span>
+              </span>
+              <span class="project-body">
+                <span class="project-title">Shape Invaders</span>
+                <span class="project-summary">A canvas arcade shooter with space combat, keyboard controls, enemy waves, scoring, and launch-screen gameplay.</span>
+                <span class="tag-list">
+                  <span>JavaScript</span>
+                  <span>Canvas</span>
+                  <span>Game Dev</span>
+                </span>
+              </span>
+            </button>
+
+            <button class="project-card" type="button" data-modal-target="portfolio-modal-7">
+              <span class="portfolio-image">
+                <img src="img/portfolio/arcane-exterminator.png" alt="Screenshot of the Arcane Exterminator browser game">
+                <span class="project-overlay">
+                  <svg class="icon icon-large" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="m21 21-5.2-5.2M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z"></path>
+                  </svg>
+                </span>
+              </span>
+              <span class="project-body">
+                <span class="project-title">Arcane Exterminator</span>
+                <span class="project-summary">A browser survival game with escalating waves, auto-targeting combat, meta progression, shards, and permanent upgrades.</span>
+                <span class="tag-list">
+                  <span>JavaScript</span>
+                  <span>Canvas</span>
+                  <span>Game Dev</span>
+                </span>
+              </span>
+            </button>
+
             <button class="project-card" type="button" data-modal-target="portfolio-modal-6">
               <span class="portfolio-image">
                 <img src="img/portfolio/raycaster.png" alt="Screenshot of the RayCaster browser game">
@@ -255,6 +295,60 @@
       </svg>
     </button>
 
+    <div class="modal" id="portfolio-modal-8" role="dialog" aria-modal="true" aria-labelledby="portfolio-modal-8-title" hidden>
+      <div class="modal-dialog" role="document">
+        <button class="modal-close" type="button" data-modal-close aria-label="Close project">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m6 6 12 12M18 6 6 18"></path>
+          </svg>
+        </button>
+        <div class="modal-content">
+          <h2 id="portfolio-modal-8-title">Shape Invaders</h2>
+          <a class="button button-primary" href="https://scottrobertson.net/shape-invaders/" target="_blank" rel="noopener">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M14 3h7v7m0-7L10 14M5 7v14h14v-7"></path>
+            </svg>
+            Open Project
+          </a>
+          <img src="img/portfolio/shape-invaders.png" alt="Screenshot of the Shape Invaders browser game">
+          <p>Shape Invaders is a canvas-rendered arcade space shooter with movement and fire controls, enemy squadrons that dive toward the player, score tracking, and launch-screen gameplay built for quick browser play.</p>
+          <button class="button button-primary" type="button" data-modal-close>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m6 6 12 12M18 6 6 18"></path>
+            </svg>
+            Close Project
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="portfolio-modal-7" role="dialog" aria-modal="true" aria-labelledby="portfolio-modal-7-title" hidden>
+      <div class="modal-dialog" role="document">
+        <button class="modal-close" type="button" data-modal-close aria-label="Close project">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m6 6 12 12M18 6 6 18"></path>
+          </svg>
+        </button>
+        <div class="modal-content">
+          <h2 id="portfolio-modal-7-title">Arcane Exterminator</h2>
+          <a class="button button-primary" href="https://scottrobertson.net/arcane-exterminator/" target="_blank" rel="noopener">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M14 3h7v7m0-7L10 14M5 7v14h14v-7"></path>
+            </svg>
+            Open Project
+          </a>
+          <img src="img/portfolio/arcane-exterminator.png" alt="Screenshot of the Arcane Exterminator browser game">
+          <p>Arcane Exterminator is a browser survival game about enduring escalating waves and stacking power. It includes auto-targeting combat, keyboard and touch controls, zoom controls, meta progression, shards, and permanent upgrade bonuses that apply across runs.</p>
+          <button class="button button-primary" type="button" data-modal-close>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m6 6 12 12M18 6 6 18"></path>
+            </svg>
+            Close Project
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div class="modal" id="portfolio-modal-1" role="dialog" aria-modal="true" aria-labelledby="portfolio-modal-1-title" hidden>
       <div class="modal-dialog" role="document">
         <button class="modal-close" type="button" data-modal-close aria-label="Close project">
@@ -291,7 +385,7 @@
         </button>
         <div class="modal-content">
           <h2 id="portfolio-modal-2-title">Space Blaster</h2>
-          <a class="button button-primary" href="https://scottrobertson.net/SpaceBlaster/" target="_blank" rel="noopener">
+          <a class="button button-primary" href="https://scottrobertson.net/space-blaster/" target="_blank" rel="noopener">
             <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M14 3h7v7m0-7L10 14M5 7v14h14v-7"></path>
             </svg>
@@ -318,7 +412,7 @@
         </button>
         <div class="modal-content">
           <h2 id="portfolio-modal-3-title">SomethingToDoRightNow</h2>
-          <a class="button button-primary" href="https://scottrobertson.net/SomethingToDoRightNow/" target="_blank" rel="noopener">
+          <a class="button button-primary" href="https://github.com/scottrobertson97/SomethingToDoRightNow" target="_blank" rel="noopener">
             <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M14 3h7v7m0-7L10 14M5 7v14h14v-7"></path>
             </svg>
@@ -345,7 +439,7 @@
         </button>
         <div class="modal-content">
           <h2 id="portfolio-modal-4-title">Scott's Drink Recipes</h2>
-          <a class="button button-primary" href="https://robertson-430-project1.herokuapp.com/" target="_blank" rel="noopener">
+          <a class="button button-primary" href="https://github.com/scottrobertson97/430-project1-api" target="_blank" rel="noopener">
             <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M14 3h7v7m0-7L10 14M5 7v14h14v-7"></path>
             </svg>
