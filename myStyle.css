@@ -341,10 +341,30 @@ section {
   padding: 1.25rem;
 }
 
+.project-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.65rem;
+}
+
 .project-title {
   display: block;
-  margin-bottom: 0.65rem;
   font-size: 1.1rem;
+  overflow-wrap: anywhere;
+}
+
+.project-year {
+  flex: 0 0 auto;
+  border: 1px solid #d6c1b7;
+  border-radius: 999px;
+  padding: 0.18rem 0.5rem;
+  background: #fff4ee;
+  color: #8b452a;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.2;
 }
 
 .project-summary {
