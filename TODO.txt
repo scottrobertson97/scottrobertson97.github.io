@@ -1,1 +1,197 @@
-Add descriptions to projects
+Ticket #1: Strengthen Hero Positioning
+Status: Done
+Description:
+Rewrite the hero copy so it presents Scott Robertson as a hireable software developer with specific strengths in JavaScript, interactive web apps, browser projects, APIs, and maintainable user interfaces.
+Acceptance Criteria:
+- Hero still includes the existing View Work and Resume calls to action.
+- Copy is concise and hiring-focused.
+- Copy mentions specific technical strengths rather than broad generic claims.
+- Text renders cleanly on desktop and mobile without awkward wrapping.
+Story Points: 2
+
+Ticket #2: Add Compact Skills Band
+Status: Done
+Description:
+Add a restrained skills section or band that highlights resume-aligned technologies and keywords such as JavaScript, React, HTML/CSS, Canvas, APIs, Node/Express, MongoDB, SQL, Git, and responsive design.
+Acceptance Criteria:
+- Skills are easy to scan near the top of the page.
+- The section does not look like a decorative skill-bar chart.
+- Skills align with the resume and portfolio project evidence.
+- Layout works on desktop and mobile.
+Story Points: 3
+
+Ticket #3: Improve Project Descriptions
+Status: Done
+Description:
+Rewrite project card and modal descriptions to emphasize what was technically built, what problems were solved, and what implementation details matter to hiring reviewers.
+Acceptance Criteria:
+- Each visible project card has a clear technical summary.
+- Each modal description adds useful implementation detail beyond the card copy.
+- Descriptions are concise and consistent in tone.
+- Existing project links and images remain intact.
+Story Points: 5
+
+Ticket #4: Clarify Project Actions
+Status: Done
+Description:
+Update project modal buttons so action labels clearly distinguish between live demos, source code, and project documentation.
+Acceptance Criteria:
+- Buttons use labels such as Live Demo, View Code, or View Documentation where appropriate.
+- No modal uses vague action text when a clearer destination is known.
+- Button hrefs continue to point to the correct destinations.
+- External links still use target="_blank" and rel="noopener".
+Story Points: 2
+
+Ticket #5: Reorder Projects For Hiring Impact
+Status: Done
+Description:
+Reorder portfolio projects so the strongest examples for software development hiring appear first, balancing full applications, API/database work, and interactive frontend work.
+Acceptance Criteria:
+- First three projects demonstrate the strongest hireable skills.
+- Project order is reflected consistently in visible cards and related modal structure.
+- Modal triggers still open the correct project details.
+- The grid remains visually balanced on desktop and mobile.
+Story Points: 3
+
+Ticket #6: Strengthen About Section
+Status: Done
+Description:
+Revise the About section to connect Scott's background, project experience, and target software development roles more directly.
+Acceptance Criteria:
+- About copy mentions the type of role or work being targeted.
+- Copy remains concise and professional.
+- Existing About section layout remains clean on desktop and mobile.
+- No duplicate resume button is reintroduced.
+Story Points: 2
+
+Ticket #7: Align Site Keywords With Resume
+Status: Done
+Description:
+Review the resume and site copy together, then mirror important resume keywords on the portfolio site where they naturally fit.
+Acceptance Criteria:
+- Key resume technologies and role terms are represented on the site.
+- Keywords are incorporated naturally into copy, tags, or metadata.
+- No keyword stuffing or unreadable copy is introduced.
+- Resume link count remains limited to the intended nav and hero links.
+Story Points: 3
+
+Ticket #8: Add Project Metadata
+Status: Done
+Description:
+Add concise metadata to projects, such as project type, year, status, and code/demo availability, so hiring reviewers can quickly understand each project.
+Acceptance Criteria:
+- Metadata is visible or easily discoverable for each project.
+- Metadata labels are consistent across projects.
+- Existing year information is preserved or improved.
+- Metadata does not clutter the cards or modals.
+Story Points: 3
+
+Ticket #9: Evaluate Direct Email Contact
+Status: Done
+Description:
+Decide whether to add a direct email link to the Contact section to create a clearer hiring outreach path alongside GitHub and LinkedIn.
+Acceptance Criteria:
+- If added, email appears once in the Contact UI.
+- If not added, document the reason in this TODO ticket or a follow-up note.
+- Contact section remains focused and does not duplicate internal navigation.
+- GitHub and LinkedIn still appear once in the visible Contact UI.
+Story Points: 1
+
+Ticket #10: Preserve Compact Footer
+Status: Done
+Description:
+Keep the footer as a single compact copyright line and prevent duplicate navigation from being reintroduced.
+Acceptance Criteria:
+- Footer contains only "Copyright © Scott Robertson 2026".
+- Footer has no navigation links.
+- Footer does not repeat a separate Scott Robertson label.
+- Footer spacing remains compact on desktop and mobile.
+Story Points: 1
+
+Ticket #11: Tighten Hero Layout
+Status: Done
+Description:
+Reduce the hero section height and vertical spacing so the page feels more purposeful and brings users to the portfolio sooner while preserving the primary name, role, copy, and calls to action.
+Acceptance Criteria:
+- Hero still clearly presents Scott Robertson, role, short positioning copy, View Work, and Resume.
+- Desktop hero no longer feels oversized or empty.
+- Mobile hero remains readable and does not feel cramped.
+- The next section is reached sooner without breaking visual balance.
+Story Points: 3
+
+Ticket #12: Refine Color Palette
+Status: Done
+Description:
+Refresh the visual palette by keeping the existing teal/dark identity while lightening the overall feel and using the orange accent more intentionally for small highlights.
+Acceptance Criteria:
+- Primary teal/dark brand feel is preserved.
+- Accent color is used consistently and sparingly.
+- Section backgrounds feel less heavy and more polished.
+- Color contrast remains accessible for text and controls.
+Story Points: 3
+
+Ticket #13: Improve Typography Hierarchy
+Status: Done
+Description:
+Refine heading, label, and body typography so the site feels more modern and less dominated by bold uppercase text.
+Acceptance Criteria:
+- Main hero name remains visually strong.
+- Secondary headings and labels use a clearer hierarchy with less visual shouting.
+- Body copy remains easy to scan on desktop and mobile.
+- Button and metadata text remain legible at small sizes.
+Story Points: 3
+
+Ticket #14: Polish Project Card Design
+Status: Done
+Description:
+Improve project card presentation with more consistent image treatment, spacing, hover states, and metadata/tag balance so the portfolio grid feels more premium and less dense.
+Acceptance Criteria:
+- Project images use consistent height and cropping.
+- Metadata, summary, and tags have clearer spacing.
+- Hover/focus states feel intentional and accessible.
+- Cards remain readable and balanced on mobile.
+Story Points: 5
+
+Ticket #15: Group Skills Visually
+Status: Done
+Description:
+Rework the skills band into grouped categories such as Frontend, Backend, Data, and Tools so the skills section feels curated rather than like a long keyword list.
+Acceptance Criteria:
+- Skills are grouped under clear category labels.
+- The section remains compact near the top of the page.
+- The grouped layout works on desktop and mobile.
+- Resume-aligned keywords remain represented without visual clutter.
+Story Points: 3
+
+Ticket #16: Add Featured Project Treatment
+Status: Done
+Description:
+Create a featured project layout that gives the strongest project more visual weight before the remaining portfolio grid.
+Acceptance Criteria:
+- One project is visually featured above or within the portfolio section.
+- Remaining projects still appear in a clean grid.
+- Featured project includes clear summary, metadata, and action path.
+- Layout remains balanced on desktop and mobile.
+Story Points: 5
+
+Ticket #17: Improve Section Rhythm
+Status: Done
+Description:
+Adjust spacing, section backgrounds, and transitions between hero, skills, portfolio, about, contact, and footer so the page has a more deliberate visual flow.
+Acceptance Criteria:
+- Sections feel distinct without relying on heavy decoration.
+- Vertical spacing is consistent across desktop and mobile.
+- Page flow guides users naturally from intro to work to contact.
+- No section feels visually isolated or crowded.
+Story Points: 3
+
+Ticket #18: Simplify Mobile Project Cards
+Status: Done
+Description:
+Reduce visual density in mobile project cards by tuning metadata prominence, spacing, and text hierarchy while keeping the same information available.
+Acceptance Criteria:
+- Mobile cards are easier to scan at narrow widths.
+- Metadata does not overpower project titles or summaries.
+- Tags remain readable without wrapping awkwardly.
+- Desktop card layout is not degraded.
+Story Points: 3
