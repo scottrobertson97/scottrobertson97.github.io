@@ -102,9 +102,9 @@
           <h2 id="portfolio-title">Portfolio</h2>
           <p class="section-intro">Selected web apps and interactive projects built with JavaScript/ES6, React, Node.js APIs, canvas, and database-backed services.</p>
 
-          <button class="project-card featured-project" type="button" data-modal-target="portfolio-modal-7">
+          <button class="project-card featured-project" type="button" data-modal-target="portfolio-modal-9">
             <span class="portfolio-image">
-              <img src="img/portfolio/arcane-exterminator.png" alt="Screenshot of the Arcane Exterminator browser game">
+              <img src="img/portfolio/guinea-pig-beans.png" alt="Screenshot of the Guinea Pig Beans Phaser game">
               <span class="project-overlay">
                 <svg class="icon icon-large" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="m21 21-5.2-5.2M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z"></path>
@@ -114,24 +114,52 @@
             <span class="project-body">
               <span class="featured-label">Featured Project</span>
               <span class="project-heading">
-                <span class="project-title">Arcane Exterminator</span>
+                <span class="project-title">Guinea Pig Beans</span>
                 <span class="project-year">2026</span>
               </span>
               <span class="project-meta" aria-label="Project metadata">
-                <span><strong>Type</strong> Canvas game</span>
+                <span><strong>Type</strong> Phaser game</span>
                 <span><strong>Status</strong> Live</span>
                 <span><strong>Access</strong> Demo</span>
               </span>
-              <span class="project-summary">Canvas survival game with enemy wave scaling, auto-targeting combat, upgrade choices, resource drops, and persistent progression.</span>
+              <span class="project-summary">Cozy Phaser management game with autonomous pigs, contract goals, cage-care systems, upgrades, tech-tree progression, and persistent play.</span>
               <span class="tag-list">
-                <span>JavaScript</span>
-                <span>Canvas</span>
+                <span>Phaser</span>
+                <span>TypeScript</span>
                 <span>Game Dev</span>
               </span>
             </span>
           </button>
 
           <div class="project-grid">
+            <button class="project-card" type="button" data-modal-target="portfolio-modal-7">
+              <span class="portfolio-image">
+                <img src="img/portfolio/arcane-exterminator.png" alt="Screenshot of the Arcane Exterminator browser game">
+                <span class="project-overlay">
+                  <svg class="icon icon-large" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="m21 21-5.2-5.2M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z"></path>
+                  </svg>
+                </span>
+              </span>
+              <span class="project-body">
+                <span class="project-heading">
+                  <span class="project-title">Arcane Exterminator</span>
+                  <span class="project-year">2026</span>
+                </span>
+                <span class="project-meta" aria-label="Project metadata">
+                  <span><strong>Type</strong> Canvas game</span>
+                  <span><strong>Status</strong> Live</span>
+                  <span><strong>Access</strong> Demo</span>
+                </span>
+                <span class="project-summary">Canvas survival game with enemy wave scaling, auto-targeting combat, upgrade choices, resource drops, and persistent progression.</span>
+                <span class="tag-list">
+                  <span>JavaScript</span>
+                  <span>Canvas</span>
+                  <span>Game Dev</span>
+                </span>
+              </span>
+            </button>
+
             <button class="project-card" type="button" data-modal-target="portfolio-modal-8">
               <span class="portfolio-image">
                 <img src="img/portfolio/shape-invaders.png" alt="Screenshot of the Shape Invaders browser game">
@@ -374,6 +402,33 @@
         <path d="m6 15 6-6 6 6"></path>
       </svg>
     </button>
+
+    <div class="modal" id="portfolio-modal-9" role="dialog" aria-modal="true" aria-labelledby="portfolio-modal-9-title" hidden>
+      <div class="modal-dialog" role="document">
+        <button class="modal-close" type="button" data-modal-close aria-label="Close project">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m6 6 12 12M18 6 6 18"></path>
+          </svg>
+        </button>
+        <div class="modal-content">
+          <h2 id="portfolio-modal-9-title">Guinea Pig Beans</h2>
+          <a class="button button-primary" href="https://scottrobertson.net/guinea-pig-beans/" target="_blank" rel="noopener">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M14 3h7v7m0-7L10 14M5 7v14h14v-7"></path>
+            </svg>
+            Live Demo
+          </a>
+          <img src="img/portfolio/guinea-pig-beans.png" alt="Screenshot of the Guinea Pig Beans Phaser game">
+          <p>Guinea Pig Beans is a cozy Phaser and TypeScript management game built around autonomous pig behavior, cage-care feedback, contract goals, upgrade choices, tech-tree progression, and persistent browser play.</p>
+          <button class="button button-primary" type="button" data-modal-close>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m6 6 12 12M18 6 6 18"></path>
+            </svg>
+            Close Project
+          </button>
+        </div>
+      </div>
+    </div>
 
     <div class="modal" id="portfolio-modal-8" role="dialog" aria-modal="true" aria-labelledby="portfolio-modal-8-title" hidden>
       <div class="modal-dialog" role="document">
