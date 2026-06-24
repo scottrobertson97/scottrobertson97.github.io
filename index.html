@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Portfolio for Scott Robertson, a software developer focused on JavaScript/ES6, React, Node.js, C#/.NET, SQL, APIs, and interactive web applications.">
+    <meta name="description" content="Portfolio for Scott Robertson, a software developer building practical web apps, interactive browser experiences, APIs, and polished user interfaces with JavaScript, React, Node.js, C#/.NET, and SQL.">
     <meta name="keywords" content="Scott Robertson, Software Developer, JavaScript/ES6, React, Node.js, C#/.NET, ASP.NET MVC, SQL, APIs, web applications">
     <meta name="author" content="Scott Robertson">
 
@@ -25,8 +25,8 @@
           </svg>
         </button>
         <nav class="site-nav" id="site-nav" aria-label="Primary navigation" hidden>
-          <a href="#portfolio">Portfolio</a>
           <a href="#about">About</a>
+          <a href="#portfolio">Portfolio</a>
           <a href="#contact">Contact</a>
           <a href="Scott Robertson Software Developer Resume.pdf" target="_blank" rel="noopener">Resume</a>
         </nav>
@@ -39,7 +39,7 @@
           <div class="hero-content">
             <p class="eyebrow">Software Developer</p>
             <h1 id="hero-title">Scott Robertson</h1>
-            <p class="hero-copy">Hire me to build JavaScript/ES6 web apps, React and Node.js features, C#/.NET interfaces, APIs, and maintainable user experiences with clear behavior and practical code.</p>
+            <p class="hero-copy">I build clean, practical software for the web: React interfaces, Node.js APIs, C#/.NET applications, and interactive browser experiences that feel clear, responsive, and maintainable.</p>
             <div class="hero-actions">
               <a class="button button-light" href="#portfolio">View Work</a>
               <a class="button button-outline" href="Scott Robertson Software Developer Resume.pdf" target="_blank" rel="noopener">
@@ -97,10 +97,20 @@
         </div>
       </section>
 
+      <section class="about-section" id="about" aria-labelledby="about-title">
+        <div class="site-container">
+          <h2 id="about-title">About</h2>
+          <div class="about-grid">
+            <p>I am a software developer and Rochester Institute of Technology graduate who enjoys turning fuzzy product ideas into dependable, usable web experiences. I like work where the details matter: the way a dashboard explains itself, the way a game loop responds, or the way an API keeps an app predictable.</p>
+            <p>My projects span React and TypeScript apps, Node.js services, C#/.NET and ASP.NET MVC work, SQL-backed data flows, local-first tools, and browser games. Across all of it, I focus on building software that is easy to understand, easy to use, and ready to grow.</p>
+          </div>
+        </div>
+      </section>
+
       <section class="portfolio-section" id="portfolio" aria-labelledby="portfolio-title">
         <div class="site-container">
           <h2 id="portfolio-title">Portfolio</h2>
-          <p class="section-intro">Selected web apps and interactive projects built with JavaScript/ES6, React, Node.js APIs, canvas, and database-backed services.</p>
+          <p class="section-intro">A selection of web apps, local-first tools, games, and API-backed projects built with JavaScript, React, TypeScript, Node.js, canvas, and modern browser storage.</p>
 
           <div class="project-grid">
             <article class="project-card">
@@ -117,8 +127,8 @@
                   <span><strong>Status</strong> Live</span>
                   <span><strong>Access</strong> Demo</span>
                 </div>
-                <p class="project-summary">Mobile-first quitting companion for nicotine pouches with craving delay, pouch logging, daily limit tracking, insights, and local persistence.</p>
-                <p class="project-detail">Pouchless is a Vite, React, and TypeScript PWA built with Tailwind, Zustand, and Dexie/IndexedDB. It provides installable, local-first habit support with calm, non-judgmental flows for cravings, logs, plans, insights, and journaling.</p>
+                <p class="project-summary">Mobile-first quit companion that helps people slow cravings, track pouches, set daily limits, and notice progress over time.</p>
+                <p class="project-detail">Pouchless is an installable React and TypeScript PWA with local-first persistence through Dexie and IndexedDB. The experience keeps habit support calm and usable, with lightweight flows for cravings, logs, plans, insights, and journaling.</p>
                 <div class="tag-list">
                   <span>React</span>
                   <span>TypeScript</span>
@@ -147,8 +157,8 @@
                   <span><strong>Status</strong> Live</span>
                   <span><strong>Access</strong> Demo</span>
                 </div>
-                <p class="project-summary">React and TypeScript personal finance tracker with local SQLite-backed persistence, dashboard summaries, transactions, accounts, categories, and import/export.</p>
-                <p class="project-detail">Financial Tracker is a Vite, React, and TypeScript personal finance app with SQL.js and SQLite-backed local persistence. It supports dashboard summaries, transaction workflows, account and category management, import/export tools, and an optional Tauri desktop shell.</p>
+                <p class="project-summary">Personal finance tracker with local SQLite persistence, dashboard summaries, transaction workflows, accounts, categories, and import/export.</p>
+                <p class="project-detail">This version of Financial Tracker uses React, TypeScript, SQL.js, and SQLite-backed local storage to keep data private and portable. It supports everyday finance workflows in the browser, with an optional Tauri shell for desktop use.</p>
                 <div class="tag-list">
                   <span>React</span>
                   <span>TypeScript</span>
@@ -177,8 +187,8 @@
                   <span><strong>Status</strong> Live</span>
                   <span><strong>Access</strong> Demo</span>
                 </div>
-                <p class="project-summary">Cozy Phaser management game with autonomous pigs, contract goals, cage-care systems, upgrades, tech-tree progression, and persistent play.</p>
-                <p class="project-detail">Guinea Pig Beans is a cozy Phaser and TypeScript management game built around autonomous pig behavior, cage-care feedback, contract goals, upgrade choices, tech-tree progression, and persistent browser play.</p>
+                <p class="project-summary">Cozy Phaser management game about caring for autonomous pigs, fulfilling contracts, improving the cage, and growing through persistent progression.</p>
+                <p class="project-detail">Guinea Pig Beans combines autonomous character behavior, cage-care feedback, contract goals, upgrade choices, and tech-tree progression into a friendly browser management loop built with Phaser and TypeScript.</p>
                 <div class="tag-list">
                   <span>Phaser</span>
                   <span>TypeScript</span>
@@ -207,8 +217,8 @@
                   <span><strong>Status</strong> Live</span>
                   <span><strong>Access</strong> Demo</span>
                 </div>
-                <p class="project-summary">Canvas survival game with enemy wave scaling, auto-targeting combat, upgrade choices, resource drops, and persistent progression.</p>
-                <p class="project-detail">Arcane Exterminator manages escalating enemy waves, auto-target selection, combat resolution, pickup resources, and upgrade state inside a canvas-based survival loop. It adds replay depth through shards and permanent bonuses that carry across runs.</p>
+                <p class="project-summary">Canvas survival game with escalating enemy waves, auto-targeting combat, upgrade choices, resource drops, and persistent progression.</p>
+                <p class="project-detail">Arcane Exterminator turns a tight canvas game loop into a repeatable progression system, balancing enemy pressure, pickup timing, upgrade state, shards, and permanent bonuses across runs.</p>
                 <div class="tag-list">
                   <span>JavaScript</span>
                   <span>Canvas</span>
@@ -237,8 +247,8 @@
                   <span><strong>Status</strong> Live</span>
                   <span><strong>Access</strong> Demo</span>
                 </div>
-                <p class="project-summary">Canvas arcade shooter with real-time input, enemy wave behavior, collision handling, scoring, and restartable browser gameplay.</p>
-                <p class="project-detail">Shape Invaders implements a browser game loop around canvas drawing, keyboard movement, projectile updates, enemy dive patterns, collision checks, and score state. The project focuses on responsive arcade feedback without relying on a game framework.</p>
+                <p class="project-summary">Canvas arcade shooter with responsive input, enemy wave behavior, collision handling, scoring, and quick restartable play.</p>
+                <p class="project-detail">Shape Invaders uses plain JavaScript to handle drawing, keyboard movement, projectile updates, enemy patterns, collisions, and score state. The project focuses on snappy browser arcade feedback without a game framework.</p>
                 <div class="tag-list">
                   <span>JavaScript</span>
                   <span>Canvas</span>
@@ -267,8 +277,8 @@
                   <span><strong>Status</strong> Live</span>
                   <span><strong>Access</strong> Demo</span>
                 </div>
-                <p class="project-summary">Pure JavaScript raycasting demo that renders first-person movement and wall projection through canvas math and keyboard input.</p>
-                <p class="project-detail">RayCaster Game builds a first-person browser view with pure JavaScript raycasting instead of a 3D engine. Keyboard input updates player position and direction, while canvas rendering projects wall distances into a navigable scene.</p>
+                <p class="project-summary">Pure JavaScript raycasting demo that renders first-person movement and wall projection with canvas math and keyboard input.</p>
+                <p class="project-detail">RayCaster Game creates a first-person browser view without a 3D engine. Player movement, direction, distance checks, and wall projection all run through JavaScript and canvas rendering.</p>
                 <div class="tag-list">
                   <span>JavaScript</span>
                   <span>Canvas</span>
@@ -298,7 +308,7 @@
                   <span><strong>Access</strong> Code</span>
                 </div>
                 <p class="project-summary">React finance dashboard with authenticated accounts, transaction entry, charted summaries, MongoDB storage, and Redis-backed sessions.</p>
-                <p class="project-detail">Financial Tracker uses React and a Node.js API to manage authenticated dashboard views, transaction entry, and visual summaries for user accounts. MongoDB stores finance records while Redis supports token and session handling for the application flow.</p>
+                <p class="project-detail">This earlier Financial Tracker pairs a React front end with a Node.js API for account-based dashboards, transaction entry, and visual summaries. MongoDB stores finance records while Redis supports token and session handling.</p>
                 <div class="tag-list">
                   <span>React</span>
                   <span>MongoDB</span>
@@ -328,7 +338,7 @@
                   <span><strong>Access</strong> Code</span>
                 </div>
                 <p class="project-summary">Recipe web app with authenticated submissions, searchable drink records, API endpoints, and MongoDB-backed persistence.</p>
-                <p class="project-detail">Scott's Drink Recipes pairs a web interface with API routes for creating accounts, submitting recipes, storing records in MongoDB, and searching by main ingredient or spirit. The project demonstrates authenticated CRUD-style data flow around user-generated content.</p>
+                <p class="project-detail">Scott's Drink Recipes supports account creation, recipe submission, MongoDB-backed storage, and search by main ingredient or spirit. The project centers on authenticated CRUD flows for user-generated content.</p>
                 <div class="tag-list">
                   <span>API</span>
                   <span>MongoDB</span>
@@ -358,7 +368,7 @@
                   <span><strong>Access</strong> Code</span>
                 </div>
                 <p class="project-summary">Location-aware activity finder that combines ZIP input, weather data, Google Maps results, and open-place filtering.</p>
-                <p class="project-detail">SomethingToDoRightNow combines ZIP-based location input, weather API data, and Google Maps API place results to recommend nearby activities. The app solves the filtering problem by matching current conditions with places that are open and practical to visit.</p>
+                <p class="project-detail">SomethingToDoRightNow turns a simple question into a practical recommendation: what can I do nearby right now? It combines location input, weather API data, and Google Maps results to surface open places that fit current conditions.</p>
                 <div class="tag-list">
                   <span>APIs</span>
                   <span>Maps</span>
@@ -387,8 +397,8 @@
                   <span><strong>Status</strong> Live</span>
                   <span><strong>Access</strong> Demo</span>
                 </div>
-                <p class="project-summary">JavaScript audio visualizer with user-adjustable playback controls and canvas-rendered graphics driven by live audio state.</p>
-                <p class="project-detail">Audio Visualizer connects playback controls to canvas-rendered visual output so UI changes affect the audio experience and the live graphics together. The implementation emphasizes real-time rendering, event-driven controls, and clear browser-based interaction.</p>
+                <p class="project-summary">JavaScript audio visualizer with adjustable playback controls and canvas graphics driven by live audio state.</p>
+                <p class="project-detail">Audio Visualizer connects user controls, audio playback, and canvas rendering so changes in the interface are reflected immediately in the sound and visuals. The implementation emphasizes real-time feedback and clear browser interaction.</p>
                 <div class="tag-list">
                   <span>JavaScript</span>
                   <span>Canvas</span>
@@ -417,8 +427,8 @@
                   <span><strong>Status</strong> Live</span>
                   <span><strong>Access</strong> Demo</span>
                 </div>
-                <p class="project-summary">Modular JavaScript shooter with canvas rendering, player controls, projectile updates, enemy interactions, and game-loop structure.</p>
-                <p class="project-detail">Space Blaster separates player input, projectile updates, enemy behavior, and drawing into modular JavaScript responsibilities. Canvas rendering and a repeated update loop keep the gameplay responsive while making the code easier to extend.</p>
+                <p class="project-summary">Modular JavaScript shooter with canvas rendering, player controls, projectile updates, enemy interactions, and a clean game-loop structure.</p>
+                <p class="project-detail">Space Blaster separates input, projectile updates, enemy behavior, and drawing into focused JavaScript modules. The canvas loop keeps the action responsive while leaving the code approachable for new mechanics.</p>
                 <div class="tag-list">
                   <span>JavaScript</span>
                   <span>Canvas</span>
@@ -436,20 +446,10 @@
         </div>
       </section>
 
-      <section class="about-section" id="about" aria-labelledby="about-title">
-        <div class="site-container">
-          <h2 id="about-title">About</h2>
-          <div class="about-grid">
-            <p>I am a software developer and Rochester Institute of Technology graduate focused on software development roles building user-facing web applications, internal tools, browser experiences, and API-backed products.</p>
-            <p>My experience spans front-end and back-end web development, including React and Node.js projects, C#/.NET and ASP.NET MVC application work, SQL-backed data flows, and interactive applications that use maps, visualizations, and practical UI behavior.</p>
-          </div>
-        </div>
-      </section>
-
       <section class="contact-section" id="contact" aria-labelledby="contact-title">
         <div class="site-container">
           <h2 id="contact-title">Contact</h2>
-          <p class="section-intro">Find my code and professional profile here.</p>
+          <p class="section-intro">A few good places to see more of my work or get in touch.</p>
           <div class="link-panel">
             <a class="contact-link" href="https://github.com/scottrobertson97" target="_blank" rel="noopener">
               <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
