@@ -4,8 +4,6 @@
   var nav = document.getElementById("site-nav");
   var menuToggle = document.querySelector(".menu-toggle");
   var scrollTopButton = document.querySelector(".scroll-top");
-  var lastFocusedElement = null;
-  var activeModal = null;
   var desktopQuery = window.matchMedia("(min-width: 768px)");
 
   function setMenuState(isOpen) {
@@ -33,76 +31,6 @@
     setMenuState(menuToggle && menuToggle.getAttribute("aria-expanded") === "true");
   }
 
-  function focusableElements(container) {
-    return Array.prototype.slice.call(
-      container.querySelectorAll("a[href], button:not([disabled]), [tabindex]:not([tabindex='-1'])")
-    );
-  }
-
-  function closeModal() {
-    if (!activeModal) {
-      return;
-    }
-
-    activeModal.hidden = true;
-    document.body.classList.remove("modal-open");
-    activeModal = null;
-
-    if (lastFocusedElement) {
-      lastFocusedElement.focus();
-      lastFocusedElement = null;
-    }
-  }
-
-  function openModal(modalId, opener) {
-    var modal = document.getElementById(modalId);
-    if (!modal) {
-      return;
-    }
-
-    lastFocusedElement = opener;
-    activeModal = modal;
-    modal.hidden = false;
-    document.body.classList.add("modal-open");
-
-    var focusTargets = focusableElements(modal);
-    if (focusTargets.length) {
-      focusTargets[0].focus();
-    }
-  }
-
-  function handleModalKeydown(event) {
-    if (!activeModal) {
-      return;
-    }
-
-    if (event.key === "Escape") {
-      closeModal();
-      return;
-    }
-
-    if (event.key !== "Tab") {
-      return;
-    }
-
-    var focusTargets = focusableElements(activeModal);
-    if (!focusTargets.length) {
-      event.preventDefault();
-      return;
-    }
-
-    var firstTarget = focusTargets[0];
-    var lastTarget = focusTargets[focusTargets.length - 1];
-
-    if (event.shiftKey && document.activeElement === firstTarget) {
-      event.preventDefault();
-      lastTarget.focus();
-    } else if (!event.shiftKey && document.activeElement === lastTarget) {
-      event.preventDefault();
-      firstTarget.focus();
-    }
-  }
-
   function updateScrollTopButton() {
     if (!scrollTopButton) {
       return;
@@ -125,25 +53,6 @@
       }
     });
   }
-
-  document.addEventListener("click", function (event) {
-    var opener = event.target.closest("[data-modal-target]");
-    if (opener) {
-      openModal(opener.getAttribute("data-modal-target"), opener);
-      return;
-    }
-
-    if (event.target.closest("[data-modal-close]")) {
-      closeModal();
-      return;
-    }
-
-    if (activeModal && event.target === activeModal) {
-      closeModal();
-    }
-  });
-
-  document.addEventListener("keydown", handleModalKeydown);
 
   if (scrollTopButton) {
     scrollTopButton.addEventListener("click", function () {
