@@ -498,6 +498,66 @@ section {
   line-height: 1.72;
 }
 
+.blog-section {
+  background: var(--accent-soft);
+}
+
+.blog-feature {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 2rem;
+  max-width: 920px;
+  margin: 2rem auto 0;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--accent);
+  border-radius: 0.45rem;
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.blog-label {
+  margin: 0 0 0.75rem;
+  color: var(--contrast);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.blog-copy h3 {
+  margin-bottom: 1rem;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.8rem, 3.2vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.blog-copy > p:last-child {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.65;
+}
+
+.blog-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.blog-subscribe {
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.blog-actions a:focus-visible {
+  outline: 3px solid var(--accent-dark);
+  outline-offset: 4px;
+}
+
 .contact-section {
   background: var(--surface-warm);
 }
@@ -611,8 +671,13 @@ section {
   }
 
   .project-grid,
-  .about-grid {
+  .about-grid,
+  .blog-feature {
     grid-template-columns: 1fr;
+  }
+
+  .blog-actions {
+    align-items: flex-start;
   }
 
   .about-grid {
