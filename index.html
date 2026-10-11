@@ -110,10 +110,10 @@
 
       <section class="portfolio-section" id="portfolio" aria-labelledby="portfolio-title">
         <div class="site-container">
-          <h2 id="portfolio-title">Portfolio</h2>
-          <p class="section-intro">A selection of web apps, local-first tools, games, and API-backed projects built with JavaScript, React, TypeScript, Node.js, canvas, and modern browser storage.</p>
+          <h2 id="portfolio-title">Recent projects</h2>
+          <p class="section-intro">The latest web apps, tools, and games I've been building. Explore a recent project below, or show more to browse the rest.</p>
 
-          <div class="project-grid">
+          <div class="project-grid project-grid-recent">
             <article class="project-card">
               <div class="portfolio-image">
                 <img src="img/portfolio/daymark.png" alt="Screenshot of the Daymark browser-local symptom journal">
@@ -204,336 +204,349 @@
               </div>
             </article>
 
-            <article class="project-card">
-              <div class="portfolio-image">
-                <img src="img/portfolio/pouchless.png" alt="Screenshot of the Pouchless quit nicotine pouches app dashboard">
-              </div>
-              <div class="project-body">
-                <div class="project-heading">
-                  <h3 class="project-title">Pouchless</h3>
-                  <span class="project-year">2026</span>
-                </div>
-                <div class="project-meta" aria-label="Project metadata">
-                  <span><strong>Type</strong> Local-first PWA</span>
-                  <span><strong>Status</strong> Live</span>
-                  <span><strong>Access</strong> Demo</span>
-                </div>
-                <p class="project-summary">Mobile-first quit companion that helps people slow cravings, track pouches, set daily limits, and notice progress over time.</p>
-                <p class="project-detail">Pouchless is an installable React and TypeScript PWA with local-first persistence through Dexie and IndexedDB. The experience keeps habit support calm and usable, with lightweight flows for cravings, logs, plans, insights, and journaling.</p>
-                <div class="tag-list">
-                  <span>React</span>
-                  <span>TypeScript</span>
-                  <span>PWA</span>
-                </div>
-                <a class="button button-primary project-action" href="https://scottrobertson.net/quit-zyn/" target="_blank" rel="noopener">
-                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M14 3h7v7m0-7L10 14M5 7v14h14v-7"></path>
-                  </svg>
-                  Live Demo
-                </a>
-              </div>
-            </article>
-
-            <article class="project-card">
-              <div class="portfolio-image">
-                <img src="img/portfolio/financial-tracker.png" alt="Screenshot of the local-first Financial Tracker app dashboard">
-              </div>
-              <div class="project-body">
-                <div class="project-heading">
-                  <h3 class="project-title">Financial Tracker</h3>
-                  <span class="project-year">2026</span>
-                </div>
-                <div class="project-meta" aria-label="Project metadata">
-                  <span><strong>Type</strong> Local-first app</span>
-                  <span><strong>Status</strong> Live</span>
-                  <span><strong>Access</strong> Demo</span>
-                </div>
-                <p class="project-summary">Personal finance tracker with local SQLite persistence, dashboard summaries, transaction workflows, accounts, categories, and import/export.</p>
-                <p class="project-detail">This version of Financial Tracker uses React, TypeScript, SQL.js, and SQLite-backed local storage to keep data private and portable. It supports everyday finance workflows in the browser, with an optional Tauri shell for desktop use.</p>
-                <div class="tag-list">
-                  <span>React</span>
-                  <span>TypeScript</span>
-                  <span>SQLite</span>
-                </div>
-                <a class="button button-primary project-action" href="https://scottrobertson.net/financial-tracker/" target="_blank" rel="noopener">
-                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M14 3h7v7m0-7L10 14M5 7v14h14v-7"></path>
-                  </svg>
-                  Live Demo
-                </a>
-              </div>
-            </article>
-
-            <article class="project-card">
-              <div class="portfolio-image">
-                <img src="img/portfolio/guinea-pig-beans.png" alt="Screenshot of the Guinea Pig Beans Phaser game">
-              </div>
-              <div class="project-body">
-                <div class="project-heading">
-                  <h3 class="project-title">Guinea Pig Beans</h3>
-                  <span class="project-year">2026</span>
-                </div>
-                <div class="project-meta" aria-label="Project metadata">
-                  <span><strong>Type</strong> Phaser game</span>
-                  <span><strong>Status</strong> Live</span>
-                  <span><strong>Access</strong> Demo</span>
-                </div>
-                <p class="project-summary">Cozy Phaser management game about caring for autonomous pigs, fulfilling contracts, improving the cage, and growing through persistent progression.</p>
-                <p class="project-detail">Guinea Pig Beans combines autonomous character behavior, cage-care feedback, contract goals, upgrade choices, and tech-tree progression into a friendly browser management loop built with Phaser and TypeScript.</p>
-                <div class="tag-list">
-                  <span>Phaser</span>
-                  <span>TypeScript</span>
-                  <span>Game Dev</span>
-                </div>
-                <a class="button button-primary project-action" href="https://scottrobertson.net/guinea-pig-beans/" target="_blank" rel="noopener">
-                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M14 3h7v7m0-7L10 14M5 7v14h14v-7"></path>
-                  </svg>
-                  Live Demo
-                </a>
-              </div>
-            </article>
-
-            <article class="project-card">
-              <div class="portfolio-image">
-                <img src="img/portfolio/arcane-exterminator.png" alt="Screenshot of the Arcane Exterminator browser game">
-              </div>
-              <div class="project-body">
-                <div class="project-heading">
-                  <h3 class="project-title">Arcane Exterminator</h3>
-                  <span class="project-year">2026</span>
-                </div>
-                <div class="project-meta" aria-label="Project metadata">
-                  <span><strong>Type</strong> Canvas game</span>
-                  <span><strong>Status</strong> Live</span>
-                  <span><strong>Access</strong> Demo</span>
-                </div>
-                <p class="project-summary">Canvas survival game with escalating enemy waves, auto-targeting combat, upgrade choices, resource drops, and persistent progression.</p>
-                <p class="project-detail">Arcane Exterminator turns a tight canvas game loop into a repeatable progression system, balancing enemy pressure, pickup timing, upgrade state, shards, and permanent bonuses across runs.</p>
-                <div class="tag-list">
-                  <span>JavaScript</span>
-                  <span>Canvas</span>
-                  <span>Game Dev</span>
-                </div>
-                <a class="button button-primary project-action" href="https://scottrobertson.net/arcane-exterminator/" target="_blank" rel="noopener">
-                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M14 3h7v7m0-7L10 14M5 7v14h14v-7"></path>
-                  </svg>
-                  Live Demo
-                </a>
-              </div>
-            </article>
-
-            <article class="project-card">
-              <div class="portfolio-image">
-                <img src="img/portfolio/shape-invaders.png" alt="Screenshot of the Shape Invaders browser game">
-              </div>
-              <div class="project-body">
-                <div class="project-heading">
-                  <h3 class="project-title">Shape Invaders</h3>
-                  <span class="project-year">2026</span>
-                </div>
-                <div class="project-meta" aria-label="Project metadata">
-                  <span><strong>Type</strong> Canvas game</span>
-                  <span><strong>Status</strong> Live</span>
-                  <span><strong>Access</strong> Demo</span>
-                </div>
-                <p class="project-summary">Canvas arcade shooter with responsive input, enemy wave behavior, collision handling, scoring, and quick restartable play.</p>
-                <p class="project-detail">Shape Invaders uses plain JavaScript to handle drawing, keyboard movement, projectile updates, enemy patterns, collisions, and score state. The project focuses on snappy browser arcade feedback without a game framework.</p>
-                <div class="tag-list">
-                  <span>JavaScript</span>
-                  <span>Canvas</span>
-                  <span>Game Dev</span>
-                </div>
-                <a class="button button-primary project-action" href="https://scottrobertson.net/shape-invaders/" target="_blank" rel="noopener">
-                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M14 3h7v7m0-7L10 14M5 7v14h14v-7"></path>
-                  </svg>
-                  Live Demo
-                </a>
-              </div>
-            </article>
-
-            <article class="project-card">
-              <div class="portfolio-image">
-                <img src="img/portfolio/raycaster.png" alt="Screenshot of the RayCaster browser game">
-              </div>
-              <div class="project-body">
-                <div class="project-heading">
-                  <h3 class="project-title">RayCaster Game</h3>
-                  <span class="project-year">2020</span>
-                </div>
-                <div class="project-meta" aria-label="Project metadata">
-                  <span><strong>Type</strong> Canvas demo</span>
-                  <span><strong>Status</strong> Live</span>
-                  <span><strong>Access</strong> Demo</span>
-                </div>
-                <p class="project-summary">Pure JavaScript raycasting demo that renders first-person movement and wall projection with canvas math and keyboard input.</p>
-                <p class="project-detail">RayCaster Game creates a first-person browser view without a 3D engine. Player movement, direction, distance checks, and wall projection all run through JavaScript and canvas rendering.</p>
-                <div class="tag-list">
-                  <span>JavaScript</span>
-                  <span>Canvas</span>
-                  <span>Game Dev</span>
-                </div>
-                <a class="button button-primary project-action" href="https://scottrobertson.net/RayCaster/" target="_blank" rel="noopener">
-                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M14 3h7v7m0-7L10 14M5 7v14h14v-7"></path>
-                  </svg>
-                  Live Demo
-                </a>
-              </div>
-            </article>
-
-            <article class="project-card">
-              <div class="portfolio-image">
-                <img src="img/portfolio/financialtracker.png" alt="Screenshot of the Financial Tracker dashboard">
-              </div>
-              <div class="project-body">
-                <div class="project-heading">
-                  <h3 class="project-title">Financial Tracker</h3>
-                  <span class="project-year">2018</span>
-                </div>
-                <div class="project-meta" aria-label="Project metadata">
-                  <span><strong>Type</strong> Full-stack app</span>
-                  <span><strong>Status</strong> Archived</span>
-                  <span><strong>Access</strong> Code</span>
-                </div>
-                <p class="project-summary">React finance dashboard with authenticated accounts, transaction entry, charted summaries, MongoDB storage, and Redis-backed sessions.</p>
-                <p class="project-detail">This earlier Financial Tracker pairs a React front end with a Node.js API for account-based dashboards, transaction entry, and visual summaries. MongoDB stores finance records while Redis supports token and session handling.</p>
-                <div class="tag-list">
-                  <span>React</span>
-                  <span>MongoDB</span>
-                  <span>Redis</span>
-                </div>
-                <a class="button button-primary project-action" href="https://github.com/scottrobertson97/430-project3-react" target="_blank" rel="noopener">
-                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M14 3h7v7m0-7L10 14M5 7v14h14v-7"></path>
-                  </svg>
-                  View Code
-                </a>
-              </div>
-            </article>
-
-            <article class="project-card">
-              <div class="portfolio-image">
-                <img src="img/portfolio/drinkrecipes.png" alt="Screenshot of Scott's Drink Recipes web app">
-              </div>
-              <div class="project-body">
-                <div class="project-heading">
-                  <h3 class="project-title">Drink Recipes</h3>
-                  <span class="project-year">2018</span>
-                </div>
-                <div class="project-meta" aria-label="Project metadata">
-                  <span><strong>Type</strong> API app</span>
-                  <span><strong>Status</strong> Archived</span>
-                  <span><strong>Access</strong> Code</span>
-                </div>
-                <p class="project-summary">Recipe web app with authenticated submissions, searchable drink records, API endpoints, and MongoDB-backed persistence.</p>
-                <p class="project-detail">Scott's Drink Recipes supports account creation, recipe submission, MongoDB-backed storage, and search by main ingredient or spirit. The project centers on authenticated CRUD flows for user-generated content.</p>
-                <div class="tag-list">
-                  <span>API</span>
-                  <span>MongoDB</span>
-                  <span>Auth</span>
-                </div>
-                <a class="button button-primary project-action" href="https://github.com/scottrobertson97/430-project1-api" target="_blank" rel="noopener">
-                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M14 3h7v7m0-7L10 14M5 7v14h14v-7"></path>
-                  </svg>
-                  View Code
-                </a>
-              </div>
-            </article>
-
-            <article class="project-card">
-              <div class="portfolio-image">
-                <img src="img/portfolio/somethingtodorightnow.png" alt="Screenshot of the SomethingToDoRightNow map app">
-              </div>
-              <div class="project-body">
-                <div class="project-heading">
-                  <h3 class="project-title">SomethingToDoRightNow</h3>
-                  <span class="project-year">2018</span>
-                </div>
-                <div class="project-meta" aria-label="Project metadata">
-                  <span><strong>Type</strong> Location app</span>
-                  <span><strong>Status</strong> Archived</span>
-                  <span><strong>Access</strong> Code</span>
-                </div>
-                <p class="project-summary">Location-aware activity finder that combines ZIP input, weather data, Google Maps results, and open-place filtering.</p>
-                <p class="project-detail">SomethingToDoRightNow turns a simple question into a practical recommendation: what can I do nearby right now? It combines location input, weather API data, and Google Maps results to surface open places that fit current conditions.</p>
-                <div class="tag-list">
-                  <span>APIs</span>
-                  <span>Maps</span>
-                  <span>JavaScript</span>
-                </div>
-                <a class="button button-primary project-action" href="https://github.com/scottrobertson97/SomethingToDoRightNow" target="_blank" rel="noopener">
-                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M14 3h7v7m0-7L10 14M5 7v14h14v-7"></path>
-                  </svg>
-                  View Code
-                </a>
-              </div>
-            </article>
-
-            <article class="project-card">
-              <div class="portfolio-image">
-                <img src="img/portfolio/audiovisualizerscreen.png" alt="Screenshot of the Audio Visualizer canvas">
-              </div>
-              <div class="project-body">
-                <div class="project-heading">
-                  <h3 class="project-title">Audio Visualizer</h3>
-                  <span class="project-year">2018</span>
-                </div>
-                <div class="project-meta" aria-label="Project metadata">
-                  <span><strong>Type</strong> Canvas demo</span>
-                  <span><strong>Status</strong> Live</span>
-                  <span><strong>Access</strong> Demo</span>
-                </div>
-                <p class="project-summary">JavaScript audio visualizer with adjustable playback controls and canvas graphics driven by live audio state.</p>
-                <p class="project-detail">Audio Visualizer connects user controls, audio playback, and canvas rendering so changes in the interface are reflected immediately in the sound and visuals. The implementation emphasizes real-time feedback and clear browser interaction.</p>
-                <div class="tag-list">
-                  <span>JavaScript</span>
-                  <span>Canvas</span>
-                  <span>Audio</span>
-                </div>
-                <a class="button button-primary project-action" href="https://scottrobertson.net/AudioVisualizer/" target="_blank" rel="noopener">
-                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M14 3h7v7m0-7L10 14M5 7v14h14v-7"></path>
-                  </svg>
-                  Live Demo
-                </a>
-              </div>
-            </article>
-
-            <article class="project-card">
-              <div class="portfolio-image">
-                <img src="img/portfolio/spaceblaster.png" alt="Screenshot of the Space Blaster game">
-              </div>
-              <div class="project-body">
-                <div class="project-heading">
-                  <h3 class="project-title">Space Blaster</h3>
-                  <span class="project-year">2018</span>
-                </div>
-                <div class="project-meta" aria-label="Project metadata">
-                  <span><strong>Type</strong> Canvas game</span>
-                  <span><strong>Status</strong> Live</span>
-                  <span><strong>Access</strong> Demo</span>
-                </div>
-                <p class="project-summary">Modular JavaScript shooter with canvas rendering, player controls, projectile updates, enemy interactions, and a clean game-loop structure.</p>
-                <p class="project-detail">Space Blaster separates input, projectile updates, enemy behavior, and drawing into focused JavaScript modules. The canvas loop keeps the action responsive while leaving the code approachable for new mechanics.</p>
-                <div class="tag-list">
-                  <span>JavaScript</span>
-                  <span>Canvas</span>
-                  <span>Game Dev</span>
-                </div>
-                <a class="button button-primary project-action" href="https://scottrobertson.net/space-blaster/" target="_blank" rel="noopener">
-                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M14 3h7v7m0-7L10 14M5 7v14h14v-7"></path>
-                  </svg>
-                  Live Demo
-                </a>
-              </div>
-            </article>
           </div>
+
+          <details class="project-archive">
+            <summary class="project-toggle">
+              <span class="projects-show-more">Show more projects</span>
+              <span class="projects-show-less">Show fewer projects</span>
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m6 9 6 6 6-6"></path>
+              </svg>
+            </summary>
+            <h3 class="project-archive-title" id="more-projects-title">More projects</h3>
+            <div class="project-grid" aria-labelledby="more-projects-title">
+              <article class="project-card">
+                <div class="portfolio-image">
+                  <img src="img/portfolio/pouchless.png" alt="Screenshot of the Pouchless quit nicotine pouches app dashboard" loading="lazy">
+                </div>
+                <div class="project-body">
+                  <div class="project-heading">
+                    <h3 class="project-title">Pouchless</h3>
+                    <span class="project-year">2026</span>
+                  </div>
+                  <div class="project-meta" aria-label="Project metadata">
+                    <span><strong>Type</strong> Local-first PWA</span>
+                    <span><strong>Status</strong> Live</span>
+                    <span><strong>Access</strong> Demo</span>
+                  </div>
+                  <p class="project-summary">Mobile-first quit companion that helps people slow cravings, track pouches, set daily limits, and notice progress over time.</p>
+                  <p class="project-detail">Pouchless is an installable React and TypeScript PWA with local-first persistence through Dexie and IndexedDB. The experience keeps habit support calm and usable, with lightweight flows for cravings, logs, plans, insights, and journaling.</p>
+                  <div class="tag-list">
+                    <span>React</span>
+                    <span>TypeScript</span>
+                    <span>PWA</span>
+                  </div>
+                  <a class="button button-primary project-action" href="https://scottrobertson.net/quit-zyn/" target="_blank" rel="noopener">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M14 3h7v7m0-7L10 14M5 7v14h14v-7"></path>
+                    </svg>
+                    Live Demo
+                  </a>
+                </div>
+              </article>
+
+              <article class="project-card">
+                <div class="portfolio-image">
+                  <img src="img/portfolio/financial-tracker.png" alt="Screenshot of the local-first Financial Tracker app dashboard" loading="lazy">
+                </div>
+                <div class="project-body">
+                  <div class="project-heading">
+                    <h3 class="project-title">Financial Tracker</h3>
+                    <span class="project-year">2026</span>
+                  </div>
+                  <div class="project-meta" aria-label="Project metadata">
+                    <span><strong>Type</strong> Local-first app</span>
+                    <span><strong>Status</strong> Live</span>
+                    <span><strong>Access</strong> Demo</span>
+                  </div>
+                  <p class="project-summary">Personal finance tracker with local SQLite persistence, dashboard summaries, transaction workflows, accounts, categories, and import/export.</p>
+                  <p class="project-detail">This version of Financial Tracker uses React, TypeScript, SQL.js, and SQLite-backed local storage to keep data private and portable. It supports everyday finance workflows in the browser, with an optional Tauri shell for desktop use.</p>
+                  <div class="tag-list">
+                    <span>React</span>
+                    <span>TypeScript</span>
+                    <span>SQLite</span>
+                  </div>
+                  <a class="button button-primary project-action" href="https://scottrobertson.net/financial-tracker/" target="_blank" rel="noopener">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M14 3h7v7m0-7L10 14M5 7v14h14v-7"></path>
+                    </svg>
+                    Live Demo
+                  </a>
+                </div>
+              </article>
+
+              <article class="project-card">
+                <div class="portfolio-image">
+                  <img src="img/portfolio/guinea-pig-beans.png" alt="Screenshot of the Guinea Pig Beans Phaser game" loading="lazy">
+                </div>
+                <div class="project-body">
+                  <div class="project-heading">
+                    <h3 class="project-title">Guinea Pig Beans</h3>
+                    <span class="project-year">2026</span>
+                  </div>
+                  <div class="project-meta" aria-label="Project metadata">
+                    <span><strong>Type</strong> Phaser game</span>
+                    <span><strong>Status</strong> Live</span>
+                    <span><strong>Access</strong> Demo</span>
+                  </div>
+                  <p class="project-summary">Cozy Phaser management game about caring for autonomous pigs, fulfilling contracts, improving the cage, and growing through persistent progression.</p>
+                  <p class="project-detail">Guinea Pig Beans combines autonomous character behavior, cage-care feedback, contract goals, upgrade choices, and tech-tree progression into a friendly browser management loop built with Phaser and TypeScript.</p>
+                  <div class="tag-list">
+                    <span>Phaser</span>
+                    <span>TypeScript</span>
+                    <span>Game Dev</span>
+                  </div>
+                  <a class="button button-primary project-action" href="https://scottrobertson.net/guinea-pig-beans/" target="_blank" rel="noopener">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M14 3h7v7m0-7L10 14M5 7v14h14v-7"></path>
+                    </svg>
+                    Live Demo
+                  </a>
+                </div>
+              </article>
+
+              <article class="project-card">
+                <div class="portfolio-image">
+                  <img src="img/portfolio/arcane-exterminator.png" alt="Screenshot of the Arcane Exterminator browser game" loading="lazy">
+                </div>
+                <div class="project-body">
+                  <div class="project-heading">
+                    <h3 class="project-title">Arcane Exterminator</h3>
+                    <span class="project-year">2026</span>
+                  </div>
+                  <div class="project-meta" aria-label="Project metadata">
+                    <span><strong>Type</strong> Canvas game</span>
+                    <span><strong>Status</strong> Live</span>
+                    <span><strong>Access</strong> Demo</span>
+                  </div>
+                  <p class="project-summary">Canvas survival game with escalating enemy waves, auto-targeting combat, upgrade choices, resource drops, and persistent progression.</p>
+                  <p class="project-detail">Arcane Exterminator turns a tight canvas game loop into a repeatable progression system, balancing enemy pressure, pickup timing, upgrade state, shards, and permanent bonuses across runs.</p>
+                  <div class="tag-list">
+                    <span>JavaScript</span>
+                    <span>Canvas</span>
+                    <span>Game Dev</span>
+                  </div>
+                  <a class="button button-primary project-action" href="https://scottrobertson.net/arcane-exterminator/" target="_blank" rel="noopener">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M14 3h7v7m0-7L10 14M5 7v14h14v-7"></path>
+                    </svg>
+                    Live Demo
+                  </a>
+                </div>
+              </article>
+
+              <article class="project-card">
+                <div class="portfolio-image">
+                  <img src="img/portfolio/shape-invaders.png" alt="Screenshot of the Shape Invaders browser game" loading="lazy">
+                </div>
+                <div class="project-body">
+                  <div class="project-heading">
+                    <h3 class="project-title">Shape Invaders</h3>
+                    <span class="project-year">2026</span>
+                  </div>
+                  <div class="project-meta" aria-label="Project metadata">
+                    <span><strong>Type</strong> Canvas game</span>
+                    <span><strong>Status</strong> Live</span>
+                    <span><strong>Access</strong> Demo</span>
+                  </div>
+                  <p class="project-summary">Canvas arcade shooter with responsive input, enemy wave behavior, collision handling, scoring, and quick restartable play.</p>
+                  <p class="project-detail">Shape Invaders uses plain JavaScript to handle drawing, keyboard movement, projectile updates, enemy patterns, collisions, and score state. The project focuses on snappy browser arcade feedback without a game framework.</p>
+                  <div class="tag-list">
+                    <span>JavaScript</span>
+                    <span>Canvas</span>
+                    <span>Game Dev</span>
+                  </div>
+                  <a class="button button-primary project-action" href="https://scottrobertson.net/shape-invaders/" target="_blank" rel="noopener">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M14 3h7v7m0-7L10 14M5 7v14h14v-7"></path>
+                    </svg>
+                    Live Demo
+                  </a>
+                </div>
+              </article>
+
+              <article class="project-card">
+                <div class="portfolio-image">
+                  <img src="img/portfolio/raycaster.png" alt="Screenshot of the RayCaster browser game" loading="lazy">
+                </div>
+                <div class="project-body">
+                  <div class="project-heading">
+                    <h3 class="project-title">RayCaster Game</h3>
+                    <span class="project-year">2020</span>
+                  </div>
+                  <div class="project-meta" aria-label="Project metadata">
+                    <span><strong>Type</strong> Canvas demo</span>
+                    <span><strong>Status</strong> Live</span>
+                    <span><strong>Access</strong> Demo</span>
+                  </div>
+                  <p class="project-summary">Pure JavaScript raycasting demo that renders first-person movement and wall projection with canvas math and keyboard input.</p>
+                  <p class="project-detail">RayCaster Game creates a first-person browser view without a 3D engine. Player movement, direction, distance checks, and wall projection all run through JavaScript and canvas rendering.</p>
+                  <div class="tag-list">
+                    <span>JavaScript</span>
+                    <span>Canvas</span>
+                    <span>Game Dev</span>
+                  </div>
+                  <a class="button button-primary project-action" href="https://scottrobertson.net/RayCaster/" target="_blank" rel="noopener">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M14 3h7v7m0-7L10 14M5 7v14h14v-7"></path>
+                    </svg>
+                    Live Demo
+                  </a>
+                </div>
+              </article>
+
+              <article class="project-card">
+                <div class="portfolio-image">
+                  <img src="img/portfolio/financialtracker.png" alt="Screenshot of the Financial Tracker dashboard" loading="lazy">
+                </div>
+                <div class="project-body">
+                  <div class="project-heading">
+                    <h3 class="project-title">Financial Tracker</h3>
+                    <span class="project-year">2018</span>
+                  </div>
+                  <div class="project-meta" aria-label="Project metadata">
+                    <span><strong>Type</strong> Full-stack app</span>
+                    <span><strong>Status</strong> Archived</span>
+                    <span><strong>Access</strong> Code</span>
+                  </div>
+                  <p class="project-summary">React finance dashboard with authenticated accounts, transaction entry, charted summaries, MongoDB storage, and Redis-backed sessions.</p>
+                  <p class="project-detail">This earlier Financial Tracker pairs a React front end with a Node.js API for account-based dashboards, transaction entry, and visual summaries. MongoDB stores finance records while Redis supports token and session handling.</p>
+                  <div class="tag-list">
+                    <span>React</span>
+                    <span>MongoDB</span>
+                    <span>Redis</span>
+                  </div>
+                  <a class="button button-primary project-action" href="https://github.com/scottrobertson97/430-project3-react" target="_blank" rel="noopener">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M14 3h7v7m0-7L10 14M5 7v14h14v-7"></path>
+                    </svg>
+                    View Code
+                  </a>
+                </div>
+              </article>
+
+              <article class="project-card">
+                <div class="portfolio-image">
+                  <img src="img/portfolio/drinkrecipes.png" alt="Screenshot of Scott's Drink Recipes web app" loading="lazy">
+                </div>
+                <div class="project-body">
+                  <div class="project-heading">
+                    <h3 class="project-title">Drink Recipes</h3>
+                    <span class="project-year">2018</span>
+                  </div>
+                  <div class="project-meta" aria-label="Project metadata">
+                    <span><strong>Type</strong> API app</span>
+                    <span><strong>Status</strong> Archived</span>
+                    <span><strong>Access</strong> Code</span>
+                  </div>
+                  <p class="project-summary">Recipe web app with authenticated submissions, searchable drink records, API endpoints, and MongoDB-backed persistence.</p>
+                  <p class="project-detail">Scott's Drink Recipes supports account creation, recipe submission, MongoDB-backed storage, and search by main ingredient or spirit. The project centers on authenticated CRUD flows for user-generated content.</p>
+                  <div class="tag-list">
+                    <span>API</span>
+                    <span>MongoDB</span>
+                    <span>Auth</span>
+                  </div>
+                  <a class="button button-primary project-action" href="https://github.com/scottrobertson97/430-project1-api" target="_blank" rel="noopener">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M14 3h7v7m0-7L10 14M5 7v14h14v-7"></path>
+                    </svg>
+                    View Code
+                  </a>
+                </div>
+              </article>
+
+              <article class="project-card">
+                <div class="portfolio-image">
+                  <img src="img/portfolio/somethingtodorightnow.png" alt="Screenshot of the SomethingToDoRightNow map app" loading="lazy">
+                </div>
+                <div class="project-body">
+                  <div class="project-heading">
+                    <h3 class="project-title">SomethingToDoRightNow</h3>
+                    <span class="project-year">2018</span>
+                  </div>
+                  <div class="project-meta" aria-label="Project metadata">
+                    <span><strong>Type</strong> Location app</span>
+                    <span><strong>Status</strong> Archived</span>
+                    <span><strong>Access</strong> Code</span>
+                  </div>
+                  <p class="project-summary">Location-aware activity finder that combines ZIP input, weather data, Google Maps results, and open-place filtering.</p>
+                  <p class="project-detail">SomethingToDoRightNow turns a simple question into a practical recommendation: what can I do nearby right now? It combines location input, weather API data, and Google Maps results to surface open places that fit current conditions.</p>
+                  <div class="tag-list">
+                    <span>APIs</span>
+                    <span>Maps</span>
+                    <span>JavaScript</span>
+                  </div>
+                  <a class="button button-primary project-action" href="https://github.com/scottrobertson97/SomethingToDoRightNow" target="_blank" rel="noopener">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M14 3h7v7m0-7L10 14M5 7v14h14v-7"></path>
+                    </svg>
+                    View Code
+                  </a>
+                </div>
+              </article>
+
+              <article class="project-card">
+                <div class="portfolio-image">
+                  <img src="img/portfolio/audiovisualizerscreen.png" alt="Screenshot of the Audio Visualizer canvas" loading="lazy">
+                </div>
+                <div class="project-body">
+                  <div class="project-heading">
+                    <h3 class="project-title">Audio Visualizer</h3>
+                    <span class="project-year">2018</span>
+                  </div>
+                  <div class="project-meta" aria-label="Project metadata">
+                    <span><strong>Type</strong> Canvas demo</span>
+                    <span><strong>Status</strong> Live</span>
+                    <span><strong>Access</strong> Demo</span>
+                  </div>
+                  <p class="project-summary">JavaScript audio visualizer with adjustable playback controls and canvas graphics driven by live audio state.</p>
+                  <p class="project-detail">Audio Visualizer connects user controls, audio playback, and canvas rendering so changes in the interface are reflected immediately in the sound and visuals. The implementation emphasizes real-time feedback and clear browser interaction.</p>
+                  <div class="tag-list">
+                    <span>JavaScript</span>
+                    <span>Canvas</span>
+                    <span>Audio</span>
+                  </div>
+                  <a class="button button-primary project-action" href="https://scottrobertson.net/AudioVisualizer/" target="_blank" rel="noopener">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M14 3h7v7m0-7L10 14M5 7v14h14v-7"></path>
+                    </svg>
+                    Live Demo
+                  </a>
+                </div>
+              </article>
+
+              <article class="project-card">
+                <div class="portfolio-image">
+                  <img src="img/portfolio/spaceblaster.png" alt="Screenshot of the Space Blaster game" loading="lazy">
+                </div>
+                <div class="project-body">
+                  <div class="project-heading">
+                    <h3 class="project-title">Space Blaster</h3>
+                    <span class="project-year">2018</span>
+                  </div>
+                  <div class="project-meta" aria-label="Project metadata">
+                    <span><strong>Type</strong> Canvas game</span>
+                    <span><strong>Status</strong> Live</span>
+                    <span><strong>Access</strong> Demo</span>
+                  </div>
+                  <p class="project-summary">Modular JavaScript shooter with canvas rendering, player controls, projectile updates, enemy interactions, and a clean game-loop structure.</p>
+                  <p class="project-detail">Space Blaster separates input, projectile updates, enemy behavior, and drawing into focused JavaScript modules. The canvas loop keeps the action responsive while leaving the code approachable for new mechanics.</p>
+                  <div class="tag-list">
+                    <span>JavaScript</span>
+                    <span>Canvas</span>
+                    <span>Game Dev</span>
+                  </div>
+                  <a class="button button-primary project-action" href="https://scottrobertson.net/space-blaster/" target="_blank" rel="noopener">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M14 3h7v7m0-7L10 14M5 7v14h14v-7"></path>
+                    </svg>
+                    Live Demo
+                  </a>
+                </div>
+              </article>
+            </div>
+          </details>
         </div>
       </section>
 

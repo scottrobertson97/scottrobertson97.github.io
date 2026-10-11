@@ -365,6 +365,66 @@ section {
   box-shadow: 0 20px 42px rgba(31, 41, 51, 0.13);
 }
 
+.project-grid-recent .project-card {
+  border-top: 3px solid var(--accent);
+}
+
+.project-archive {
+  margin-top: 2rem;
+  border-top: 1px solid var(--line);
+  padding-top: 1.75rem;
+}
+
+.project-toggle {
+  display: flex;
+  width: fit-content;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 0 auto;
+  border: 1px solid var(--accent);
+  border-radius: 0.45rem;
+  padding: 0.85rem 1.35rem;
+  background: var(--panel);
+  color: var(--accent-dark);
+  font-weight: 800;
+  text-align: center;
+  list-style: none;
+  cursor: pointer;
+}
+
+.project-toggle::-webkit-details-marker {
+  display: none;
+}
+
+.project-toggle:hover {
+  background: var(--accent-soft);
+}
+
+.project-toggle:focus-visible {
+  outline: 3px solid var(--accent-dark);
+  outline-offset: 4px;
+}
+
+.projects-show-less,
+.project-archive[open] .projects-show-more {
+  display: none;
+}
+
+.project-archive[open] .projects-show-less {
+  display: inline;
+}
+
+.project-archive[open] .project-toggle .icon {
+  transform: rotate(180deg);
+}
+
+.project-archive-title {
+  margin: 2rem 0 1.25rem;
+  font-size: 1.25rem;
+}
+
 .portfolio-image {
   position: relative;
   display: block;
